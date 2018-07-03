@@ -7,7 +7,7 @@
   * @日期       ： 2018年2月28
   * @摘要       ： 延时函数的编写,利用滴答定时器SysTick
   ******************************************************************************/
- 
+
 /* 包含的头文件 --------------------------------------------------------------*/
 #include "delay.h"
 
@@ -24,7 +24,7 @@ static u16 fac_ms = 0;
 void delay_init(u8 SYSCLK)
 {
 	SysTick_CLKSourceConfig(SysTick_CLKSource_HCLK_Div8); //设置滴答定时器的时钟源为AHB的8分频
-	fac_us = SYSCLK/8;  
+	fac_us = SYSCLK / 8;
 }
 
 /************************************************
@@ -35,16 +35,16 @@ void delay_init(u8 SYSCLK)
 *************************************************/
 void delay_us(u32 nus)
 {
-	u32 temp;	    	 
-	SysTick->LOAD=nus*fac_us; 					//时间加载	  		 
-	SysTick->VAL=0x00;        					//清空计数器
-	SysTick->CTRL|=SysTick_CTRL_ENABLE_Msk ;	//开始倒数	  
+	u32 temp;
+	SysTick->LOAD = nus * fac_us; 					//时间加载
+	SysTick->VAL = 0x00;        					//清空计数器
+	SysTick->CTRL |= SysTick_CTRL_ENABLE_Msk ;	//开始倒数
 	do
 	{
-		temp=SysTick->CTRL;
-	}while((temp&0x01)&&!(temp&(1<<16)));		//等待时间到达   
-	SysTick->CTRL&=~SysTick_CTRL_ENABLE_Msk;	//关闭计数器
-	SysTick->VAL =0X00;      					 //清空计数器	 
+		temp = SysTick->CTRL;
+	} while ((temp & 0x01) && !(temp & (1 << 16)));		//等待时间到达
+	SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk;	//关闭计数器
+	SysTick->VAL = 0X00;      					 //清空计数器
 }
 
 /************************************************
@@ -56,17 +56,17 @@ void delay_us(u32 nus)
 			当72M条件下，nms<=1864
 			所以采用分段延时来增大可延时范围
 *************************************************/
-void delay_ms(u32 nms)
+void gd_delay_ms(u32 ms)
 {
-	u8 repeat=nms/1000;
-	u16 remain = nms%1000;
-	while(repeat)
+	u8 repeat = ms / 1000; //得到要延时多少秒
+	u16 remain = ms % 1000;
+	while (repeat)
 	{
-		delay_us(1000);
+		gd_delay_us(1000000); //1s
 		repeat--;
 	}
-	if(remain)
+	if (remain)
 	{
-		delay_us(remain);
+		gd_delay_us(remain * 1000); //延时多少ms
 	}
 }

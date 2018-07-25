@@ -112,7 +112,8 @@
 /* #define SYSCLK_FREQ_36MHz  36000000 */
 /* #define SYSCLK_FREQ_48MHz  48000000 */
 /* #define SYSCLK_FREQ_56MHz  56000000 */
-#define SYSCLK_FREQ_72MHz  72000000
+//#define SYSCLK_FREQ_72MHz  72000000
+#define SYSCLK_FREQ_200MHz 200000000
 #endif
 
 /*!< Uncomment the following line if you need to use external SRAM mounted
@@ -160,6 +161,8 @@
   uint32_t SystemCoreClock         = SYSCLK_FREQ_56MHz;        /*!< System Clock Frequency (Core Clock) */
 #elif defined SYSCLK_FREQ_72MHz
   uint32_t SystemCoreClock         = SYSCLK_FREQ_72MHz;        /*!< System Clock Frequency (Core Clock) */
+#elif defined SYSCLK_FREQ_200MHz
+  uint32_t SystemCoreClock         = SYSCLK_FREQ_200MHz;
 #else /*!< HSI Selected as System Clock source */
   uint32_t SystemCoreClock         = HSI_VALUE;        /*!< System Clock Frequency (Core Clock) */
 #endif
@@ -187,6 +190,8 @@ static void SetSysClock(void);
   static void SetSysClockTo56(void);  
 #elif defined SYSCLK_FREQ_72MHz
   static void SetSysClockTo72(void);
+#elif defined SYSCLK_FREQ_200MHz
+  static void SetSysClockTo200(void);
 #endif
 
 #ifdef DATA_IN_ExtSRAM
@@ -211,6 +216,10 @@ static void SetSysClock(void);
   */
 void SystemInit (void)
 {
+#if defined (__FPU_USED) && (__FPU_USED == 1U)
+  SCB->CPACR |= ((3U << 10U * 2U) |         /* set CP10 Full Access */
+                 (3U << 11U * 2U)  );       /* set CP11 Full Access */
+#endif
   /* Reset the RCC clock configuration to the default reset state(for debug purpose) */
   /* Set HSION bit */
   RCC->CR |= (uint32_t)0x00000001;
@@ -430,6 +439,9 @@ static void SetSysClock(void)
   SetSysClockTo56();  
 #elif defined SYSCLK_FREQ_72MHz
   SetSysClockTo72();
+//Ôö¼Ó200M
+#elif defined SYSCLK_FREQ_200MHz
+  SetSysClockTo200();
 #endif
  
  /* If none of the define above is enabled, the HSI is used as System clock
@@ -1075,6 +1087,117 @@ static void SetSysClockTo72(void)
   }
   else
   { /* If HSE fails to start-up, the application will have wrong clock 
+         configuration. User can add here some code to deal with this error */
+  }
+}
+#elif defined SYSCLK_FREQ_200MHz
+/**
+  * @brief  Sets System clock frequency to 200MHz and configure HCLK, PCLK2
+  *         and PCLK1 prescalers.
+  * @note   This function should be used only after reset.
+  * @param  None
+  * @retval None
+  */
+#define  RCC_CTRL_HSIEN                         ((uint32_t)0x00000001)        /*!< Internal High Speed clock enable */
+#define  RCC_CTRL_HSISTBL                       ((uint32_t)0x00000002)        /*!< Internal High Speed clock ready flag */
+#define  RCC_CTRL_HSITWK                        ((uint32_t)0x000000F8)        /*!< Internal High Speed clock trimming */
+#define  RCC_CTRL_HSICAL                        ((uint32_t)0x0000FF00)        /*!< Internal High Speed clock Calibration */
+#define  RCC_CTRL_HSEEN                         ((uint32_t)0x00010000)        /*!< External High Speed clock enable */
+#define  RCC_CTRL_HSESTBL                       ((uint32_t)0x00020000)        /*!< External High Speed clock ready flag */
+#define  RCC_CTRL_HSEBYPS                       ((uint32_t)0x00040000)        /*!< External High Speed clock Bypass */
+#define  RCC_CTRL_HSECFDEN                      ((uint32_t)0x00080000)        /*!< Clock Security System enable */
+#define  RCC_CTRL_PLLEN                         ((uint32_t)0x01000000)        /*!< PLL enable */
+#define  RCC_CTRL_PLLSTBL                       ((uint32_t)0x02000000)        /*!< PLL clock ready flag */
+
+#define  RCC_CFG_AHBPSC_DIV1                    ((uint32_t)0x00000000)        /*!< SYSCLK not divided */
+#define  RCC_CFG_APB2PSC_DIV2                   ((uint32_t)0x00002000)        /*!< HCLK divided by 2 */
+#define  RCC_CFG_APB1PSC_DIV2                   ((uint32_t)0x00000400)        /*!< HCLK divided by 2 */
+#define  RCC_CFG_PLLCFG_MASK                    ((uint32_t)0x1FC0FFFF)        /*!< Mask for PLLRANGE, PLLHSEPSC, PLLMULT, PLLRC */
+#define  RCC_CFG_PLLRC_HSE                      ((uint32_t)0x00010000)        /*!< HSE clock selected as PLL entry clock source */
+#define  RCC_CFG_PLLMULT25                      ((uint32_t)0x20200000)        /*!< PLL input clock*25 */
+#define  RCC_CFG_PLLRANGE_GT72MHZ               ((uint32_t)0x80000000)        /*!< When PLL frequency is greater than 72MHz */
+#define  RCC_CFG_SYSCLKSEL                      ((uint32_t)0x00000003)        /*!< SYSCLKSEL[1:0] bits (System clock Switch) */
+#define  RCC_CFG_SYSCLKSEL_PLL                  ((uint32_t)0x00000002)        /*!< PLL selected as system clock */
+#define  RCC_CFG_SYSCLKSTS                      ((uint32_t)0x0000000C)        /*!< SYSCLKSTST[1:0] bits (System Clock Switch Status) */
+#define  RCC_CFG_SYSCLKSTS_PLL                  ((uint32_t)0x00000008)        /*!< PLL used as system clock */
+
+#define HSE_STABLE_DELAY             (5000u)
+#define PLL_STABLE_DELAY             (500u)
+
+static void WaitHseStbl(uint32_t delay)
+{
+  uint32_t i;
+
+  for(i = 0; i < delay; i++)
+    ;
+}
+
+static void SetSysClockTo200(void)
+{
+  __IO uint32_t StartUpCounter = 0, HSEStatus = 0;
+
+  /* SYSCLK, HCLK, PCLK2 and PCLK1 configuration ---------------------------*/
+  /* Enable HSE */
+  RCC->CR |= ((uint32_t)RCC_CTRL_HSEEN);
+
+  /* Wait till HSE is ready and if Time out is reached exit */
+  do
+  {
+    HSEStatus = RCC->CR & RCC_CTRL_HSESTBL;
+    StartUpCounter++;
+  }
+  while((HSEStatus == 0) && (StartUpCounter != HSE_STARTUP_TIMEOUT));
+  
+  WaitHseStbl(HSE_STABLE_DELAY);  
+
+  if ((RCC->CR & RCC_CTRL_HSESTBL) != RESET)
+  {
+    HSEStatus = (uint32_t)0x01;
+  }
+  else
+  {
+    HSEStatus = (uint32_t)0x00;
+  }
+
+  if (HSEStatus == (uint32_t)0x01)
+  {
+    /* HCLK = SYSCLK */
+    RCC->CFGR |= (uint32_t)RCC_CFG_AHBPSC_DIV1;
+
+    /* PCLK2 = HCLK/2 */
+    RCC->CFGR &= 0xFFFFC7FF;
+    RCC->CFGR |= (uint32_t)RCC_CFG_APB2PSC_DIV2;
+
+    /* PCLK1 = HCLK/2 */
+    RCC->CFGR &= 0xFFFFF8FF;
+    RCC->CFGR |= (uint32_t)RCC_CFG_APB1PSC_DIV2;
+            
+    /*  PLL Rconfiguration: PLLCLK = HSE * 25 = 200 MHz */
+    RCC->CFGR &= RCC_CFG_PLLCFG_MASK;
+    RCC->CFGR |= (uint32_t)(RCC_CFG_PLLRC_HSE | RCC_CFG_PLLMULT25 | RCC_CFG_PLLRANGE_GT72MHZ);
+
+    /* Enable PLL */
+    RCC->CR |= RCC_CTRL_PLLEN;
+
+    /* Wait till PLL is ready */
+    while((RCC->CR & RCC_CTRL_PLLSTBL) == 0)
+    {
+    }
+
+    /* Select PLL as system clock source */
+    RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFG_SYSCLKSEL));
+    RCC->CFGR |= (uint32_t)RCC_CFG_SYSCLKSEL_PLL;
+
+    /* Wait till PLL is used as system clock source */
+    while ((RCC->CFGR & (uint32_t)RCC_CFG_SYSCLKSTS) != RCC_CFG_SYSCLKSTS_PLL)
+    {
+    }
+    
+    WaitHseStbl(PLL_STABLE_DELAY);
+  }
+  else
+  {
+    /* If HSE fails to start-up, the application will have wrong clock
          configuration. User can add here some code to deal with this error */
   }
 }

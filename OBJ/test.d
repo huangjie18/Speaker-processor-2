@@ -79,10 +79,12 @@
 ..\obj\test.o: ..\STemWin\inc\TREEVIEW.h
 ..\obj\test.o: ..\STemWin\inc\KNOB.h
 ..\obj\test.o: ..\HARDWARE\InterFace\interface.h
+..\obj\test.o: ..\MALLOC\malloc.h
 ..\obj\test.o: ..\HARDWARE\Test\example.h
+..\obj\test.o: ..\HARDWARE\IC24C16\24c16.h
+..\obj\test.o: ..\HARDWARE\IIC\iic.h
 ..\obj\test.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 ..\obj\test.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 ..\obj\test.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 ..\obj\test.o: ..\HARDWARE\KEY\key.h
-..\obj\test.o: ..\MALLOC\malloc.h
 ..\obj\test.o: ..\HARDWARE\TOUCH\touch.h

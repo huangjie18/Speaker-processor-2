@@ -1,15 +1,6 @@
 #include "malloc.h"	    
 //////////////////////////////////////////////////////////////////////////////////	 
-//本程序只供学习使用，未经作者许可，不得用于其它任何用途
-//ALIENTEK战舰STM32开发板V3
-//内存管理 驱动代码	   
-//正点原子@ALIENTEK
-//技术论坛:www.openedv.com
-//修改日期:2015/1/20
-//版本：V1.0
-//版权所有，盗版必究。
-//Copyright(C) 广州市星翼电子科技有限公司 2009-2019
-//All rights reserved									  
+//用内存管理表数组来管理内存池数组								  
 //////////////////////////////////////////////////////////////////////////////////
 
 
@@ -58,8 +49,8 @@ void mymemset(void *s,u8 c,u32 count)
 //memx:所属内存块
 void my_mem_init(u8 memx)  
 {  
-    mymemset(mallco_dev.memmap[memx], 0,memtblsize[memx]*2);//内存状态表数据清零  
-	mymemset(mallco_dev.membase[memx], 0,memsize[memx]);	//内存池所有数据清零  
+    mymemset(mallco_dev.memmap[memx], 0,memtblsize[memx]*2);//内存状态表数据清零，内存管理数组清零 
+	mymemset(mallco_dev.membase[memx], 0,memsize[memx]);	//内存池所有数据清零，即是数组清零  
 	mallco_dev.memrdy[memx]=1;								//内存管理初始化OK  
 }  
 //获取内存使用率
@@ -88,7 +79,8 @@ u32 my_mem_malloc(u8 memx,u32 size)
     if(!mallco_dev.memrdy[memx])mallco_dev.init(memx);//未初始化,先执行初始化 
     if(size==0)return 0XFFFFFFFF;//不需要分配
     nmemb=size/memblksize[memx];  	//获取需要分配的连续内存块数
-    if(size%memblksize[memx])nmemb++;  
+    if(size%memblksize[memx])nmemb++; 
+	//memtblsize内存表大小
     for(offset=memtblsize[memx]-1;offset>=0;offset--)//搜索整个内存控制区  
     {     
 		if(!mallco_dev.memmap[memx][offset])cmemb++;//连续空内存块数增加
@@ -97,10 +89,10 @@ u32 my_mem_malloc(u8 memx,u32 size)
 		{
             for(i=0;i<nmemb;i++)  					//标注内存块非空 
             {  
-                mallco_dev.memmap[memx][offset+i]=nmemb;  
+                mallco_dev.memmap[memx][offset+i]=nmemb;  //在内存管理表数组nmemb个成员里写上所需的块数
             }  
-            return (offset*memblksize[memx]);//返回偏移地址  
-		}
+            return (offset*memblksize[memx]);//返回偏移地址,memblksize[memx]内存分块大小32，即是数组首地址要偏移
+		}                                    //多少个字节地址得到申请地址
     }  
     return 0XFFFFFFFF;//未找到符合分配条件的内存块  
 }  
@@ -118,12 +110,13 @@ u8 my_mem_free(u8 memx,u32 offset)
     }  
     if(offset<memsize[memx])//偏移在内存池内. 
     {  
-        int index=offset/memblksize[memx];			//偏移所在内存块号码  
+        int index=offset/memblksize[memx];			//得到内存管理表数组的第几个成员  
         int nmemb=mallco_dev.memmap[memx][index];	//内存块数量
+		//内存管理表里的数组元素清零
         for(i=0;i<nmemb;i++)  						//内存块清零
         {  
             mallco_dev.memmap[memx][index+i]=0;  
-        }  
+        } 
         return 0;  
     }else return 2;//偏移超区了.  
 }  
@@ -132,10 +125,11 @@ u8 my_mem_free(u8 memx,u32 offset)
 //ptr:内存首地址 
 void myfree(u8 memx,void *ptr)  
 {  
-	u32 offset;   
+	u32 offset; 
 	if(ptr==NULL)return;//地址为0.  
- 	offset=(u32)ptr-(u32)mallco_dev.membase[memx];     
-    my_mem_free(memx,offset);	//释放内存      
+ 	offset=(u32)ptr-(u32)mallco_dev.membase[memx];//申请的地址-内存池数组首地址=偏移地址，再强制转为常量。     
+    my_mem_free(memx,offset);	//释放内存 
+
 }  
 //分配内存(外部调用)
 //memx:所属内存块
@@ -146,7 +140,8 @@ void *mymalloc(u8 memx,u32 size)
     u32 offset;   
 	offset=my_mem_malloc(memx,size);  	   	 	   
     if(offset==0XFFFFFFFF)return NULL;  
-    else return (void*)((u32)mallco_dev.membase[memx]+offset);  
+    //else return (void*)((u32)mallco_dev.membase[memx]+offset); //先把内存池数组地址强制转换为u32数据加上偏移再转化为指针  
+	else return (mallco_dev.membase[memx]+offset);               //得到的是申请内存的首地址，因为地址是从后到前申请
 }  
 //重新分配内存(外部调用)
 //memx:所属内存块

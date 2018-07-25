@@ -56,6 +56,7 @@ Requirements: WindowManager - ( )
 #include "malloc.h"
 #include "touch.h"
 
+
 WM_HWIN test_2(void);
 /*********************************************************************
 *                                                                    *
@@ -81,7 +82,7 @@ WM_HWIN test_2(void);
 static void FLEX_SET(void)
 {
 	//设置皮肤
-	Button_flex();   //按钮皮肤设置
+//	Button_flex();   //按钮皮肤设置
 //	Framewin_flex(); //用了自定义
 	SLIDER_SetDefaultSkin(_DrawSkin_SLIDER1);//滑块皮肤设置
 	Listbox_flex(); //列表框皮肤设置
@@ -97,11 +98,16 @@ static void FLEX_SET(void)
 *
 *       MainTask
 */
+BUTTON_SKINFLEX_PROPS Props_Default; //按钮初始颜色
+
+u8 te[5] = {1,2,3,4,5};
+u8 te_r[5] = {0};
+
 void MainTask(void)
 {
 	u8 key_value;
     WM_SetCreateFlags(WM_CF_MEMDEV);  //开启存储设备，要消耗内存RAM 
-	GUI_Init();
+	GUI_Init();                    //emwin初始化
 	WM_SetDesktopColor(GUI_BLACK); //背景色
 	GUI_Delay(1); //为什么要加这个呢，先让背景无效化一次刷新，然后就可以在背景上绘制图画
 	FLEX_SET(); //皮肤设置
@@ -110,16 +116,31 @@ void MainTask(void)
 	Init_touch_adj();  //触摸校准
 #else
 #endif
-	
-	hWin_now = test_2(); //创建主界面
+	BUTTON_GetSkinFlexProps(&Props_Default, BUTTON_SKINFLEX_PI_ENABLED); //按钮初始状态颜色
+	hWin_now = CreateMainface(); //创建主界面
 //  Pratice();  //练习用
-	
 //  example();  //例子用
 //	touch_main();
 //	while(1)
 //	{
 //		GUI_Delay(10);
 //	}
+//	key_value = AT24C16_PageRead(te_r,0,sizeof(te_r));
+//	if(key_value)
+//	{
+//		GUI_SetBkColor(GUI_RED);
+//        GUI_Clear();
+//	}
+//	else
+//	{
+//		GUI_SetBkColor(GUI_GREEN);
+//        GUI_Clear();
+//	}
+//	
+//	GUI_SetColor(GUI_BLACK);
+//    GUI_GotoXY(0, 0);
+//    GUI_DispDecMin(te_r[4]);
+//	while(1);
 
 }
 

@@ -2,10 +2,12 @@
 
 #include "DIALOG.h"
 
+
 //按钮聚焦皮肤设置
 void Button_flex(void)
 {
 	BUTTON_SKINFLEX_PROPS Props;
+	
 	BUTTON_GetSkinFlexProps(&Props, BUTTON_SKINFLEX_PI_FOCUSSED); //聚焦的状态
 	Props.aColorFrame[0] = GUI_GREEN; //圆角边框的外部颜色
 	Props.aColorFrame[1] = GUI_BLACK; //圆角边框的内部颜色
@@ -16,15 +18,46 @@ void Button_flex(void)
 	Props.aColorUpper[1] = GUI_RED;   //上层渐变的（下层）颜色
 	BUTTON_SetSkinFlexProps(&Props, BUTTON_SKINFLEX_PI_FOCUSSED);  //聚焦颜色
 	BUTTON_SetSkinFlexProps(&Props, BUTTON_SKINFLEX_PI_PRESSED);   //按下颜色
+	
+	BUTTON_SetSkinFlexProps(&Props_Default, BUTTON_SKINFLEX_PI_ENABLED);   //初始化颜色
+	BUTTON_SetDefaultTextColor(GUI_BLACK, BUTTON_CI_UNPRESSED);    //按钮字体颜色
+}
+
+/*
+*******************************************************************************************
+* 函 数 名: Button_flex_2
+* 功能说明: 配置按钮外观
+* 形 参: 无
+* 返 回 值: 无
+*******************************************************************************************
+*/
+void Button_flex_2(void)
+{
+	BUTTON_SKINFLEX_PROPS Props;
+//	BUTTON_GetSkinFlexProps(&Props, BUTTON_SKINFLEX_PI_FOCUSSED); //聚焦的状态
 //	Props.aColorFrame[0] = GUI_GREEN; //圆角边框的外部颜色
 //	Props.aColorFrame[1] = GUI_BLACK; //圆角边框的内部颜色
-//	Props.aColorFrame[2] = GUI_YELLOW;   //框架与内部区域的颜色
-//	Props.aColorLower[0] = GUI_YELLOW;   //下层渐变的（上层）颜色
-//	Props.aColorLower[1] = GUI_YELLOW;   //下层渐变的（下层）颜色
-//	Props.aColorUpper[0] = GUI_YELLOW;   //上层渐变的（上层）颜色
-//	Props.aColorUpper[1] = GUI_YELLOW;   //上层渐变的（下层）颜色
-//	BUTTON_SetSkinFlexProps(&Props, BUTTON_SKINFLEX_PI_ENABLED);   //按下颜色
+//	Props.aColorFrame[2] = GUI_RED;   //框架与内部区域的颜色
+//	Props.aColorLower[0] = GUI_RED;   //下层渐变的（上层）颜色
+//	Props.aColorLower[1] = GUI_RED;   //下层渐变的（下层）颜色
+//	Props.aColorUpper[0] = GUI_RED;   //上层渐变的（上层）颜色
+//	Props.aColorUpper[1] = GUI_RED;   //上层渐变的（下层）颜色
+//	BUTTON_SetSkinFlexProps(&Props, BUTTON_SKINFLEX_PI_FOCUSSED);  //聚焦颜色
+//	BUTTON_SetSkinFlexProps(&Props, BUTTON_SKINFLEX_PI_PRESSED);   //按下颜色
+
+	
+	BUTTON_GetSkinFlexProps(&Props, BUTTON_SKINFLEX_PI_ENABLED); //聚焦的状态
+	Props.aColorFrame[0] = GUI_GREEN; //圆角边框的外部颜色
+	Props.aColorFrame[1] = GUI_BLACK; //圆角边框的内部颜色
+	Props.aColorFrame[2] = GUI_BLUE;   //框架与内部区域的颜色
+	Props.aColorLower[0] = GUI_BLUE;   //下层渐变的（上层）颜色
+	Props.aColorLower[1] = GUI_BLUE;   //下层渐变的（下层）颜色
+	Props.aColorUpper[0] = GUI_BLUE;   //上层渐变的（上层）颜色
+	Props.aColorUpper[1] = GUI_BLUE;   //上层渐变的（下层）颜色
+	BUTTON_SetSkinFlexProps(&Props, BUTTON_SKINFLEX_PI_ENABLED);   //初始颜色
+	BUTTON_SetDefaultTextColor(GUI_WHITE, BUTTON_CI_UNPRESSED);    //按钮字体颜色
 }
+
 
 //Framewin皮肤设置
 void Framewin_flex(void)

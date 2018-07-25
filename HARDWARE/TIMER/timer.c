@@ -45,7 +45,7 @@ void TIM3_IRQHandler(void)
 	{	
 		i++;
 		OS_TimeMS++;
-		if(i>=10)
+		if(i>=10) //10ms调用一次触屏函数
 		{
 			#if (USE_TOUCH_MODE == 1)
 			GUI_TOUCH_Exec();  //调用STemwin自带触摸函数

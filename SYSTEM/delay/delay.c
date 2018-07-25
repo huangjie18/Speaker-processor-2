@@ -224,7 +224,7 @@ void delay_us(u32 nus)
 
 void delay_ms(u16 nms)
 {
-	u32 repeat=nms/1;
+	u32 repeat=nms;
 	while(repeat)
 	{
 		delay_us(1000);  //1ms

@@ -74,7 +74,9 @@ Purpose     : Dialog box include
 #include "TREEVIEW.h"
 #include "KNOB.h"
 
+//自己写的头文件
 #include "interface.h"
+#include "malloc.h"	 
 
 #if GUI_WINSUPPORT
 

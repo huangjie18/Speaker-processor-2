@@ -86,4 +86,6 @@
 ..\obj\main.o: ..\STemWin\inc\KNOB.h
 ..\obj\main.o: ..\HARDWARE\InterFace\interface.h
 ..\obj\main.o: ..\HARDWARE\Test\example.h
+..\obj\main.o: ..\HARDWARE\IC24C16\24c16.h
+..\obj\main.o: ..\HARDWARE\IIC\iic.h
 ..\obj\main.o: ..\HARDWARE\TOUCH\touch.h

@@ -11,122 +11,115 @@
 #include "Interface.h"
 #include "example.h"
 #include "touch.h"
+#include "iic.h"
+#include "24c16.h"
+/**************************************
+***********注意事项********************
+1.改Device为GDF303时不用改东西可以直接用,因为GDF303
+没有FPU单元;
+2.改Device为ATF403时,ATF403拥有FPU单元，但此时用的
+EMWIN-CM3库没有支持FPU单元,如果开启FPU则会进入硬件错误,
+关闭FPU单元则正常使用。
+关闭步骤：Target -> Floating Poirt Hardware -> Not Used
+3.改了主频后需要改FSMC的速度，否则emwin读数据有问题
+////////////////
+4.如果使用SRAM-224k需要配置EOPB0 为 0xfe，ZW会把128k分给SRAM,NZW会增大128k，
+此时的ZW固定为128k
 
-//const GUI_POINT aPoints[] =
-//{
-//    { 40, 20},
-//    { 0, 20},
-//    { 20, 0}
-//};
-///* 用于存储放大后的坐标点 */
-//GUI_POINT aEnlargedPoints[GUI_COUNTOF(aPoints)];
-//void Sample(void)
-//{
-//    int i;
-//    /* 清屏 */
-//    GUI_Clear();
-//    /* 设置绘图模式 */
-//	GUI_SetPenSize(1);
-//    GUI_SetDrawMode(GUI_DM_XOR);
-//    /* 绘制多边形 */
-//    GUI_FillPolygon(aPoints, /* 指向要显示和填充的多边形 */
-//                    GUI_COUNTOF(aPoints), /* 点列表中指定的点数量 */
-//                    140, /* 原点的 X 位置 */
-//                    110); /* 原点的 Y 位置 */
-//    for (i = 1; i < 10; i++)
-//    {
-//        GUI_EnlargePolygon(aEnlargedPoints, /* 指向目标多边形 */
-//                           aPoints, /* 指向源多边形 */
-//                           GUI_COUNTOF(aPoints), /* 点列表中指定的点数量 */
-//                           i * 5); /* 扩展多边形的长度 （像素） */
-//        /* 绘制放大后的多边形 */
-//        GUI_FillPolygon(aEnlargedPoints, GUI_COUNTOF(aPoints), 140, 110);
 
-//    }
-//}
+5.*注意：该软件GP芯片使用的stm32的flash下载算法，如果不行请使用回GD的flash算法
+*该屏的DB13和DB15要掉转
 
+
+***************************************/
 
 //当前页面句柄
 WM_HWIN hWin_now;
-/**************************************************************************
 
-*注意：该软件GP芯片使用的stm32的flash下载算法，如果不行请使用回GD的flash算法
-*该屏的DB13和DB15要掉转
-
-***************************************************************************/
-u32 a_bkcolor[3]={GUI_RED,GUI_GREEN,GUI_BLUE};
-
+/*
+*******************************************************************************************
+* 函 数 名: GPIO_TEST
+* 功能说明: 用来测试GUI单个例子
+* 形 参: 无
+* 返 回 值: 无
+*******************************************************************************************
+*/
 void GPIO_TEST(void)
 {
-	GUI_PID_STATE TouchState;
-  int           xPhys;
-  int           yPhys;
-
-  GUI_Init();
-  GUI_CURSOR_Show();
-  GUI_CURSOR_Select(&GUI_CursorCrossL);
-  GUI_SetBkColor(GUI_WHITE);
-  GUI_SetColor(GUI_BLACK);
-  GUI_Clear();
-  GUI_DispString("Measurement of\nA/D converter values");
-  while (1) {
-    GUI_TOUCH_GetState(&TouchState);  // Get the touch position in pixel
-    xPhys = GUI_TOUCH_GetxPhys();     // Get the A/D mesurement result in x
-    yPhys = GUI_TOUCH_GetyPhys();     // Get the A/D mesurement result in y
-    //
-    // Display the measurement result
-    //
-    GUI_SetColor(GUI_BLUE);
-    GUI_DispStringAt("Analog input:\n", 0, 20);
-    GUI_GotoY(GUI_GetDispPosY() + 2);
-    GUI_DispString("x:");
-    GUI_DispDec(xPhys, 4);
-    GUI_DispString(", y:");
-    GUI_DispDec(yPhys, 4);
-    //
-    // Display the according position
-    //
-    GUI_SetColor(GUI_RED);
-    GUI_GotoY(GUI_GetDispPosY() + 4);
-    GUI_DispString("\nPosition:\n");
-    GUI_GotoY(GUI_GetDispPosY() + 2);
-    GUI_DispString("x:");
-    GUI_DispDec(TouchState.x,4);
-    GUI_DispString(", y:");
-    GUI_DispDec(TouchState.y,4);
-    //
-    // Wait a while
-    //
-    GUI_Delay(100);
-  };
+    GUI_Init();
+    /* 调用测试函数 */
+	GUI_SetBkColor(GUI_WHITE);
+	GUI_SetColor(GUI_BLACK);
+    GUI_Clear();
+	GUI_SetDrawMode(GUI_DRAWMODE_NORMAL);
+	GUI_FillCircle(120, 64, 40);
+	GUI_SetDrawMode(GUI_DRAWMODE_XOR);
+	GUI_FillCircle(140, 84, 40);
+    while (1)
+    {
+        GUI_Delay(10);
+    }
 
 }
 
+/*
+*******************************************************************************************
+* 函 数 名: All_Init
+* 功能说明: 配置外设
+* 形 参: 无
+* 返 回 值: 无
+*******************************************************************************************
+*/
+void All_Init(void)
+{
+	delay_init();
+	delay_ms(3000); //等待单片机供电稳定
+	/*************************AT32F403***********************************/
+	//保证这段操作电源要稳定否则会锁死芯片,如果锁了请百度解锁(￣▽￣)／
+	//把SRAM扩展为224k,只适用于AT32系列芯片,要下载两次才能正常运行
+	//初次下载：MEM1_MAX_SIZE一定要<(96*1024),以保证程序正确,能正确设置SRAM为224k
+	//第二次下载：MEM1_MAX_SIZE可以设置>96k,然后注销掉这段
+//	FLASH_Unlock();  //解锁FLASH
+//	FLASH_EraseOptionBytes();
+//	FLASH_ProgramOptionByteData(0x1FFFF810,0xFE);// 224 KB SRAM 96+128
+//	FLASH_Lock();//上锁
+	/*****************************END*************************************/
+	
+	
+    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
+    LED_GPIO_Init();        //按键LED初始化,全亮
+    KEY_GPIO_Init();        //按键初始化
+    Encoder_GPIO_Init();    //编码器初始化
+    Lcd_Initialize();       //LCD初始化
+    TIM3_Int_Init(999, (SystemCoreClock/1000000-1)); //1KHZ 定时器1ms
+	TP_Init();             //触摸屏引脚初始化
+	my_mem_init(SRAMIN);    //可以用来使用外部RAM,用到外部SRAM再使用
+	IIC_Init();             //用来驱动24c16
+//  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_CRC,ENABLE); //使能CRC时钟，否则STemWin不能使用,此处用emwin所以不用
+	
+}
+
+/*
+*******************************************************************************************
+* 函 数 名: main
+* 功能说明: 主函数
+* 形 参: 无
+* 返 回 值: int
+*******************************************************************************************
+*/
 int main(void)
 {
     u8 key_value = 0;
     u8 key_value1 = 0;
     u8 key_value2 = 0;
     u8 key_value3 = 0;
+	u8 mem_use = 0;  //内存使用率
+	u8 *p=0;         //申请数据的指针
     u16 count = 0;
+	u32 key_count = 0;
     GUI_COLOR color;
-
-
-    delay_init();
-    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
-    LED_GPIO_Init();        //按键LED初始化,全亮
-    KEY_GPIO_Init();        //按键初始化
-    Encoder_GPIO_Init();    //编码器初始化
-    Lcd_Initialize();       //LCD初始化
-    TIM3_Int_Init(999, 71); //1KHZ 定时器1ms
-    my_mem_init(SRAMIN);    //可以用来使用外部RAM
-
-
-
-    RCC_AHBPeriphClockCmd(RCC_AHBPeriph_CRC,ENABLE); //使能CRC时钟，否则STemWin不能使用
-	TP_Init();
+	All_Init();  //所有外设初始化
 //	GPIO_TEST();  //测试
-
 	MainTask(); //主程序
 
     while(1)
@@ -134,7 +127,7 @@ int main(void)
         if(WM_IsWindow(hWin_now)) //判断hWin_now是否有效,Framewin窗口客户区句柄
         {
 
-            //旋钮检测
+            /***********************************旋钮检测************************************/
             //有问题，里面有while循环,需要注意陷入死循环
             key_value1 = Encoder_Check_One();   //旋钮1检测
             key_value2 = Encoder_Check_Two();   //旋钮2检测
@@ -187,12 +180,20 @@ int main(void)
 
                     default:
                         break;
-                }
+                }//end of switch(key_value)
+				key_count = 0;
+            }//end of if
+			else  //没有旋钮动作
+			{
+				key_count++;  
+				if(key_count >= 500) //当大约2s内没有动作
+				{
+					WM_SendMessageNoPara(hWin_now, MSG_KNOB_NULL);  
+				}
+			}
 
-            }
 
-
-            //按键检测
+            /*********************************按键检测*********************************/
             key_value = KEY_Scan(0);
             if(key_value)
             {
@@ -246,9 +247,9 @@ int main(void)
                         break;
                     default:
                         break;
-                }
+                }//end of switch(key_value)
 
-            }
+            }//end of key_value
         }
         else   //无效则刷RED屏
         {
@@ -258,6 +259,13 @@ int main(void)
             GUI_SetColor(GUI_BLACK);
             GUI_GotoXY(0, 0);
             GUI_DispDecMin(GUI_ALLOC_GetNumFreeBytes());
+			
+			//显示内存使用率
+//			p = mymalloc(0,20480); //申请20k
+			mem_use = my_mem_perused(SRAMIN);
+			GUI_GotoXY(0, 10);
+			GUI_DispDecMin(mem_use);
+//			myfree(0,p);          //释放内存
         }
 
         if(count == 1000)
@@ -271,4 +279,5 @@ int main(void)
     }
 
 }
+
 

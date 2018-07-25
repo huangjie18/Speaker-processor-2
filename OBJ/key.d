@@ -79,5 +79,8 @@
 ..\obj\key.o: ..\STemWin\inc\TREEVIEW.h
 ..\obj\key.o: ..\STemWin\inc\KNOB.h
 ..\obj\key.o: ..\HARDWARE\InterFace\interface.h
+..\obj\key.o: ..\MALLOC\malloc.h
 ..\obj\key.o: ..\HARDWARE\Test\example.h
+..\obj\key.o: ..\HARDWARE\IC24C16\24c16.h
+..\obj\key.o: ..\HARDWARE\IIC\iic.h
 ..\obj\key.o: ..\HARDWARE\LED\led.h

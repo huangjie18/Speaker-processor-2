@@ -210,9 +210,8 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED: 
 				Main_channel = 0;
-				INPUT_channel = 0;  //输入通道聚焦位置标志
                 GUI_EndDialog(pMsg->hWin, 0); //结束本界面
-                hWin_now = CreateINPUT_CHANNEL(); //显示INPUT子界面
+                hWin_now = Input_First(); //显示INPUT第一个界面
 				break;
 			}
 			break;
@@ -221,7 +220,6 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_CLICKED:
 				Main_channel = 1;
                 GUI_EndDialog(pMsg->hWin, 0); //结束本界面
-                hWin_now = Create_COAX_face();          //COAX界面
 				break;
 			case WM_NOTIFICATION_RELEASED:
 
@@ -232,10 +230,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		case ID_BUTTON_2: //Gen_Out
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
-				Main_channel = 2;
-				Gen_channel = 0;
                 GUI_EndDialog(pMsg->hWin,0);   //结束本界面
-				hWin_now = CreateGen_Out();
 				break;
 			case WM_NOTIFICATION_RELEASED:
 
@@ -247,9 +242,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				Main_channel = 3;
-				OUTPUT_channel = 0;
                 GUI_EndDialog(pMsg->hWin,0);     //结束当前页面
-                hWin_now = CreateOut_face();     //输出OUT子界面
 				break;
 			case WM_NOTIFICATION_RELEASED:
 
@@ -265,7 +258,6 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_RELEASED:
 				Main_channel = 4;
 				GUI_EndDialog(pMsg->hWin,0);
-				hWin_now = CreateSystem();
 				break;
 
 			}
@@ -278,7 +270,6 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_RELEASED:
 				Main_channel = 5;
 				GUI_EndDialog(pMsg->hWin,0);
-				hWin_now = CreateMode();
 				break;
 
 			}
@@ -291,17 +282,11 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 
 		GUI_SetBkColor(GUI_BLACK);
 		GUI_Clear();  //全屏黑色
-//		GUI_DrawGradientRoundedV(0, 0, 399, 50, 0, 0xC0CEDC, GUI_BLACK); //渐变
-//		//
-////		GUI_DrawGradientRoundedV(0, 0, 399, 239, 0, 0xC0CEDC, GUI_BLACK);
 		GUI_SetPenSize(3);
 		GUI_SetColor(GUI_RED);
 		GUI_DrawLine(0, 50, 400, 50); //画红线
 
-		GUI_DrawBitmap(&bmlannge_yellow, 100, 0);
-
-		//GUI_DrawGradientH(0, 46, 200 - 1, 240 - 4, 0xdda0dd, 0xe14169);
-		//GUI_DrawGradientH(200, 46, 400 - 1, 240 - 4, 0xe14169, 0xdda0dd);
+		GUI_DrawBitmap(&bmlannge_yellow, 100, 0); //显示兰格logo
 		break;
 	
 /***************************************************************************************/
@@ -329,24 +314,20 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 	
 	//INPUT
 	case MSG_KEY_INPUT:
-		INPUT_channel = 0;  //输入通道聚焦位置标志
         GUI_EndDialog(pMsg->hWin, 0); //结束本界面
-        hWin_now = CreateINPUT_CHANNEL(); //显示INPUT子界面
+		hWin_now = Input_First(); //显示INPUT第一个界面
 		break;
-	
-	//OUT
-	case MSG_KEY_OUTPUT:
-		OUTPUT_channel = 0;
-        GUI_EndDialog(pMsg->hWin,0);     //结束当前页面
-        hWin_now = CreateOut_face();     //输出OUT子界面
-		break;
-	
-	
-	//SYS
-	case MSG_KEY_SYSTEM:
-		GUI_EndDialog(pMsg->hWin,0);
-		hWin_now = CreateSystem();
-		break;
+//	
+//	//OUT
+//	case MSG_KEY_OUTPUT:
+//        GUI_EndDialog(pMsg->hWin,0);     //结束当前页面
+//		break;
+//	
+//	
+//	//SYS
+//	case MSG_KEY_SYSTEM:
+//		GUI_EndDialog(pMsg->hWin,0);
+//		break;
 	
 	default:
 		WM_DefaultProc(pMsg);
@@ -367,6 +348,10 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 WM_HWIN CreateMainface(void);
 WM_HWIN CreateMainface(void) {
 	WM_HWIN hWin;
+	
+	//设置皮肤
+	
+	Button_flex();   //按钮皮肤设置
 	/////////////
 	hWin = GUI_CreateDialogBox(_aDialogCreate, GUI_COUNTOF(_aDialogCreate), _cbDialog, WM_HBKWIN, 0, 0);
 

@@ -67,7 +67,7 @@ Purpose     : Display controller initialization
 
 //自己修改的代码
 #define USE_EXRAM  0//不使用外部SRAM
-#define GUI_NUMBYTES  MEM1_MAX_SIZE //设置STemWin内存大小
+#define GUI_NUMBYTES  150*1024 //设置STemWin内存大小
 #define GUI_BLOCKSIZE 0X80  //块大小
 /*********************************************************************
 *
@@ -114,13 +114,19 @@ void GUI_X_Config(void)
 	else
 	{
 		//从内部RAM中分配GUI_NUMBYTES字节的内存
-		U32 *aMemory = mymalloc(SRAMIN,GUI_NUMBYTES);
-		//为存储管理系统分配一个存储块
-		GUI_ALLOC_AssignMemory((void*)aMemory,GUI_NUMBYTES);
-		//设置存储块的平均尺寸，该区越大，可用的存储块数量越少
-		GUI_ALLOC_SetAvBlockSize(GUI_BLOCKSIZE);
-		//设置默认字体
-		GUI_SetDefaultFont(GUI_FONT_6X8);
+//		U32 *aMemory = mymalloc(SRAMIN,GUI_NUMBYTES);
+//		//为存储管理系统分配一个存储块
+//		GUI_ALLOC_AssignMemory((void*)aMemory,GUI_NUMBYTES);
+//		//设置存储块的平均尺寸，该区越大，可用的存储块数量越少
+//		GUI_ALLOC_SetAvBlockSize(GUI_BLOCKSIZE);
+//		//设置默认字体
+//		GUI_SetDefaultFont(GUI_FONT_6X8);
+		
+		
+		static U32 aMemory[GUI_NUMBYTES / 4];
+		/*  Assign memory to emWin */
+		GUI_ALLOC_AssignMemory(aMemory, GUI_NUMBYTES);
+		GUI_ALLOC_SetAvBlockSize(GUI_BLOCKSIZE); 
 	}
 }
 /*************************** End of file ****************************/

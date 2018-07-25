@@ -297,7 +297,7 @@ void Touch_Adjust(void)
 
 
 ////////////////////////////////////////////
-#define CALIB_POINT_COUT  5  //多少点校准,现在最大为5点，文档介绍可以9点校准
+#define CALIB_POINT_COUT  4  //多少点校准,现在最大为5点，文档介绍可以9点校准
 /*
 触摸屏校准点相对屏幕像素四角的偏移像素
 第1个点 ： x1 = CALIB_OFFSET, y1 = CALIB_OFFSET
@@ -386,7 +386,7 @@ static u8 _Explain(void) {
   GUI_DispStringHCenterAt("TOUCH_Calibrate", LCD_GetXSize() / 2, 5);
   while(Penirq)
   {
-	  if(count >= 1000)  //10秒自动退出
+	  if(count >= 500)  //x秒自动退出
 	  {
 		  return 0;  //不运行校准直接退出
 	  }
@@ -603,7 +603,27 @@ void Init_touch_adj(void)
 }
 
 /////////////////////////////////////////////////////////////
+/*********************************************************************
+*
+*       _StoreUnstable
+*/
+static void _StoreUnstable(int x, int y) {
+  static int _xLast = -1;
+  static int _yLast = -1;
+  int xOut, yOut;
 
+  if ((x != -1) && (y != -1) && (_xLast != -1) && (_yLast != -1)) {
+    xOut = _xLast;    
+    yOut = _yLast;    
+  } else {
+    xOut = -1;
+    yOut = -1;    
+  }
+  _xLast = x;
+  _yLast = y;
+  GUI_TOUCH_StoreUnstable(xOut, yOut);
+  
+}
 
 //触摸扫描
 void ReadTouch(void)
@@ -714,7 +734,7 @@ void ReadTouch(void)
 			}
 			else
 			{
-				x = -0;
+				x = -1;
 			}
 
 			ReadState++;
@@ -726,15 +746,15 @@ void ReadTouch(void)
 			}
 			else
 			{
-				y = 0;
+				y = -1;
 			}
 			if((x<100)||(x>4000)||(y<100)||(y>4000)) //读取数值错误
 			{
-				GUI_TOUCH_StoreUnstable(-1, -1);  //
+				_StoreUnstable(-1, -1);  //
 			}
 			else
 			{
-				GUI_TOUCH_StoreUnstable(x, y);
+				_StoreUnstable(x, y);
 			}
 			
 //			GUI_TOUCH_StoreUnstable(x, y);

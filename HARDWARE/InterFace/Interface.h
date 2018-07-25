@@ -3,6 +3,9 @@
 #include "GUI.h"
 #include "DIALOG.h"
 #include "example.h"
+#include "sys.h"
+#include "24c16.h"
+#include "iic.h"
 //添加变量的声明转换
 #ifdef Gen_GLOBALS //在.c文件中定义该类型,采用这方法不能赋初值
 #define EXTERN1
@@ -26,6 +29,7 @@
 #define MSG_KNOB_OUT_RIGHT     (GUI_ID_USER + 0xFA)
 #define MSG_KNOB_CONTROL_LEFT  (GUI_ID_USER + 0xFB)
 #define MSG_KNOB_CONTROL_RIGHT (GUI_ID_USER + 0xFC)
+#define MSG_KNOB_NULL		   (GUI_ID_USER + 0xFD)  //没有旋钮动作
 
 
 //定义一个变量来存放当前的页面的句柄
@@ -34,152 +38,132 @@ extern WM_HWIN hWin_now;
 
 //皮肤设置函数
 void Button_flex(void); //按钮皮肤设置
+void Button_flex_2(void); //按钮皮肤设置
 void Framewin_flex(void); //框架皮肤设置
 int _DrawSkin_SLIDER1(const WIDGET_ITEM_DRAW_INFO * pDrawItemInfo);//滑块皮肤设置
 void Listbox_flex(void);
 //界面函数
 WM_HWIN CreateMainface(void); //主界面窗口
 
-//第二层界面
-WM_HWIN CreateINPUT_CHANNEL(void); //输入通道界面窗口
-WM_HWIN CreateOut_face(void); //输出主界面
+//IIC地址设置
+#define Addr_num  15
+extern u16 IIC_Addr[Addr_num];
 
+/*********************************************第二次界面**********************************/
+/******************************
+***
+***变量
+***
+*******************************/
+extern BUTTON_SKINFLEX_PROPS Props_Default; 
+extern char INPUT_CHANNEL;  //用来指示选中哪个输入通道
 
-//第三层界面
-
-/*******************************变量区**********************************/
-enum 
-{
-	list_0 = 0,
-	list_1,
-	list_2,
-	list_3,
-	list_4,
-	list_5,
-	list_6,
-	list_7,
-};
-/****************Input1************************/
-
-//右边子窗口存放数据结构体
+/******************************************Input_First  数据*********************************************/
+//Input_First数据结构
 typedef struct
 {
-	char Invert;
-	unsigned char RMSTC;  
-	unsigned char Hold;
-	unsigned char Decay;
-	signed char Gain;
-	signed char Aux1MixerGain;
-	signed char Aux2MixerGain;
-	signed char Aux3MixerGain;
-	signed char Aux4MixerGain;
-	signed char Aux5MixerGain;
-	signed char Aux6MixerGain;
-	signed char Aux7MixerGain;
-	signed char Aux8MixerGain;
-	
-}Input_data;
+	u8  IN_DATA_1;
+	u8  IN_DATA_2;
+	u8  IN_DATA_3;
+	u8  IN_DATA_4;
+	u8  IN_DATA_5;
+	u8  IN_DATA_6;
+	u8  IN_DATA_7;
+	u8  IN_DATA_8;
+}Input_First_data;
 
 
-//外部变量
-extern Input_data Input1_data1[8]; //存放数据的变量
-extern char INPUT_channel;         //输入通道标志
- 
+/******************************************Input_First  End*********************************************/
 
-
-/*************************END****************************************/
-
-/***********************************界面函数*****************************************/
-/************************************INPUT******************************************/
-WM_HWIN Createthird_layer(void); //Input1界面窗口
-
-//右边第一个子窗口
-WM_HWIN CreateWindow_Child(void); //右边第一个子窗口界面
-WM_HWIN Get_child_hWin(I32 ID);  //Input1右边子窗口获得控件句柄
-
-//右边第二个子窗口
-WM_HWIN CreateSecond_Child(void);
-
-//右边第三个子窗口
-WM_HWIN CreateThird_Child(void);
-
-//右边第四个子窗口
-WM_HWIN CreateFour_Child(void);
-
-//右边第五个子窗口
-WM_HWIN CreateFive_Child(void);
-
-/************************************Output******************************************/
-//变量区
-extern char OUTPUT_channel;        //输出通道标志 
-
-
-WM_HWIN CreateOutput1_third_face(void); //第三输出界面
-
-
-//右边第一个子窗口
-WM_HWIN Out_fristchild(void);
-
-
-//右边第二个子窗口
-WM_HWIN CreateOut_twoface(void);
-
-//右边第三个子窗口
-WM_HWIN CreateOut_threeface(void);
-
-
-/************************************COAX_IN******************************************/
-WM_HWIN Create_COAX_face(void);  //主界面函数
-
-//子窗口界面
-WM_HWIN CreateCOAX_face_3(void); //第二个
-
-
-/************************************Gen_Out******************************************/
-//变量区
-typedef struct Gen_out  //存放该窗口要用到的数据
+/******************************************Input_Second的数据列表****************************************/
+//要保存的数据
+typedef struct 
 {
-	char Window_Switch ; //设置一个变量来判别当前的输入聚焦在哪个窗口，0代表在列表框
-    WM_HWIN hChild; //子窗口句柄
-    int Sel;            //索引号
+	//NOISEGATE的数据
+	s16  RMSTC_DATA;       //存放RMSTC的数值,有符号
+	s16  HOLD_DATA;		   //存放HOLD的数值
+	s16  DECAY_DATA;	   //存放DECAY的数值
 	
-} Gen;
+	//MUTE_AND_INVERT
+	u8 IN_MUTE_STA;      //指示IN_MUTE当前状态
+	u8 IN_INVERT_STA;    //指示IN_INVERT当前状态 
+	
+	//COMPRESSOR的数据
+	char ON_OFF;           //存放开或关的数据
+	u16  THRSH_DATA;       //存放THRSH的数据
+	u16  RATIO_DATA;       //存放RATIO的数据
+	u16  ATK_TIME_DATA;    //存放ATK_TIME的数据
+	u16  RELEASE_DATA;     //存放RELEASE的数据
+	u16  COM_HOLD_DATA;    //存放HOLD的数据
+}Input_Data;
 
+//Input_Second数据
+typedef  struct 
+{
+	Input_Data data;      //要保存的数据
 
+	//指示不同通道的数据
+	char face_switch;      //指示第几个通道页面
+	char Item;             //指示选中第几个子项目
+	char *String;          //用来存放字符串
+	
+	//用来计算长短按的
+	u16  Time_count;       //判断定时器长短按
+	u16  Key_count;        //判断旋转按钮快慢
+	
+	//定时器的句柄
+	WM_HTIMER  hItime;
+	
+	//用来判断按钮是否释放
+	u16 Released;         //0代表已经释放，1代表没释放
+	
+}Input_Second_data;
 
-EXTERN1 Gen Gen_data; //变量定义在Gen_OutDLG.C中
-EXTERN1 char Gen_channel;
+//子项目
+enum
+{
+	RMSTC_Item,
+	HOLD_Item,
+	DECAY_Item,
+	IN_MUTE_Item,
+	IN_INVERT_Item,
+	ON_OFF_Item,
+	THRSH_Item,
+	RATIO_Item,
+	ATK_TIME_Item,
+	RELEASE_Item,
+	COM_HOLD_Item,
+};
 
-WM_HWIN CreateGen_Out(void);   //主界面
+//定时器
+enum
+{
+	RMSTC_Time_left,
+	RMSTC_Time_right,
+	HOLD_Time_left,
+	HOLD_Time_right,
+	DECAY_Time_left,
+	DECAY_Time_right,
+	THRSH_Time_left,
+	THRSH_Time_right,
+	RATIO_Time_left,
+	RATIO_Time_right,
+	ATK_Time_left,
+	ATK_Time_right,
+	RELEASE_Time_left,
+	RELEASE_Time_right,
+	COM_HOLD_Time_left,
+	COM_HOLD_Time_right,
+};
 
-//WNoise界面
-WM_HWIN CreateGen_WNoise(void); //Gen_Out->WNoise界面 
-
-//SIN界面
-WM_HWIN CreateGen_Sin(void);
-WM_HWIN CreateSIN_Child1(void); //SET_1界面
-
-//SweepFreq界面
-WM_HWIN CreateGen_Sweep(void);   //主界面
-WM_HWIN CreateSweep_Two(void); 
-WM_HWIN CreateSweep_child_1(void); //SET_1界面
-
-//Pulse界面
-WM_HWIN CreatePulse(void);     //主界面
-WM_HWIN CreatePulse_Child(void);   //SET_1界面
-
-//WNoise2界面
-WM_HWIN CreateWNoise2(void);   //主界面
-WM_HWIN CreateWNoise_Child1(void);  //SET_1
-WM_HWIN CreateWNoise_Child2(void);  //SET_2
-/***********************************SYS*************************************************/
-//Sys界面
-WM_HWIN CreateSystem(void);
-
-/***********************************Mode*************************************************/
-//Mode界面
-WM_HWIN CreateMode(void);
-/*************************************************END*************************************/
-
-
+/*******************************************Input_Second  End*******************************************/
+/******************************
+***
+***函数
+***
+*******************************/
+WM_HWIN Input_First(void);
+WM_HWIN Input_Second(void);
+WM_HWIN Input_Third(void);
+WM_HWIN Input_Four(void);
 #endif

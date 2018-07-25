@@ -12,16 +12,15 @@
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>
         <TargetCommonOption>
-          <Device>STM32F103VC</Device>
-          <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F1xx_DFP.2.2.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
-          <Cpu>IROM(0x08000000,0x40000) IRAM(0x20000000,0xC000) CPUTYPE("Cortex-M3") CLOCK(12000000) ELITTLE</Cpu>
+          <Device>AT32F403VC</Device>
+          <Vendor>ArteryTek</Vendor>
+          <PackID>Keil.AT32F4xx_DFP.1.0.3</PackID>
+          <Cpu>IROM(0x08000000,0x40000) IRAM(0x20000000,0x38000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
-          <FlashDriverDll>UL2CM3(-S0 -C0 -P0 -FD20000000 -FC1000 -FN1 -FF0STM32F10x_512 -FS08000000 -FL080000 -FP0($$Device:STM32F103VC$Flash\STM32F10x_512.FLM))</FlashDriverDll>
-          <DeviceId>4226</DeviceId>
-          <RegisterFile>$$Device:STM32F103VC$Device\Include\stm32f10x.h</RegisterFile>
+          <FlashDriverDll>UL2CM3(-S0 -C0 -P0 -FD20000000 -FC1000 -FN1 -FF0AT32F403_256 -FS08000000 -FL040000 -FP0($$Device:AT32F403VC$Flash\AT32F403_256.FLM))</FlashDriverDll>
+          <DeviceId>0</DeviceId>
+          <RegisterFile>$$Device:AT32F403VC$Device\Include\AT32F403xx.h</RegisterFile>
           <MemoryEnv></MemoryEnv>
           <Cmp></Cmp>
           <Asm></Asm>
@@ -31,7 +30,7 @@
           <SLE66CMisc></SLE66CMisc>
           <SLE66AMisc></SLE66AMisc>
           <SLE66LinkerMisc></SLE66LinkerMisc>
-          <SFDFile>$$Device:STM32F103VC$SVD\STM32F103xx.svd</SFDFile>
+          <SFDFile>$$Device:AT32F403VC$SVD\AT32F403xx.svd</SFDFile>
           <bCustSvd>0</bCustSvd>
           <UseEnv>0</UseEnv>
           <BinPath></BinPath>
@@ -108,13 +107,13 @@
         </CommonProperty>
         <DllOption>
           <SimDllName>SARMCM3.DLL</SimDllName>
-          <SimDllArguments>-REMAP</SimDllArguments>
+          <SimDllArguments> -REMAP</SimDllArguments>
           <SimDlgDll>DCM.DLL</SimDlgDll>
-          <SimDlgDllArguments>-pCM3</SimDlgDllArguments>
+          <SimDlgDllArguments>-pCM4</SimDlgDllArguments>
           <TargetDllName>SARMCM3.DLL</TargetDllName>
           <TargetDllArguments></TargetDllArguments>
           <TargetDlgDll>TCM.DLL</TargetDlgDll>
-          <TargetDlgDllArguments>-pCM3</TargetDlgDllArguments>
+          <TargetDlgDllArguments>-pCM4</TargetDlgDllArguments>
         </DllOption>
         <DebugOption>
           <OPTHX>
@@ -213,7 +212,7 @@
             <AdsLsxf>1</AdsLsxf>
             <RvctClst>0</RvctClst>
             <GenPPlst>0</GenPPlst>
-            <AdsCpuType>"Cortex-M3"</AdsCpuType>
+            <AdsCpuType>"Cortex-M4"</AdsCpuType>
             <RvctDeviceName></RvctDeviceName>
             <mOS>0</mOS>
             <uocRom>0</uocRom>
@@ -222,7 +221,7 @@
             <hadIRAM>1</hadIRAM>
             <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
-            <RvdsVP>0</RvdsVP>
+            <RvdsVP>1</RvdsVP>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -282,7 +281,7 @@
               <IRAM>
                 <Type>0</Type>
                 <StartAddress>0x20000000</StartAddress>
-                <Size>0xc000</Size>
+                <Size>0x38000</Size>
               </IRAM>
               <IROM>
                 <Type>1</Type>
@@ -337,7 +336,7 @@
               <OCR_RVCT9>
                 <Type>0</Type>
                 <StartAddress>0x20000000</StartAddress>
-                <Size>0xc000</Size>
+                <Size>0x38000</Size>
               </OCR_RVCT9>
               <OCR_RVCT10>
                 <Type>0</Type>
@@ -369,7 +368,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F10X_HD,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\CORE;..\STM32F10x_StdPeriph_Driver\inc;..\USER;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\HARDWARE\LCD;..\STemWin\Config;..\STemWin\inc;..\MALLOC;..\HARDWARE\TIMER;..\STemWin\Demo;..\HARDWARE\Test;..\HARDWARE\InterFace;..\HARDWARE\LED;..\HARDWARE\KEY;..\STemWin\STemWin_Addons;..\HARDWARE\TOUCH</IncludePath>
+              <IncludePath>..\CORE;..\STM32F10x_StdPeriph_Driver\inc;..\USER;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\HARDWARE\LCD;..\STemWin\Config;..\STemWin\inc;..\MALLOC;..\HARDWARE\TIMER;..\STemWin\Demo;..\HARDWARE\Test;..\HARDWARE\InterFace;..\HARDWARE\LED;..\HARDWARE\KEY;..\STemWin\STemWin_Addons;..\HARDWARE\TOUCH;..\HARDWARE\IIC;..\HARDWARE\IC24C16</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -477,6 +476,11 @@
               <FileType>1</FileType>
               <FilePath>..\STM32F10x_StdPeriph_Driver\src\stm32f10x_tim.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f10x_flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\STM32F10x_StdPeriph_Driver\src\stm32f10x_flash.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -547,6 +551,16 @@
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\TOUCH\touch.c</FilePath>
             </File>
+            <File>
+              <FileName>iic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\IIC\iic.c</FilePath>
+            </File>
+            <File>
+              <FileName>24c16.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\IC24C16\24c16.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -612,170 +626,30 @@
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\InterFace\Flex_set.c</FilePath>
             </File>
-            <File>
-              <FileName>Input_face.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\InterFace\Input_face.c</FilePath>
-            </File>
-            <File>
-              <FileName>Input1_third_layer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\InterFace\Input1_third_layer.c</FilePath>
-            </File>
-            <File>
-              <FileName>First_ChildDLG.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\InterFace\ChildWindow\First_ChildDLG.c</FilePath>
-            </File>
-            <File>
-              <FileName>Second_ChildDLG.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\InterFace\ChildWindow\Second_ChildDLG.c</FilePath>
-            </File>
-            <File>
-              <FileName>Third_ChildDLG.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\InterFace\ChildWindow\Third_ChildDLG.c</FilePath>
-            </File>
-            <File>
-              <FileName>Four_ChildDLG.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\InterFace\ChildWindow\Four_ChildDLG.c</FilePath>
-            </File>
-            <File>
-              <FileName>Five_ChildDLG.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\InterFace\ChildWindow\Five_ChildDLG.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>Interface_Out</GroupName>
+          <GroupName>Inface_2</GroupName>
           <Files>
             <File>
-              <FileName>Out_face.c</FileName>
+              <FileName>Input_First.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\HARDWARE\InterFace_Out\Out_face.c</FilePath>
+              <FilePath>..\HARDWARE\inface_2\INPUT\Input_First.c</FilePath>
             </File>
             <File>
-              <FileName>Output1_third_face.c</FileName>
+              <FileName>Input_Four.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\HARDWARE\InterFace_Out\Output1_third_face.c</FilePath>
+              <FilePath>..\HARDWARE\inface_2\INPUT\Input_Four.c</FilePath>
             </File>
             <File>
-              <FileName>Out-Firstchild.c</FileName>
+              <FileName>Input_Second.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\HARDWARE\InterFace_Out\Window_Child\Out-Firstchild.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Interface_Coax</GroupName>
-          <Files>
-            <File>
-              <FileName>Coax_face.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\InterFacd-Coax\Coax_face.c</FilePath>
+              <FilePath>..\HARDWARE\inface_2\INPUT\Input_Second.c</FilePath>
             </File>
             <File>
-              <FileName>COAX_face_3DLG.c</FileName>
+              <FileName>Input_Third.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\HARDWARE\InterFacd-Coax\COAX_face_3DLG.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Interface_Gen</GroupName>
-          <Files>
-            <File>
-              <FileName>Gen_OutDLG.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\Interface_Gen\Gen_OutDLG.c</FilePath>
-            </File>
-            <File>
-              <FileName>Gen_WNoiseDLG.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\Interface_Gen\Gen_WNoiseDLG.c</FilePath>
-            </File>
-            <File>
-              <FileName>Sweep_TwoDLG.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\Interface_Gen\Child\Sweep_TwoDLG.c</FilePath>
-            </File>
-            <File>
-              <FileName>Gen_SinDLG.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\Interface_Gen\Gen_SinDLG.c</FilePath>
-            </File>
-            <File>
-              <FileName>SIN_Child1DLG.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\Interface_Gen\Child\SIN_Child1DLG.c</FilePath>
-            </File>
-            <File>
-              <FileName>Gen_SweepDLG.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\Interface_Gen\Gen_SweepDLG.c</FilePath>
-            </File>
-            <File>
-              <FileName>Sweep_child_1DLG.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\Interface_Gen\Sweep_child_1DLG.c</FilePath>
-            </File>
-            <File>
-              <FileName>Gen_PulseDLG.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\Interface_Gen\Gen_PulseDLG.c</FilePath>
-            </File>
-            <File>
-              <FileName>Pulse_ChildDLG.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\Interface_Gen\Pulse_ChildDLG.c</FilePath>
-            </File>
-            <File>
-              <FileName>WNoise_Child1DLG.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\Interface_Gen\WNoise_Child1DLG.c</FilePath>
-            </File>
-            <File>
-              <FileName>Gen_WNoise2DLG.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\Interface_Gen\Gen_WNoise2DLG.c</FilePath>
-            </File>
-            <File>
-              <FileName>WNoise_Child2DLG.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\Interface_Gen\WNoise_Child2DLG.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Interface_Sys</GroupName>
-          <Files>
-            <File>
-              <FileName>SystemDLG.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\InterFace_Sys\SystemDLG.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Interface_Mode</GroupName>
-          <Files>
-            <File>
-              <FileName>ModeDLG.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\InterFace_Mode\ModeDLG.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>example</GroupName>
-          <Files>
-            <File>
-              <FileName>MOTION_RadialMenu.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\example\MOTION_RadialMenu.c</FilePath>
+              <FilePath>..\HARDWARE\inface_2\INPUT\Input_Third.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -78,7 +78,10 @@
 ..\obj\touch.o: ..\STemWin\inc\TREEVIEW.h
 ..\obj\touch.o: ..\STemWin\inc\KNOB.h
 ..\obj\touch.o: ..\HARDWARE\InterFace\interface.h
+..\obj\touch.o: ..\MALLOC\malloc.h
 ..\obj\touch.o: ..\HARDWARE\Test\example.h
+..\obj\touch.o: ..\HARDWARE\IC24C16\24c16.h
+..\obj\touch.o: ..\HARDWARE\IIC\iic.h
 ..\obj\touch.o: ..\SYSTEM\delay\delay.h
 ..\obj\touch.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 ..\obj\touch.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h

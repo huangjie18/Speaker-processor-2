@@ -18,6 +18,8 @@
 **********************************************************************
 */
 
+//LOW PASS 
+
 // USER START (Optionally insert additional includes)
 // USER END
 
@@ -72,6 +74,9 @@
 *
 **********************************************************************
 */
+static Output_Third_Data *Out_Third;
+
+
 static const GUI_POINT pPoint_left[] = {
 	{ 0, 10 },
 	{ 10, 0 },
@@ -83,6 +88,22 @@ static const GUI_POINT pPoint_right[] = {
 	{ 20, 10 },
 	{ 10, 20 },
 };
+
+//页面显示的字符串数据
+static char face_string[][20] = 
+{
+	"NULL",
+	"OUTPUT1 PAGE 2/3",
+	"OUTPUT2 PAGE 2/3",
+	"OUTPUT3 PAGE 2/3",
+	"OUTPUT4 PAGE 2/3",
+	"OUTPUT5 PAGE 2/3",
+	"OUTPUT6 PAGE 2/3",
+	"OUTPUT7 PAGE 2/3",
+	"OUTPUT8 PAGE 2/3",
+
+};
+
 // USER START (Optionally insert additional static data)
 // USER END
 
@@ -148,8 +169,8 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 	{ CHECKBOX_CreateIndirect, "Checkbox", ID_CHECKBOX_3, 107 + 203, 208, 90, 23, 0, 0x0, 0 },
 
 	/*页面切换*/
-	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_18, 5, 3, 20, 25, 0, 0x0, 0 },
-	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_19, 375, 3, 20, 25, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_18, 5, 5, 20, 25, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_19, 375, 5, 20, 25, 0, 0x0, 0 },
 };
 
 /*********************************************************************
@@ -245,9 +266,70 @@ static void _cbButton_right(WM_MESSAGE * pMsg) //--------------（3）
 		BUTTON_Callback(pMsg);
 	}
 }
-// USER START (Optionally insert additional static code)
-// USER END
 
+/******************************Show_Value 所需数据*****************************/
+#include "stdio.h"
+
+#define TYPE_LOW_X  150
+#define TYPE_LOW_Y  107
+#define FREQ_LOW_Y	TYPE_LOW_Y+34
+#define GAIN_LOW_Y	FREQ_LOW_Y+34
+
+//定义无效区域
+static const GUI_RECT InvaliRect_Value[][4] = {
+	//LOW
+	{ TYPE_LOW_X-50, TYPE_LOW_Y, TYPE_LOW_X+50, TYPE_LOW_Y+20}, 
+	{ TYPE_LOW_X-50, FREQ_LOW_Y, TYPE_LOW_X+50, FREQ_LOW_Y+20},
+	{ TYPE_LOW_X-50, GAIN_LOW_Y, TYPE_LOW_X+50, GAIN_LOW_Y+20},
+	{0},
+	{0},
+	//HIGH
+	{ TYPE_LOW_X+150, TYPE_LOW_Y, TYPE_LOW_X+250, TYPE_LOW_Y+20}, 
+	{ TYPE_LOW_X+150, FREQ_LOW_Y, TYPE_LOW_X+250, FREQ_LOW_Y+20},
+	{ TYPE_LOW_X+150, GAIN_LOW_Y, TYPE_LOW_X+250, GAIN_LOW_Y+20},
+
+};
+/*
+*******************************************************************************************
+* 函 数 名: Show_Value
+* 功能说明: 显示数值
+* 形 参: 无
+* 返 回 值: 无
+*******************************************************************************************
+*/
+static void Show_Value(void)
+{
+	char str[10];
+	GUI_SetColor(GUI_BLACK);
+	GUI_SetTextMode(GUI_TM_TRANS);
+	GUI_SetFont(&GUI_Font20_1);
+	
+	//TYPE_LOW
+	snprintf(str,sizeof(str) - 1,"%d",Out_Third->data.TYPE_DATA_LOW);  //把数值转为字符串
+	GUI_DispStringHCenterAt(str,TYPE_LOW_X,TYPE_LOW_Y);          //以当前坐标为中心显示字符串
+
+	//FREQ_LOW
+	snprintf(str,sizeof(str) - 1,"%d",Out_Third->data.FREQ_DATA_LOW);  //把数值转为字符串
+	GUI_DispStringHCenterAt(str,TYPE_LOW_X,FREQ_LOW_Y);          //以当前坐标为中心显示字符串
+	
+	//GAIN_LOW
+	snprintf(str,sizeof(str) - 1,"%d",Out_Third->data.GAIN_DATA_LOW);  //把数值转为字符串
+	GUI_DispStringHCenterAt(str,TYPE_LOW_X,GAIN_LOW_Y);          //以当前坐标为中心显示字符串
+	
+	//TYPE_HIGH
+	snprintf(str,sizeof(str) - 1,"%d",Out_Third->data.TYPE_DATA_HIGH);  //把数值转为字符串
+	GUI_DispStringHCenterAt(str,TYPE_LOW_X+200,TYPE_LOW_Y);          //以当前坐标为中心显示字符串
+
+	//FREQ_HIGH
+	snprintf(str,sizeof(str) - 1,"%d",Out_Third->data.FREQ_DATA_HIGH);  //把数值转为字符串
+	GUI_DispStringHCenterAt(str,TYPE_LOW_X+200,FREQ_LOW_Y);          //以当前坐标为中心显示字符串
+	
+	//GAIN_HIGH
+	snprintf(str,sizeof(str) - 1,"%d",Out_Third->data.GAIN_DATA_HIGH);  //把数值转为字符串
+	GUI_DispStringHCenterAt(str,TYPE_LOW_X+200,GAIN_LOW_Y);          //以当前坐标为中心显示字符串
+	
+	AT24C16_PageWrite((u8 *)(&(Out_Third->data)),IIC_Addr[Out_Third->face_switch+30],sizeof(Out_Third->data));
+}
 /*********************************************************************
 *
 *       _cbDialog
@@ -265,7 +347,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 	case WM_INIT_DIALOG:
 		//TEXT设置
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_0);
-		TEXT_SetText(hItem, "OUTPUT PAGE 2/3");
+		TEXT_SetText(hItem, Out_Third->String);
 		TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
 		TEXT_SetFont(hItem, GUI_FONT_24B_1);
 		TEXT_SetTextColor(hItem, GUI_MAKE_COLOR(0x00FFFFFF));
@@ -306,15 +388,15 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_9);
 		BUTTON_SetFont(hItem, GUI_FONT_16B_1);  //设置字体
-		BUTTON_SetText(hItem, "FREQ(Hz)");          //设置显示的字符串
+		BUTTON_SetText(hItem, "TYPE");          //设置显示的字符串
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_10);
 		BUTTON_SetFont(hItem, GUI_FONT_16B_1);  //设置字体
-		BUTTON_SetText(hItem, "GAIN(dB)");          //设置显示的字符串
+		BUTTON_SetText(hItem, "FREQ(Hz)");          //设置显示的字符串
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_11);
 		BUTTON_SetFont(hItem, GUI_FONT_16B_1);  //设置字体
-		BUTTON_SetText(hItem, "TYPE");          //设置显示的字符串
+		BUTTON_SetText(hItem, "GAIN(dB)");          //设置显示的字符串
 
 		//复选框
 		//LOW PASS
@@ -325,7 +407,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		CHECKBOX_SetFont(hItem, GUI_FONT_13H_1);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_1);
-		CHECKBOX_SetText(hItem, "IN_INVERT");
+		CHECKBOX_SetText(hItem, "INVERT");
 		CHECKBOX_SetTextColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFocusColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFont(hItem, GUI_FONT_13H_1);
@@ -338,7 +420,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		CHECKBOX_SetFont(hItem, GUI_FONT_13H_1);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_3);
-		CHECKBOX_SetText(hItem, "IN_INVERT");
+		CHECKBOX_SetText(hItem, "INVERT");
 		CHECKBOX_SetTextColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFocusColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFont(hItem, GUI_FONT_13H_1);
@@ -441,9 +523,157 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		GUI_FillRoundedRect(304, 102, 396, 132, 4);
 		GUI_FillRoundedRect(304, 136, 396, 166, 4);
 		GUI_FillRoundedRect(304, 170, 396, 200, 4);
-
+		
+		//显示各个子选项数值
+		Show_Value();
+		
 		break;
-
+		
+	/*********************************************自定义信息处理**************************************************/
+	//旋钮左转
+	case MSG_KNOB_CONTROL_LEFT:
+		//子选项指示
+		if(Out_Third->Item == INVERT_HIGH_Item_Out)
+		{
+			Out_Third->Item = TYPE_LOW_Item_Out;
+		}
+		else
+		{
+			Out_Third->Item++;
+		}
+		GUI_SendKeyMsg(GUI_KEY_TAB, 1);     //下一个聚焦点
+		break;
+	
+	//旋钮右转
+	case MSG_KNOB_CONTROL_RIGHT:
+		if(Out_Third->Item == TYPE_LOW_Item_Out)
+		{
+			Out_Third->Item = INVERT_HIGH_Item_Out;
+		}
+		else
+		{
+			Out_Third->Item--;
+		}
+		GUI_SendKeyMsg(GUI_KEY_BACKTAB, 1); //上一个聚焦
+		break;
+		
+	//CONTROL按下
+	case MSG_KEY_CONTROL:
+		if((Out_Third->Item == LOW_HIGH_Item_Out)||(Out_Third->Item == INVERT_LOW_Item_Out)
+			||(Out_Third->Item == MID_HIGH_Item_Out)||(Out_Third->Item == INVERT_HIGH_Item_Out)) //IN_MUTE_Item和IN_INVERT_Item项
+		{
+			GUI_SendKeyMsg(GUI_KEY_SPACE,1);
+		}
+		else
+		{
+			GUI_SendKeyMsg(GUI_KEY_ENTER, 1);   //确定
+		}
+		break;
+		
+	//没有旋钮动作
+	case MSG_KNOB_NULL:
+		Out_Third->Key_count = 0;
+		break;
+	
+	//ESC
+	case MSG_KEY_ESC:
+		GUI_EndDialog(pMsg->hWin, 0); //关闭当前窗口
+        hWin_now = Output_First();  //显示Input_First页面
+		break;
+	
+	//页面切换
+	case MSG_KNOB_OUT_LEFT:	
+		GUI_EndDialog(pMsg->hWin, 0);   //结束当前界面
+		hWin_now = Output_Four();      //切换下一个界面
+		break;
+	
+	case MSG_KNOB_OUT_RIGHT:
+		GUI_EndDialog(pMsg->hWin, 0);   //结束当前界面
+		hWin_now = Output_Second();      //切换下一个界面
+		break;
+	
+	//INPUT右转
+	case MSG_KNOB_INPUT_RIGHT:  
+		switch(Out_Third->Item)
+		{
+			//值减少
+			case TYPE_LOW_Item_Out:
+				Value_Change_dec(&Out_Third->data.TYPE_DATA_LOW,&Out_Third->Key_count);
+				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[TYPE_LOW_Item_Out]); //无效化该区域重新刷新
+				break;
+			
+			case FREQ_LOW_Item_Out:
+				Value_Change_dec(&Out_Third->data.FREQ_DATA_LOW,&Out_Third->Key_count);
+				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[FREQ_LOW_Item_Out]); //无效化该区域重新刷新
+				break;
+			
+			case GAIN_LOW_Item_Out:
+				Value_Change_dec(&Out_Third->data.GAIN_DATA_LOW,&Out_Third->Key_count);
+				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[GAIN_LOW_Item_Out]); //无效化该区域重新刷新
+				break;
+			
+			//值减少
+			case TYPE_HIGH_Item_Out:
+				Value_Change_dec(&Out_Third->data.TYPE_DATA_HIGH,&Out_Third->Key_count);
+				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[TYPE_HIGH_Item_Out]); //无效化该区域重新刷新
+				break;
+			
+			case FREQ_HIGH_Item_Out:
+				Value_Change_dec(&Out_Third->data.FREQ_DATA_HIGH,&Out_Third->Key_count);
+				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[FREQ_HIGH_Item_Out]); //无效化该区域重新刷新
+				break;
+			
+			case GAIN_HIGH_Item_Out:
+				Value_Change_dec(&Out_Third->data.GAIN_DATA_HIGH,&Out_Third->Key_count);
+				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[GAIN_HIGH_Item_Out]); //无效化该区域重新刷新
+				break;
+			
+			
+		}
+		break;
+		
+	case MSG_KNOB_INPUT_LEFT:  
+		switch(Out_Third->Item)
+		{
+			//值增加
+			case TYPE_LOW_Item_Out:
+				Value_Change_add(&Out_Third->data.TYPE_DATA_LOW,&Out_Third->Key_count);
+				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[TYPE_LOW_Item_Out]); //无效化该区域重新刷新
+				break;
+			
+			case FREQ_LOW_Item_Out:
+				Value_Change_add(&Out_Third->data.FREQ_DATA_LOW,&Out_Third->Key_count);
+				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[FREQ_LOW_Item_Out]); //无效化该区域重新刷新
+				break;
+			
+			case GAIN_LOW_Item_Out:
+				Value_Change_add(&Out_Third->data.GAIN_DATA_LOW,&Out_Third->Key_count);
+				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[GAIN_LOW_Item_Out]); //无效化该区域重新刷新
+				break;
+			
+			//值增加
+			case TYPE_HIGH_Item_Out:
+				Value_Change_add(&Out_Third->data.TYPE_DATA_HIGH,&Out_Third->Key_count);
+				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[TYPE_HIGH_Item_Out]); //无效化该区域重新刷新
+				break;
+			
+			case FREQ_HIGH_Item_Out:
+				Value_Change_add(&Out_Third->data.FREQ_DATA_HIGH,&Out_Third->Key_count);
+				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[FREQ_HIGH_Item_Out]); //无效化该区域重新刷新
+				break;
+			
+			case GAIN_HIGH_Item_Out:
+				Value_Change_add(&Out_Third->data.GAIN_DATA_HIGH,&Out_Third->Key_count);
+				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[GAIN_HIGH_Item_Out]); //无效化该区域重新刷新
+				break;
+			
+			
+		}
+		break;	
+	/*********************************END***************************************/
+	//释放内存
+	case WM_DELETE:
+		break;
 	default:
 		WM_DefaultProc(pMsg);
 		break;
@@ -460,10 +690,41 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 *
 *       CreateWindow
 */
-WM_HWIN Output_Third(void);
+static void Init_data(Output_Third_Data *L)
+{
+	L->face_switch		=		OUTPUT_CHANNEL;
+	L->Item				=		TYPE_LOW_Item_Out;
+	L->String			=		face_string[OUTPUT_CHANNEL];
+	L->Time_count		=		0;
+	L->hItime			=		0;
+	L->Key_count		=		0;
+	L->checkbox_sta		=		0;
+	
+	//数据初始化
+//	L->data.RMSTC_DATA  =		0;
+//	L->data.DECAY_DATA	=		0;
+//	L->data.THRSH_DATA	=		0;
+//	L->data.OUT_INVERT_STA 	=	0;
+//	L->data.OUT_MUTE_STA	=	0;
+//	L->data.DELAY_DATA	=		0;
+	AT24C16_PageRead((u8 *)(&(L->data)),IIC_Addr[L->face_switch+30],sizeof(L->data));
+}
+
 WM_HWIN Output_Third(void) {
 	WM_HWIN hWin;
-
+	
+	//申请动态内存
+	Out_Third = (Output_Third_Data *)mymalloc(0,sizeof(Output_Third_Data));
+	
+	if(Out_Third == NULL)
+	{
+		return 0;
+	}
+	else
+	{
+		Init_data(Out_Third);
+	}
+	
 	hWin = GUI_CreateDialogBox(_aDialogCreate, GUI_COUNTOF(_aDialogCreate), _cbDialog, WM_HBKWIN, 0, 0);
 	return hWin;
 }

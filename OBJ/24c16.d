@@ -31,3 +31,4 @@
 ..\obj\24c16.o: ..\STM32F10x_StdPeriph_Driver\inc\stm32f10x_wwdg.h
 ..\obj\24c16.o: ..\STM32F10x_StdPeriph_Driver\inc\misc.h
 ..\obj\24c16.o: ..\HARDWARE\IIC\iic.h
+..\obj\24c16.o: ..\SYSTEM\delay\delay.h

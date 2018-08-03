@@ -55,7 +55,7 @@ Requirements: WindowManager - ( )
 #include "key.h"
 #include "malloc.h"
 #include "touch.h"
-
+#include "delay.h"
 
 WM_HWIN test_2(void);
 /*********************************************************************
@@ -100,8 +100,9 @@ static void FLEX_SET(void)
 */
 BUTTON_SKINFLEX_PROPS Props_Default; //按钮初始颜色
 
-u8 te[5] = {1,2,3,4,5};
+u8 te[] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,25,35,45,55};
 u8 te_r[5] = {0};
+#define Write_Add (500)
 
 void MainTask(void)
 {
@@ -118,6 +119,7 @@ void MainTask(void)
 #endif
 	BUTTON_GetSkinFlexProps(&Props_Default, BUTTON_SKINFLEX_PI_ENABLED); //按钮初始状态颜色
 	hWin_now = CreateMainface(); //创建主界面
+	
 //  Pratice();  //练习用
 //  example();  //例子用
 //	touch_main();
@@ -125,21 +127,25 @@ void MainTask(void)
 //	{
 //		GUI_Delay(10);
 //	}
-//	key_value = AT24C16_PageRead(te_r,0,sizeof(te_r));
-//	if(key_value)
-//	{
-//		GUI_SetBkColor(GUI_RED);
-//        GUI_Clear();
-//	}
-//	else
-//	{
-//		GUI_SetBkColor(GUI_GREEN);
-//        GUI_Clear();
-//	}
+
+//	AT24C16_PageWrite(te,Write_Add,sizeof(te));
+//	delay_ms(10);
+//	AT24C16_PageRead(te_r,Write_Add,sizeof(te_r));
+//	
+//	GUI_SetBkColor(GUI_RED);
+//	GUI_Clear();
 //	
 //	GUI_SetColor(GUI_BLACK);
 //    GUI_GotoXY(0, 0);
-//    GUI_DispDecMin(te_r[4]);
+//    GUI_DispDecMin(te_r[0]);
+//	GUI_GotoXY(0, 15);
+//	GUI_DispDecMin(te_r[1]);
+//	GUI_GotoXY(0, 30);
+//	GUI_DispDecMin(te_r[2]);
+//	GUI_GotoXY(0, 45);
+//	GUI_DispDecMin(te_r[3]);
+//	GUI_GotoXY(0, 60);
+//	GUI_DispDecMin(te_r[4]);
 //	while(1);
 
 }

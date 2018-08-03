@@ -88,3 +88,4 @@
 ..\obj\test.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 ..\obj\test.o: ..\HARDWARE\KEY\key.h
 ..\obj\test.o: ..\HARDWARE\TOUCH\touch.h
+..\obj\test.o: ..\SYSTEM\delay\delay.h

@@ -368,7 +368,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 *
 *       CreateWindow
 */
-WM_HWIN Output_Four(void);
+
 WM_HWIN Output_Four(void) {
 	WM_HWIN hWin;
 

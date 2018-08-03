@@ -74,6 +74,8 @@
 *
 **********************************************************************
 */
+static Input_Four_data* In_Four;
+
 static const GUI_POINT pPoint_left[] = {
 	{ 0, 10 },
 	{ 10, 0 },
@@ -84,6 +86,20 @@ static const GUI_POINT pPoint_right[] = {
 	{ 10, 0 },
 	{ 20, 10 },
 	{ 10, 20 },
+};
+
+//页面显示的字符串数据
+static char face_string[][20] = 
+{
+	"NULL",
+	"INPUT1 PAGE 2/3",
+	"INPUT2 PAGE 2/3",
+	"INPUT3 PAGE 2/3",
+	"INPUT4 PAGE 2/3",
+	"INPUT5 PAGE 2/3",
+	"INPUT6 PAGE 2/3",
+	"COAX PAGE 2/3",
+
 };
 // USER START (Optionally insert additional static data)
 // USER END
@@ -126,8 +142,8 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_15, 170 + 200, 208, 20, 25, 0, 0x0, 0 },
 
 	/*页面切换*/
-	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_16, 5, 3, 20, 25, 0, 0x0, 0 },
-	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_17, 375, 3, 20, 25, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_16, 5, 5, 20, 25, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_17, 375, 5, 20, 25, 0, 0x0, 0 },
 };
 
 /*********************************************************************
@@ -223,6 +239,50 @@ static void _cbButton_right(WM_MESSAGE * pMsg) //--------------（3）
 		BUTTON_Callback(pMsg);
 	}
 }
+
+
+/*
+*******************************************************************************************
+* 函 数 名: Show_Value
+* 功能说明: 显示数值
+* 形 参: 无
+* 返 回 值: 无
+*******************************************************************************************
+*/
+#include "stdio.h"
+#define 	BAND_Y   	75
+#define 	FREQ_Y   	BAND_Y+34
+#define  	TYPE_Y		FREQ_Y+34
+#define 	GAIN_Y		TYPE_Y+34
+#define		Q_Y			GAIN_Y+34
+
+#define		BAND_MAX    30
+#define		BAND_MIN	0
+
+
+static void Show_Value(void)
+{
+	char str[10];
+	GUI_SetColor(GUI_BLACK); 		//设置颜色
+	GUI_SetTextMode(GUI_TM_TRANS);  //设置透明模式
+	GUI_SetFont(&GUI_Font20_1); 	//设置字体
+	
+	Max_Min(&In_Four->data.BAND_DATA,BAND_MAX,BAND_MIN); //设置最大和最小值
+	snprintf(str,9,"%d",In_Four->data.BAND_DATA);  //把数值转为字符串
+	GUI_DispStringHCenterAt(str,300,BAND_Y);          //以当前坐标为中心显示字符串
+	
+	snprintf(str,9,"%d",In_Four->data.FREQ_DATA);  //把数值转为字符串
+	GUI_DispStringHCenterAt(str,300,FREQ_Y);
+	
+	snprintf(str,9,"%d",In_Four->data.TYPE_DATA);  //把数值转为字符串
+	GUI_DispStringHCenterAt(str,300,TYPE_Y);
+	
+	snprintf(str,9,"%d",In_Four->data.GAIN_DATA);  //把数值转为字符串
+	GUI_DispStringHCenterAt(str,300,GAIN_Y);
+	
+	snprintf(str,9,"%d",In_Four->data.Q_DATA);  //把数值转为字符串
+	GUI_DispStringHCenterAt(str,300,Q_Y);
+}
 // USER START (Optionally insert additional static code)
 // USER END
 
@@ -243,7 +303,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 	case WM_INIT_DIALOG:
 		//TEXT设置
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_0);
-		TEXT_SetText(hItem, "INPUT PAGE 2/3");
+		TEXT_SetText(hItem, In_Four->String);
 		TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
 		TEXT_SetFont(hItem, GUI_FONT_24B_1);
 		TEXT_SetTextColor(hItem, GUI_MAKE_COLOR(0x00FFFFFF));
@@ -254,7 +314,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
 		TEXT_SetFont(hItem, GUI_FONT_24B_1);
 		TEXT_SetTextColor(hItem, GUI_MAKE_COLOR(0x00FFFFFF));
-
+		
 		//按钮设置
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_0);
 		BUTTON_SetFont(hItem, GUI_FONT_16B_1);  //设置字体
@@ -327,7 +387,18 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_17);
 		WM_SetCallback(hItem, _cbButton_right);
 		BUTTON_SetFocussable(hItem, 0); //不接受输入焦点
-
+		
+		//ON_OFF
+		hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_5);
+		BUTTON_SetFont(hItem, GUI_FONT_16B_1);  //设置字体
+		if ((In_Four->data.ON_OFF&0x01) == 0)
+		{
+			BUTTON_SetText(hItem, "ON");          //设置显示的字符串
+		}
+		else
+		{
+			BUTTON_SetText(hItem, "OFF");          //设置显示的字符串
+		}
 		break;
 		
 
@@ -350,8 +421,121 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		GUI_FillRoundedRect(Thirt_x, Four_y, 396, Four_y + 30, 4);
 		GUI_FillRoundedRect(Thirt_x, Five_y, 396, Five_y + 30, 4);
 		GUI_FillRoundedRect(Thirt_x, Six_y, 396, Six_y + 30, 4);
+	
+		//显示数值
+		Show_Value();
+		
 		break;
+	
+	//信息处理
+	case WM_NOTIFY_PARENT:
+		Id = WM_GetId(pMsg->hWinSrc);  //获得是哪个子窗口发生变化
+		NCode = pMsg->Data.v;          //子窗口发生什么变化
+		
+		//消息处理
+		switch(Id)
+		{
+			//页面切换
+			case ID_BUTTON_16:
+				switch (NCode)
+				{
+					//已点击按钮
+					case WM_NOTIFICATION_CLICKED:
 
+						break;
+
+					//已释放按钮
+					case WM_NOTIFICATION_RELEASED:
+						GUI_EndDialog(pMsg->hWin, 0);   //结束当前界面
+						hWin_now = Input_Second();      //切换下一个界面
+						break;
+				}	
+			break;
+				
+			case ID_BUTTON_17:
+				switch (NCode)
+				{
+					//已点击按钮
+					case WM_NOTIFICATION_CLICKED:
+
+						break;
+
+					//已释放按钮
+					case WM_NOTIFICATION_RELEASED:
+						GUI_EndDialog(pMsg->hWin, 0);   //结束当前界面
+						hWin_now = Input_Third();      //切换下一个界面
+						break;
+				}	
+			break;
+			
+			//ON_OFF
+			case ID_BUTTON_5:
+				switch (NCode)
+				{
+					//已点击按钮
+					case WM_NOTIFICATION_CLICKED:
+						WM_SetFocus(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_5));
+						In_Four->Item = ON_OFF_Item;
+						break;
+
+					//已释放按钮
+					case WM_NOTIFICATION_RELEASED:
+						In_Four->data.ON_OFF = ~In_Four->data.ON_OFF;  //切换显示的字符串
+						if ((In_Four->data.ON_OFF&0x01) == 0)
+						{
+							BUTTON_SetText(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_5), "ON");          //设置显示的字符串
+						}
+						else
+						{
+							BUTTON_SetText(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_5), "OFF");
+						}
+						WM_InvalidateWindow(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_5));//无效化该窗口
+						break;
+				}
+				break;
+		}
+		break;
+	/*********************************************自定义信息处理**************************************************/	
+	
+	//页面切换
+	case MSG_KNOB_OUT_LEFT:	
+		GUI_EndDialog(pMsg->hWin, 0);   //结束当前界面
+		hWin_now = Input_Third();      //切换下一个界面
+		break;
+	
+	case MSG_KNOB_OUT_RIGHT:
+		GUI_EndDialog(pMsg->hWin, 0);   //结束当前界面
+		hWin_now = Input_Second();      //切换下一个界面
+		break;
+	
+	//CONTROL 左转
+	case MSG_KNOB_CONTROL_LEFT:
+		//子选项指示
+		GUI_SendKeyMsg(GUI_KEY_TAB, 1);     //下一个聚焦点
+		break;
+	
+	//CONTROL 右转
+	case MSG_KNOB_CONTROL_RIGHT:
+		GUI_SendKeyMsg(GUI_KEY_BACKTAB, 1); //上一个聚焦
+		break;
+	
+	//CONTROL按下
+	case MSG_KEY_CONTROL:
+		GUI_SendKeyMsg(GUI_KEY_ENTER, 1);   //确定
+		break;
+	
+	//ESC
+	case MSG_KEY_ESC:
+		GUI_EndDialog(pMsg->hWin, 0); //关闭当前窗口
+		hWin_now = Input_First();  //显示Input_First页面
+		INPUT_CHANNEL = 1;
+		break;
+	
+	//可以在这里释放数据结构
+	case WM_DELETE:
+		myfree(0,In_Four); //释放动态内存
+		break;
+	
 	default:
 		WM_DefaultProc(pMsg);
 		break;
@@ -368,10 +552,40 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 *
 *       CreateWindow
 */
+//初始化数据
+static void Init_data(Input_Four_data *L)
+{
+	L->face_switch  	= 	INPUT_CHANNEL;  //获得选中的通道
+//	L->Item         	= 	RMSTC_Item;              //子选项
+	L->String       	= 	face_string[INPUT_CHANNEL]; //头项目字符串
+	L->Time_count       =	0;
+	L->hItime			=	0;
+	L->Key_count		=	0;
+	
+	L->data.ON_OFF		=	0;
+	L->data.BAND_DATA	=	0;
+	L->data.FREQ_DATA	=	0;
+	L->data.TYPE_DATA	=	0;
+	L->data.GAIN_DATA	=	0;
+	L->data.Q_DATA		=	0;
+}
 
 WM_HWIN Input_Four(void) {
 	WM_HWIN hWin;
-
+	
+	//申请数据
+	In_Four = (Input_Four_data *)mymalloc(0,sizeof(Input_Four_data));
+	
+	if(In_Four == NULL)
+	{
+		return 0;
+	}
+	else
+	{
+		Init_data(In_Four);
+	}
+	
+	
 	hWin = GUI_CreateDialogBox(_aDialogCreate, GUI_COUNTOF(_aDialogCreate), _cbDialog, WM_HBKWIN, 0, 0);
 	return hWin;
 }

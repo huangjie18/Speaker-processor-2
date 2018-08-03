@@ -82,3 +82,4 @@
 ..\obj\input_four.o: ..\HARDWARE\IIC\iic.h
 ..\obj\input_four.o: ..\MALLOC\malloc.h
 ..\obj\input_four.o: ..\STemWin\inc\BUTTON_Private.h
+..\obj\input_four.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h

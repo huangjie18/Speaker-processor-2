@@ -241,11 +241,12 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		case ID_BUTTON_3:  //OUTPUT
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
-				Main_channel = 3;
-                GUI_EndDialog(pMsg->hWin,0);     //结束当前页面
+				
 				break;
 			case WM_NOTIFICATION_RELEASED:
-
+				Main_channel = 3;
+                GUI_EndDialog(pMsg->hWin,0);     //结束当前页面
+				hWin_now = Output_First(); //显示OUTPUT第一个界面
 				break;
 
 			}

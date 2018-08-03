@@ -22,19 +22,23 @@ Dialog DLL:      TCM.DLL V1.14.5.0
  
 <h2>Project:</h2>
 D:\GitHub\Speaker-processor-2\USER\Processor.uvprojx
-Project File Date:  07/25/2018
+Project File Date:  07/28/2018
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.05 update 2 (build 169)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'Processor'
-compiling Input_Second.c...
-..\HARDWARE\inface_2\INPUT\Input_Second.c(214): warning:  #177-D: variable "pState" was declared but never referenced
+compiling Output_Third.c...
+..\HARDWARE\inface_2\OUTPUT\Output_Third.c(219): warning:  #177-D: variable "pState" was declared but never referenced
         const GUI_PID_STATE* pState = (const GUI_PID_STATE*)pMsg->Data.p;
-..\HARDWARE\inface_2\INPUT\Input_Second.c: 1 warning, 0 errors
+..\HARDWARE\inface_2\OUTPUT\Output_Third.c(341): warning:  #177-D: variable "NCode" was declared but never referenced
+        int             NCode;
+..\HARDWARE\inface_2\OUTPUT\Output_Third.c(342): warning:  #177-D: variable "Id" was declared but never referenced
+        int             Id;
+..\HARDWARE\inface_2\OUTPUT\Output_Third.c: 3 warnings, 0 errors
 linking...
-Program Size: Code=82208 RO-data=98788 RW-data=1672 ZI-data=1245248  
+Program Size: Code=93264 RO-data=101908 RW-data=2448 ZI-data=1245400  
 FromELF: creating hex file...
-"..\OBJ\Processor.axf" - 0 Error(s), 1 Warning(s).
+"..\OBJ\Processor.axf" - 0 Error(s), 3 Warning(s).
 
 <h2>Collection of Component include folders:</h2>
   D:\GitHub\Speaker-processor-2\USER\RTE

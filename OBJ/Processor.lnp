@@ -38,6 +38,10 @@
 "..\obj\input_four.o"
 "..\obj\input_second.o"
 "..\obj\input_third.o"
+"..\obj\output_first.o"
+"..\obj\output_four.o"
+"..\obj\output_second.o"
+"..\obj\output_third.o"
 --strict --scatter "..\OBJ\Processor.sct"
 --summary_stderr --info summarysizes --map --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers

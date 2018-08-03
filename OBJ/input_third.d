@@ -81,3 +81,4 @@
 ..\obj\input_third.o: ..\HARDWARE\IC24C16\24c16.h
 ..\obj\input_third.o: ..\HARDWARE\IIC\iic.h
 ..\obj\input_third.o: ..\MALLOC\malloc.h
+..\obj\input_third.o: ..\STemWin\inc\BUTTON_Private.h

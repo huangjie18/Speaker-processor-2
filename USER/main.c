@@ -15,6 +15,7 @@
 #include "24c16.h"
 /**************************************
 ***********注意事项********************
+STM32改为其他芯片
 1.改Device为GDF303时不用改东西可以直接用,因为GDF303
 没有FPU单元;
 2.改Device为ATF403时,ATF403拥有FPU单元，但此时用的
@@ -22,6 +23,8 @@ EMWIN-CM3库没有支持FPU单元,如果开启FPU则会进入硬件错误,
 关闭FPU单元则正常使用。
 关闭步骤：Target -> Floating Poirt Hardware -> Not Used
 3.改了主频后需要改FSMC的速度，否则emwin读数据有问题
+
+4.不能直接把Device 为ATF403的程序直接下载到STM32上，不能运行，要改Device
 ////////////////
 4.如果使用SRAM-224k需要配置EOPB0 为 0xfe，ZW会把128k分给SRAM,NZW会增大128k，
 此时的ZW固定为128k
@@ -30,7 +33,7 @@ EMWIN-CM3库没有支持FPU单元,如果开启FPU则会进入硬件错误,
 5.*注意：该软件GP芯片使用的stm32的flash下载算法，如果不行请使用回GD的flash算法
 *该屏的DB13和DB15要掉转
 
-
+6.STM32的程序不用改Device可直接下载到AT和GD，但反过来不行
 ***************************************/
 
 //当前页面句柄
@@ -186,8 +189,9 @@ int main(void)
 			else  //没有旋钮动作
 			{
 				key_count++;  
-				if(key_count >= 500) //当大约2s内没有动作
+				if(key_count >= 1000) //当大约XXXms内没有动作
 				{
+					key_count = 0;
 					WM_SendMessageNoPara(hWin_now, MSG_KNOB_NULL);  
 				}
 			}

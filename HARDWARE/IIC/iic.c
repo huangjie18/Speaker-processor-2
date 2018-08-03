@@ -25,8 +25,46 @@ static void IIC_Addr_Init(void)
 	IIC_Addr[6]  	=	IIC_Addr[5] + sizeof(Input_Data);    		//IN6_Second首数据存放地址
 	IIC_Addr[7]  	=	IIC_Addr[6] + sizeof(Input_Data);    		//IN7_Second首数据存放地址
 	
+	IIC_Addr[8]		=	IIC_Addr[7] + sizeof(Input_Data);			//IN1_Third首地址存放地址
+	IIC_Addr[9]		=	IIC_Addr[8] + sizeof(Input_Data3);			//IN2_Third首地址存放地址
+	IIC_Addr[10]	=	IIC_Addr[9] + sizeof(Input_Data3);			//IN3_Third首地址存放地址
+	IIC_Addr[11]	=	IIC_Addr[10] + sizeof(Input_Data3);			//IN4_Third首地址存放地址
+	IIC_Addr[12]	=	IIC_Addr[11] + sizeof(Input_Data3);			//IN5_Third首地址存放地址
+	IIC_Addr[13]	=	IIC_Addr[12] + sizeof(Input_Data3);			//IN6_Third首地址存放地址
+	IIC_Addr[14]	=	IIC_Addr[13] + sizeof(Input_Data3);			//IN7_Third首地址存放地址
+	
+	IIC_Addr[15]	=	IIC_Addr[14] + sizeof(Input_Data3);			//IN1_Four首地址存放地址
+	IIC_Addr[16]	=	IIC_Addr[15] + sizeof(Input_Data4);			//IN2_Four首地址存放地址
+	IIC_Addr[17]	=	IIC_Addr[16] + sizeof(Input_Data4);			//IN3_Four首地址存放地址
+	IIC_Addr[18]	=	IIC_Addr[17] + sizeof(Input_Data4);			//IN4_Four首地址存放地址
+	IIC_Addr[19]	=	IIC_Addr[18] + sizeof(Input_Data4);			//IN5_Four首地址存放地址
+	IIC_Addr[20]	=	IIC_Addr[19] + sizeof(Input_Data4);			//IN6_Four首地址存放地址
+	IIC_Addr[21]	=	IIC_Addr[20] + sizeof(Input_Data4);			//IN7_Four首地址存放地址
+	
+	IIC_Addr[22]	=	IIC_Addr[21] + sizeof(Input_Data4);   		//OUT_First数据存放地址
+	
+	IIC_Addr[23]	=	IIC_Addr[22] + sizeof(Output_First_data);   //OUT1_Second数据存放地址
+	IIC_Addr[24]	=	IIC_Addr[23] + sizeof(Output_Data1);   		//OUT2_Second数据存放地址
+	IIC_Addr[25]	=	IIC_Addr[24] + sizeof(Output_Data1);   		//OUT3_Second数据存放地址
+	IIC_Addr[26]	=	IIC_Addr[25] + sizeof(Output_Data1);   		//OUT4_Second数据存放地址
+	IIC_Addr[27]	=	IIC_Addr[26] + sizeof(Output_Data1);   		//OUT5_Second数据存放地址
+	IIC_Addr[28]	=	IIC_Addr[27] + sizeof(Output_Data1);   		//OUT6_Second数据存放地址
+	IIC_Addr[29]	=	IIC_Addr[28] + sizeof(Output_Data1);   		//OUT7_Second数据存放地址
+	IIC_Addr[30]	=	IIC_Addr[29] + sizeof(Output_Data1);   		//OUT8_Second数据存放地址
+	
+	IIC_Addr[31]	=	IIC_Addr[30] + sizeof(Output_Data1);		//OUT1_Third数据存放地址
+	IIC_Addr[32]	=	IIC_Addr[31] + sizeof(Output_Data2);		//OUT2_Third数据存放地址
+	IIC_Addr[33]	=	IIC_Addr[32] + sizeof(Output_Data2);		//OUT3_Third数据存放地址
+	IIC_Addr[34]	=	IIC_Addr[33] + sizeof(Output_Data2);		//OUT4_Third数据存放地址
+	IIC_Addr[35]	=	IIC_Addr[34] + sizeof(Output_Data2);		//OUT5_Third数据存放地址
+	IIC_Addr[36]	=	IIC_Addr[35] + sizeof(Output_Data2);		//OUT6_Third数据存放地址
+	IIC_Addr[37]	=	IIC_Addr[36] + sizeof(Output_Data2);		//OUT7_Third数据存放地址
+	IIC_Addr[38]	=	IIC_Addr[37] + sizeof(Output_Data2);		//OUT8_Third数据存放地址
+	
 }
 
+
+#if yehuo_use
 /*
 *******************************************************************************************
 * 函 数 名: IIC_Init
@@ -121,6 +159,30 @@ void IIC_SendByte(u8 _ucByte)
 	EEPROM_I2C_SDA_1(); //释放总线，看是否会产生应答
 }
 
+
+void IIC_SendByte_16(u16 _ucByte)
+{
+	u8 i;
+	EEPROM_I2C_SCL_0();
+	for(i=0; i<16; i++)
+	{
+		if(_ucByte & 0x8000)
+		{
+			EEPROM_I2C_SDA_1();
+		}
+		else
+		{
+			EEPROM_I2C_SDA_0();
+		}
+		delay_us(2);
+		EEPROM_I2C_SCL_1();
+		delay_us(2);
+		EEPROM_I2C_SCL_0();
+		delay_us(2);
+		_ucByte <<= 1; /* 左移一个bit */
+	}
+	EEPROM_I2C_SDA_1(); //释放总线，看是否会产生应答
+}
 /*
 *********************************************************************************************************
 *	函 数 名: IIC_ReadByte
@@ -219,6 +281,134 @@ void IIC_NAck(void)
 	delay_us(2);
 }
 
-
+#else
 /*************************************************24C16设备**********************************************/
+
+
+//初始化IIC
+void IIC_Init(void)
+{					     
+	GPIO_InitTypeDef GPIO_InitStructure;
+	RCC_APB2PeriphClockCmd(	RCC_APB2Periph_GPIOB, ENABLE );	//使能GPIOB时钟
+	   
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6|GPIO_Pin_7;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP ;   //推挽输出
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOB, &GPIO_InitStructure);
+	GPIO_SetBits(GPIOB,GPIO_Pin_6|GPIO_Pin_7); 	//PB6,PB7 输出高
+	IIC_Addr_Init();
+}
+//产生IIC起始信号
+void IIC_Start(void)
+{
+	SDA_OUT();     //sda线输出
+	IIC_SDA=1;	  	  
+	IIC_SCL=1;
+	delay_us(4);
+ 	IIC_SDA=0;//START:when CLK is high,DATA change form high to low 
+	delay_us(4);
+	IIC_SCL=0;//钳住I2C总线，准备发送或接收数据 
+}	  
+//产生IIC停止信号
+void IIC_Stop(void)
+{
+	SDA_OUT();//sda线输出
+	IIC_SCL=0;
+	IIC_SDA=0;//STOP:when CLK is high DATA change form low to high
+ 	delay_us(4);
+	IIC_SCL=1; 
+	delay_us(1);
+	IIC_SDA=1;//发送I2C总线结束信号
+	delay_us(4);							   	
+}
+//等待应答信号到来
+//返回值：1，接收应答失败
+//        0，接收应答成功
+u8 IIC_Wait_Ack(void)
+{
+	u8 ucErrTime=0;
+	SDA_IN();      //SDA设置为输入  
+	IIC_SDA=1;delay_us(1);	   
+	IIC_SCL=1;delay_us(1);	 
+	while(READ_SDA)
+	{
+		ucErrTime++;
+		if(ucErrTime>250)
+		{
+			IIC_Stop();
+			return 1;
+		}
+	}
+	IIC_SCL=0;//时钟输出0 	   
+	return 0;  
+} 
+//产生ACK应答
+void IIC_Ack(void)
+{
+	IIC_SCL=0;
+	SDA_OUT();
+	IIC_SDA=0;
+	delay_us(2);
+	IIC_SCL=1;
+	delay_us(2);
+	IIC_SCL=0;
+}
+//不产生ACK应答		    
+void IIC_NAck(void)
+{
+	IIC_SCL=0;
+	SDA_OUT();
+	IIC_SDA=1;
+	delay_us(2);
+	IIC_SCL=1;
+	delay_us(2);
+	IIC_SCL=0;
+}					 				     
+//IIC发送一个字节
+//返回从机有无应答
+//1，有应答
+//0，无应答			  
+void IIC_Send_Byte(u8 txd)
+{                        
+    u8 t;   
+	SDA_OUT(); 	    
+    IIC_SCL=0;//拉低时钟开始数据传输
+    for(t=0;t<8;t++)
+    {              
+        //IIC_SDA=(txd&0x80)>>7;
+		if((txd&0x80)>>7)
+			IIC_SDA=1;
+		else
+			IIC_SDA=0;
+		txd<<=1; 	  
+		delay_us(2);   //对TEA5767这三个延时都是必须的
+		IIC_SCL=1;
+		delay_us(2); 
+		IIC_SCL=0;	
+		delay_us(2);
+    }	 
+} 	    
+//读1个字节，ack=1时，发送ACK，ack=0，发送nACK   
+u8 IIC_Read_Byte(unsigned char ack)
+{
+	unsigned char i,receive=0;
+	SDA_IN();//SDA设置为输入
+    for(i=0;i<8;i++ )
+	{
+        IIC_SCL=0; 
+        delay_us(2);
+		IIC_SCL=1;
+        receive<<=1;
+        if(READ_SDA)receive++;   
+		delay_us(1); 
+    }					 
+    if (!ack)
+        IIC_NAck();//发送nACK
+    else
+        IIC_Ack(); //发送ACK   
+    return receive;
+}
+
+#endif
+
 

@@ -22,7 +22,7 @@
 // USER END
 
 #include "DIALOG.h"
-
+#include "BUTTON_Private.h"
 /*********************************************************************
 *
 *       Defines
@@ -55,6 +55,8 @@
 #define ID_TEXT_6 (GUI_ID_USER + 0x17)
 #define ID_TEXT_7 (GUI_ID_USER + 0x18)
 #define ID_TEXT_8 (GUI_ID_USER + 0x19)
+#define ID_BUTTON_0		(GUI_ID_USER + 0x1A)
+#define ID_BUTTON_1		(GUI_ID_USER + 0x1B)
 // USER START (Optionally insert additional defines)
 // USER END
 
@@ -68,6 +70,32 @@
 #define text_color GUI_BLACK
 static char value[8]; //用来显示的值
 
+static Input_Third_data * In_Third;
+static const GUI_POINT pPoint_left[] = {
+	{ 0, 10 },
+	{ 10, 0 },
+	{ 10, 20 },
+};
+
+static const GUI_POINT pPoint_right[] = {
+	{ 10, 0 },
+	{ 20, 10 },
+	{ 10, 20 },
+};
+
+//页面显示的字符串数据
+static char face_string[][20] = 
+{
+	"NULL",
+	"INPUT1 PAGE 3/3",
+	"INPUT2 PAGE 3/3",
+	"INPUT3 PAGE 3/3",
+	"INPUT4 PAGE 3/3",
+	"INPUT5 PAGE 3/3",
+	"INPUT6 PAGE 3/3",
+	"COAX PAGE 3/3",
+
+};
 //无效区域设置
 static GUI_RECT Rect[] =
 {
@@ -88,23 +116,41 @@ static void _ShowSlidervalue(void)
 	GUI_SetTextMode(GUI_TM_TRANS); //设置透明模式
 	GUI_SetFont(&GUI_Font20_1); //设置字体
 
+//	GUI_GotoXY(10, Text_y);  //设置1位置
+//	GUI_DispDecMin(-value[0]); //显示值
+//	GUI_GotoXY(50, Text_y);  //设置2位置
+//	GUI_DispDecMin(-value[1]); //显示值
+//	GUI_GotoXY(90, Text_y);  //设置3位置
+//	GUI_DispDecMin(-value[2]); //显示值
+//	GUI_GotoXY(130, Text_y);  //设置4位置
+//	GUI_DispDecMin(-value[3]); //显示值
+//	GUI_GotoXY(170, Text_y);  //设置5位置
+//	GUI_DispDecMin(-value[4]); //显示值
+//	GUI_GotoXY(210, Text_y);  //设置6位置
+//	GUI_DispDecMin(-value[5]); //显示值
+//	GUI_GotoXY(250, Text_y);  //设置7位置
+//	GUI_DispDecMin(-value[6]); //显示值
+//	GUI_GotoXY(290, Text_y);  //设置8位置
+//	GUI_DispDecMin(-value[7]); //显示值
+	
 	GUI_GotoXY(10, Text_y);  //设置1位置
-	GUI_DispDecMin(-value[0]); //显示值
+	GUI_DispDecMin(-In_Third->data.Aux1_SLIDER_DATA); //显示值
 	GUI_GotoXY(50, Text_y);  //设置2位置
-	GUI_DispDecMin(-value[1]); //显示值
+	GUI_DispDecMin(-In_Third->data.Aux2_SLIDER_DATA); //显示值
 	GUI_GotoXY(90, Text_y);  //设置3位置
-	GUI_DispDecMin(-value[2]); //显示值
+	GUI_DispDecMin(-In_Third->data.Aux3_SLIDER_DATA); //显示值
 	GUI_GotoXY(130, Text_y);  //设置4位置
-	GUI_DispDecMin(-value[3]); //显示值
+	GUI_DispDecMin(-In_Third->data.Aux4_SLIDER_DATA); //显示值
 	GUI_GotoXY(170, Text_y);  //设置5位置
-	GUI_DispDecMin(-value[4]); //显示值
+	GUI_DispDecMin(-In_Third->data.Aux5_SLIDER_DATA); //显示值
 	GUI_GotoXY(210, Text_y);  //设置6位置
-	GUI_DispDecMin(-value[5]); //显示值
+	GUI_DispDecMin(-In_Third->data.Aux6_SLIDER_DATA); //显示值
 	GUI_GotoXY(250, Text_y);  //设置7位置
-	GUI_DispDecMin(-value[6]); //显示值
+	GUI_DispDecMin(-In_Third->data.Aux7_SLIDER_DATA); //显示值
 	GUI_GotoXY(290, Text_y);  //设置8位置
-	GUI_DispDecMin(-value[7]); //显示值
-
+	GUI_DispDecMin(-In_Third->data.Aux8_SLIDER_DATA); //显示值
+	
+	AT24C16_PageWrite((u8 *)In_Third,IIC_Addr[(In_Third->face_switch)+7],sizeof(Input_Data3));  //保存数据
 }
 // USER START (Optionally insert additional static data)
 // USER END
@@ -140,6 +186,10 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 	{ TEXT_CreateIndirect, "Text", ID_TEXT_6, 208, 212, 30, 240 - 212, 0, 0, 0 },
 	{ TEXT_CreateIndirect, "Text", ID_TEXT_7, 248, 212, 30, 240 - 212, 0, 0, 0 },
 	{ TEXT_CreateIndirect, "Text", ID_TEXT_8, 288, 212, 30, 240 - 212, 0, 0, 0 },
+	
+	/*页面切换*/
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_0, 5, 5, 20, 25, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_1, 375, 5, 20, 25, 0, 0x0, 0 },
 	// USER START (Optionally insert additional widgets)
 	// USER END
 };
@@ -150,7 +200,95 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 *
 **********************************************************************
 */
+// USER START (Optionally insert additional static code)
+// USER END
+//左边三角形
+static void _cbButton_left(WM_MESSAGE * pMsg) //--------------（3）
+{
+	WM_HWIN hWin;
+	hWin = pMsg->hWin;
+	switch (pMsg->MsgId)
+	{
+	case WM_PAINT:
+		if (BUTTON_IsPressed(hWin))
+		{
+			//画红色三角形
+			GUI_SetColor(GUI_RED);
+			GUI_FillPolygon(pPoint_left, 3, 0, 0);
+		}
+		else
+		{
+			//画黑色三角形
+			GUI_SetColor(GUI_BLACK);
+			GUI_FillPolygon(pPoint_left, 3, 0, 0);
+		}
 
+		break;
+
+		//处理默认信息
+	default:
+		BUTTON_Callback(pMsg);
+	}
+}
+
+//右边三角形
+#define BUTTON_H2P(h) (BUTTON_Obj*) GUI_ALLOC_h2p(h)
+
+static void _cbButton_right(WM_MESSAGE * pMsg) //--------------（3）
+{
+	WM_HWIN hWin;
+	BUTTON_Obj * pObj; //用来提取出按钮的指针结构体，包含了各种信息
+
+	const GUI_PID_STATE* pState = (const GUI_PID_STATE*)pMsg->Data.p;
+	hWin = pMsg->hWin;
+	pObj = BUTTON_H2P(hWin);
+
+	switch (pMsg->MsgId)
+	{
+	case WM_PAINT:
+		if (BUTTON_IsPressed(hWin))
+		{
+			//画红色三角形
+			GUI_SetColor(GUI_RED);
+			GUI_FillPolygon(pPoint_right, 3, 0, 0);
+		}
+		else
+		{
+			//画黑色三角形
+			GUI_SetColor(GUI_BLACK);
+			GUI_FillPolygon(pPoint_right, 3, 0, 0);
+		}
+
+		//绘制聚焦,如果不接受聚焦则此项不起作用
+		if (pObj->Widget.State & WIDGET_STATE_FOCUS)
+		{
+			GUI_SetColor(GUI_RED);
+			GUI_FillPolygon(pPoint_right, 3, 0, 0);
+		}
+		break;
+
+
+		//case WM_TOUCH:
+		//	if (pMsg->Data.p) {  /* Something happened in our area (pressed or released) */
+		//		if (pState->Pressed) {
+		//			RMSTC_Value++;
+		//			WIDGET_OrState(hWin, BUTTON_STATE_PRESSED);
+		//			WM_NotifyParent(hWin, WM_NOTIFICATION_CLICKED);
+		//		}
+		//		else {
+		//			/* React only if button was pressed before ... avoid problems with moving / hiding windows above (such as dropdown) */
+		//			
+		//		}
+		//	}
+		//	else {
+		//		
+		//	}
+		//	break;
+		//处理默认信息
+	default:
+		BUTTON_Callback(pMsg);
+	}
+}
 // USER START (Optionally insert additional static code)
 // USER END
 
@@ -173,7 +311,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		// Initialization of 'Text'
 		//
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_0);
-		TEXT_SetText(hItem, "INPUT PAGE 3/3");
+		TEXT_SetText(hItem, In_Third->String);
 		TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
 		TEXT_SetFont(hItem, GUI_FONT_24B_1);
 		TEXT_SetTextColor(hItem, GUI_WHITE);
@@ -233,84 +371,103 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		CHECKBOX_SetTextColor(hItem,GUI_WHITE);
 		CHECKBOX_SetFocusColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFont(hItem, GUI_FONT_16B_1);
+		CHECKBOX_SetState(hItem,In_Third->data.Aux1_CHECKBOX_STA);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_1);
 		CHECKBOX_SetText(hItem, "AUX2");
 		CHECKBOX_SetTextColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFocusColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFont(hItem, GUI_FONT_16B_1);
+		CHECKBOX_SetState(hItem,In_Third->data.Aux2_CHECKBOX_STA);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_2);
 		CHECKBOX_SetText(hItem, "AUX3");
 		CHECKBOX_SetTextColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFocusColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFont(hItem, GUI_FONT_16B_1);
+		CHECKBOX_SetState(hItem,In_Third->data.Aux3_CHECKBOX_STA);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_3);
 		CHECKBOX_SetText(hItem, "AUX4");
 		CHECKBOX_SetTextColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFocusColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFont(hItem, GUI_FONT_16B_1);
+		CHECKBOX_SetState(hItem,In_Third->data.Aux4_CHECKBOX_STA);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_4);
 		CHECKBOX_SetText(hItem, "AUX5");
 		CHECKBOX_SetTextColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFocusColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFont(hItem, GUI_FONT_16B_1);
+		CHECKBOX_SetState(hItem,In_Third->data.Aux5_CHECKBOX_STA);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_5);
 		CHECKBOX_SetText(hItem, "AUX6");
 		CHECKBOX_SetTextColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFocusColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFont(hItem, GUI_FONT_16B_1);
+		CHECKBOX_SetState(hItem,In_Third->data.Aux6_CHECKBOX_STA);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_6);
 		CHECKBOX_SetText(hItem, "AUX7");
 		CHECKBOX_SetTextColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFocusColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFont(hItem, GUI_FONT_16B_1);
+		CHECKBOX_SetState(hItem,In_Third->data.Aux7_CHECKBOX_STA);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_7);
 		CHECKBOX_SetText(hItem, "AUX8");
 		CHECKBOX_SetTextColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFocusColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFont(hItem, GUI_FONT_16B_1);
+		CHECKBOX_SetState(hItem,In_Third->data.Aux8_CHECKBOX_STA);
 
 		//滑块
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_0);
 		SLIDER_SetRange(hItem, 0, 80);  //要取绝对值
-		SLIDER_SetValue(hItem, 80);
+		SLIDER_SetValue(hItem, In_Third->data.Aux1_SLIDER_DATA);
 		//SLIDER_SetSkin(hItem, SLIDER_DrawSkinFlex); //可以用回之前的皮肤
 
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_1);
 		SLIDER_SetRange(hItem, 0, 80);  //要取绝对值
-		SLIDER_SetValue(hItem, 80);
+		SLIDER_SetValue(hItem, In_Third->data.Aux2_SLIDER_DATA);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_2);
 		SLIDER_SetRange(hItem, 0, 80);  //要取绝对值
-		SLIDER_SetValue(hItem, 80);
+		SLIDER_SetValue(hItem, In_Third->data.Aux3_SLIDER_DATA);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_3);
 		SLIDER_SetRange(hItem, 0, 80);  //要取绝对值
-		SLIDER_SetValue(hItem, 80);
+		SLIDER_SetValue(hItem, In_Third->data.Aux4_SLIDER_DATA);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_4);
 		SLIDER_SetRange(hItem, 0, 80);  //要取绝对值
-		SLIDER_SetValue(hItem, 80);
+		SLIDER_SetValue(hItem, In_Third->data.Aux5_SLIDER_DATA);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_5);
 		SLIDER_SetRange(hItem, 0, 80);  //要取绝对值
-		SLIDER_SetValue(hItem, 80);
+		SLIDER_SetValue(hItem, In_Third->data.Aux6_SLIDER_DATA);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_6);
 		SLIDER_SetRange(hItem, 0, 80);  //要取绝对值
-		SLIDER_SetValue(hItem, 80);
+		SLIDER_SetValue(hItem, In_Third->data.Aux7_SLIDER_DATA);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_7);
 		SLIDER_SetRange(hItem, 0, 80);  //要取绝对值
-		SLIDER_SetValue(hItem, 80);
+		SLIDER_SetValue(hItem, In_Third->data.Aux8_SLIDER_DATA);
 
+		/*重新设计按钮的外观*/
+		
+		//left
+		hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_0);
+		WM_SetCallback(hItem, _cbButton_left);
+		BUTTON_SetFocussable(hItem, 0); //不接受输入焦点
+		
+		//right
+		hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_1);
+		WM_SetCallback(hItem, _cbButton_right);
+		BUTTON_SetFocussable(hItem, 0); //不接受输入焦点
 
 
 		break;
@@ -332,7 +489,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_VALUE_CHANGED:
 				// USER START (Optionally insert code for reacting on notification message)
 				hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_0); //获得滑块句柄
-				value[0] = SLIDER_GetValue(hItem); //保存滑块值
+				In_Third->data.Aux1_SLIDER_DATA = SLIDER_GetValue(hItem); //保存滑块值
 				WM_InvalidateRect(pMsg->hWin, &Rect[0]); //无效化该值重新刷新显示值
 				// USER END
 				break;
@@ -353,7 +510,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_VALUE_CHANGED:
 				// USER START (Optionally insert code for reacting on notification message)
 				hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_1); //获得滑块句柄
-				value[1] = SLIDER_GetValue(hItem); //保存滑块值
+				In_Third->data.Aux2_SLIDER_DATA = SLIDER_GetValue(hItem); //保存滑块值
 				WM_InvalidateRect(pMsg->hWin, &Rect[1]); //无效化该值重新刷新显示值
 				// USER END
 				break;
@@ -374,7 +531,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_VALUE_CHANGED:
 				// USER START (Optionally insert code for reacting on notification message)
 				hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_2); //获得滑块句柄
-				value[2] = SLIDER_GetValue(hItem); //保存滑块值
+				In_Third->data.Aux3_SLIDER_DATA = SLIDER_GetValue(hItem); //保存滑块值
 				WM_InvalidateRect(pMsg->hWin, &Rect[2]); //无效化该值重新刷新显示值
 				// USER END
 				break;
@@ -395,7 +552,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_VALUE_CHANGED:
 				// USER START (Optionally insert code for reacting on notification message)
 				hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_3); //获得滑块句柄
-				value[3] = SLIDER_GetValue(hItem); //保存滑块值
+				In_Third->data.Aux4_SLIDER_DATA = SLIDER_GetValue(hItem); //保存滑块值
 				WM_InvalidateRect(pMsg->hWin, &Rect[3]); //无效化该值重新刷新显示值
 				// USER END
 				break;
@@ -416,7 +573,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_VALUE_CHANGED:
 				// USER START (Optionally insert code for reacting on notification message)
 				hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_4); //获得滑块句柄
-				value[4] = SLIDER_GetValue(hItem); //保存滑块值
+				In_Third->data.Aux5_SLIDER_DATA = SLIDER_GetValue(hItem); //保存滑块值
 				WM_InvalidateRect(pMsg->hWin, &Rect[4]); //无效化该值重新刷新显示值
 				// USER END
 				break;
@@ -437,7 +594,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_VALUE_CHANGED:
 				// USER START (Optionally insert code for reacting on notification message)
 				hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_5); //获得滑块句柄
-				value[5] = SLIDER_GetValue(hItem); //保存滑块值
+				In_Third->data.Aux6_SLIDER_DATA = SLIDER_GetValue(hItem); //保存滑块值
 				WM_InvalidateRect(pMsg->hWin, &Rect[5]); //无效化该值重新刷新显示值
 				// USER END
 				break;
@@ -458,7 +615,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_VALUE_CHANGED:
 				// USER START (Optionally insert code for reacting on notification message)
 				hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_6); //获得滑块句柄
-				value[6] = SLIDER_GetValue(hItem); //保存滑块值
+				In_Third->data.Aux7_SLIDER_DATA = SLIDER_GetValue(hItem); //保存滑块值
 				WM_InvalidateRect(pMsg->hWin, &Rect[6]); //无效化该值重新刷新显示值
 
 				//SLIDER_SetValue(WM_GetDialogItem(pMsg->hWin, ID_SLIDER_7), value[6]);
@@ -482,7 +639,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_VALUE_CHANGED:
 				// USER START (Optionally insert code for reacting on notification message)
 				hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_7); //获得滑块句柄
-				value[7] = SLIDER_GetValue(hItem); //保存滑块值
+				In_Third->data.Aux8_SLIDER_DATA = SLIDER_GetValue(hItem); //保存滑块值
 				WM_InvalidateRect(pMsg->hWin, &Rect[7]); //无效化该值重新刷新显示值
 
 				//SLIDER_SetValue(WM_GetDialogItem(pMsg->hWin, ID_SLIDER_6), value[7]);
@@ -493,8 +650,328 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				// USER END
 			}
 			break;
+		
+		//复选框
+		case ID_CHECKBOX_0:
+			//发生什么变化
+			switch (NCode)
+			{
+			//复选框已被点击
+			case WM_NOTIFICATION_CLICKED:
+				break;
+
+			//复选框已被释放
+			case WM_NOTIFICATION_RELEASED:
+				break;
+
+			//复选框的状态已改变
+			case WM_NOTIFICATION_VALUE_CHANGED:
+				//因为用了CHECKBOX_SetState，所以无点击时也会进入该选项-次
+				//为了让创建复选框时不进行状态标记的转换
+				if(In_Third->checkbox_sta & (0x01<<0))
+				{
+					if(In_Third->data.Aux1_CHECKBOX_STA == 0)
+					{
+						In_Third->data.Aux1_CHECKBOX_STA = 1;
+					}
+					else
+					{
+						In_Third->data.Aux1_CHECKBOX_STA = 0;
+					}
+				}
+				else
+				{
+					In_Third->checkbox_sta |= (0x01<<0);
+				}
+
+				break;
+			}
+			break; 
+			
+		case ID_CHECKBOX_1:
+			//发生什么变化
+			switch (NCode)
+			{
+				//复选框已被点击
+				case WM_NOTIFICATION_CLICKED:
+					break;
+
+				//复选框已被释放
+				case WM_NOTIFICATION_RELEASED:
+					break;
+
+				//复选框的状态已改变
+				case WM_NOTIFICATION_VALUE_CHANGED:
+					//为了让创建复选框时不进行状态标记的转换
+					if(In_Third->checkbox_sta & (0x01<<1))
+					{
+						if(In_Third->data.Aux2_CHECKBOX_STA == 0)
+						{
+							In_Third->data.Aux2_CHECKBOX_STA = 1;
+						}
+						else
+						{
+							In_Third->data.Aux2_CHECKBOX_STA = 0;
+						}
+					}
+					else
+					{
+						In_Third->checkbox_sta |= (0x01<<1);
+					}
+
+					break;
+			}
+			break; 
+			
+			case ID_CHECKBOX_2:
+			//发生什么变化
+			switch (NCode)
+			{
+				//复选框已被点击
+				case WM_NOTIFICATION_CLICKED:
+					break;
+
+				//复选框已被释放
+				case WM_NOTIFICATION_RELEASED:
+					break;
+
+				//复选框的状态已改变
+				case WM_NOTIFICATION_VALUE_CHANGED:
+					//为了让创建复选框时不进行状态标记的转换
+					if(In_Third->checkbox_sta & (0x01<<2))
+					{
+						if(In_Third->data.Aux3_CHECKBOX_STA == 0)
+						{
+							In_Third->data.Aux3_CHECKBOX_STA = 1;
+						}
+						else
+						{
+							In_Third->data.Aux3_CHECKBOX_STA = 0;
+						}
+					}
+					else
+					{
+						In_Third->checkbox_sta |= (0x01<<2);
+					}
+
+					break;
+			}
+			break;
+			
+		case ID_CHECKBOX_3:
+			//发生什么变化
+			switch (NCode)
+			{
+				//复选框已被点击
+				case WM_NOTIFICATION_CLICKED:
+					break;
+
+				//复选框已被释放
+				case WM_NOTIFICATION_RELEASED:
+					break;
+
+				//复选框的状态已改变
+				case WM_NOTIFICATION_VALUE_CHANGED:
+					//为了让创建复选框时不进行状态标记的转换
+					if(In_Third->checkbox_sta & (0x01<<3))
+					{
+						if(In_Third->data.Aux4_CHECKBOX_STA == 0)
+						{
+							In_Third->data.Aux4_CHECKBOX_STA = 1;
+						}
+						else
+						{
+							In_Third->data.Aux4_CHECKBOX_STA = 0;
+						}
+					}
+					else
+					{
+						In_Third->checkbox_sta |= (0x01<<3);
+					}
+
+					break;
+			}
+			break;
+			
+		case ID_CHECKBOX_4:
+			//发生什么变化
+			switch (NCode)
+			{
+				//复选框已被点击
+				case WM_NOTIFICATION_CLICKED:
+					break;
+
+				//复选框已被释放
+				case WM_NOTIFICATION_RELEASED:
+					break;
+
+				//复选框的状态已改变
+				case WM_NOTIFICATION_VALUE_CHANGED:
+					//为了让创建复选框时不进行状态标记的转换
+					if(In_Third->checkbox_sta & (0x01<<4))
+					{
+						if(In_Third->data.Aux5_CHECKBOX_STA == 0)
+						{
+							In_Third->data.Aux5_CHECKBOX_STA = 1;
+						}
+						else
+						{
+							In_Third->data.Aux5_CHECKBOX_STA = 0;
+						}
+					}
+					else
+					{
+						In_Third->checkbox_sta |= (0x01<<4);
+					}
+
+					break;
+			}
+			break;
+			
+		case ID_CHECKBOX_5:
+			//发生什么变化
+			switch (NCode)
+			{
+				//复选框已被点击
+				case WM_NOTIFICATION_CLICKED:
+					break;
+
+				//复选框已被释放
+				case WM_NOTIFICATION_RELEASED:
+					break;
+
+				//复选框的状态已改变
+				case WM_NOTIFICATION_VALUE_CHANGED:
+					//为了让创建复选框时不进行状态标记的转换
+					if(In_Third->checkbox_sta & (0x01<<5))
+					{
+						if(In_Third->data.Aux6_CHECKBOX_STA == 0)
+						{
+							In_Third->data.Aux6_CHECKBOX_STA = 1;
+						}
+						else
+						{
+							In_Third->data.Aux6_CHECKBOX_STA = 0;
+						}
+					}
+					else
+					{
+						In_Third->checkbox_sta |= (0x01<<5);
+					}
+
+					break;
+			}
+			break;
+			
+		case ID_CHECKBOX_6:
+			//发生什么变化
+			switch (NCode)
+			{
+				//复选框已被点击
+				case WM_NOTIFICATION_CLICKED:
+					break;
+
+				//复选框已被释放
+				case WM_NOTIFICATION_RELEASED:
+					break;
+
+				//复选框的状态已改变
+				case WM_NOTIFICATION_VALUE_CHANGED:
+					//为了让创建复选框时不进行状态标记的转换
+					if(In_Third->checkbox_sta & (0x01<<6))
+					{
+						if(In_Third->data.Aux7_CHECKBOX_STA == 0)
+						{
+							In_Third->data.Aux7_CHECKBOX_STA = 1;
+						}
+						else
+						{
+							In_Third->data.Aux7_CHECKBOX_STA = 0;
+						}
+					}
+					else
+					{
+						In_Third->checkbox_sta |= (0x01<<6);
+					}
+
+					break;
+			}
+			break;
+			
+		case ID_CHECKBOX_7:
+			//发生什么变化
+			switch (NCode)
+			{
+				//复选框已被点击
+				case WM_NOTIFICATION_CLICKED:
+					break;
+
+				//复选框已被释放
+				case WM_NOTIFICATION_RELEASED:
+					break;
+
+				//复选框的状态已改变
+				case WM_NOTIFICATION_VALUE_CHANGED:
+					//为了让创建复选框时不进行状态标记的转换
+					if(In_Third->checkbox_sta & (0x01<<7))
+					{
+						if(In_Third->data.Aux8_CHECKBOX_STA == 0)
+						{
+							In_Third->data.Aux8_CHECKBOX_STA = 1;
+						}
+						else
+						{
+							In_Third->data.Aux8_CHECKBOX_STA = 0;
+						}
+					}
+					else
+					{
+						In_Third->checkbox_sta |= (0x01<<7);
+					}
+
+					break;
+			}
+			break;
+			
+		
+		//页面切换
+		case ID_BUTTON_0:
+			switch (NCode)
+			{
+			//已点击按钮
+			case WM_NOTIFICATION_CLICKED:
+
+				break;
+
+			//已释放按钮
+			case WM_NOTIFICATION_RELEASED:
+				GUI_EndDialog(pMsg->hWin, 0);   //结束当前界面
+				hWin_now = Input_Four();      //切换下一个界面
+				break;
+			}
+			break;
+
+		case ID_BUTTON_1:
+			switch (NCode)
+			{
+			//已点击按钮
+			case WM_NOTIFICATION_CLICKED:
+
+				break;
+
+			//已释放按钮
+			case WM_NOTIFICATION_RELEASED:
+				GUI_EndDialog(pMsg->hWin, 0);   //结束当前界面
+				hWin_now = Input_Second();      //切换下一个界面
+				break;
+			}
+			break;
+			
+			
 		}
-		break;
+		break; //end of case WM_NOTIFY_PARENT
+		
+	
 
 	case WM_PAINT:
 
@@ -531,7 +1008,68 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		break;
 
 
-
+	
+	/*********************************自定义信息**********************************************/
+	//旋钮左转
+	case MSG_KNOB_CONTROL_LEFT:
+		GUI_SendKeyMsg(GUI_KEY_TAB, 1);     //下一个聚焦点
+		break;
+	
+	//旋钮右转
+	case MSG_KNOB_CONTROL_RIGHT:
+		GUI_SendKeyMsg(GUI_KEY_BACKTAB, 1); //上一个聚焦
+		break;
+	
+	//INPUT左转
+	case MSG_KNOB_INPUT_LEFT:
+		GUI_SendKeyMsg(GUI_KEY_LEFT,1); //滑块数值减少
+		break;
+	
+	//INPUT右转
+	case MSG_KNOB_INPUT_RIGHT:
+		GUI_SendKeyMsg(GUI_KEY_RIGHT,1); //滑块数值增加
+		break;
+	
+	//CONTROL按下
+	case MSG_KEY_CONTROL:
+		GUI_SendKeyMsg(GUI_KEY_SPACE,1);
+		break;
+	
+	//页面切换
+	case MSG_KNOB_OUT_LEFT:	
+		GUI_EndDialog(pMsg->hWin, 0);   //结束当前界面
+		hWin_now = Input_Second();      //切换下一个界面
+		break;
+	
+	case MSG_KNOB_OUT_RIGHT:
+		GUI_EndDialog(pMsg->hWin, 0);   //结束当前界面
+		hWin_now = Input_Four();      //切换下一个界面
+		break;
+	
+	//ESC
+	case MSG_KEY_ESC:
+		GUI_SendKeyMsg(GUI_KEY_ESCAPE, 1);  //退出
+		break;
+	/****************************************END********************************************/
+	/*********************************按键处理******************************************/
+	case WM_KEY:
+		switch (((WM_KEY_INFO*)(pMsg->Data.p))->Key) //获得关于按键信息的值
+		{
+			//ESC
+			case GUI_KEY_ESCAPE:
+            GUI_EndDialog(pMsg->hWin, 0); //关闭当前窗口
+            hWin_now = Input_First();  //显示Input_First页面
+			INPUT_CHANNEL = 1;
+            break;
+		}
+		break;
+		
+	//可以在这里释放数据结构
+	case WM_DELETE:
+		myfree(0,In_Third); //释放动态内存
+		break;
+	
+	
 	default:
 		WM_DefaultProc(pMsg);
 		break;
@@ -548,10 +1086,53 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 *
 *       CreateWindow
 */
+//初始化数据
+static void Init_data(Input_Third_data *L)
+{
+//	L->data.Aux1_SLIDER_DATA 	= 80;
+//	L->data.Aux2_SLIDER_DATA 	= 80;
+//	L->data.Aux3_SLIDER_DATA 	= 80;
+//	L->data.Aux4_SLIDER_DATA 	= 80;
+//	L->data.Aux5_SLIDER_DATA 	= 80;
+//	L->data.Aux6_SLIDER_DATA 	= 80;
+//	L->data.Aux7_SLIDER_DATA 	= 80;
+//	L->data.Aux8_SLIDER_DATA 	= 80;
+//	L->data.Aux1_CHECKBOX_STA	= 0;
+//	L->data.Aux2_CHECKBOX_STA	= 0;
+//	L->data.Aux3_CHECKBOX_STA	= 0;
+//	L->data.Aux4_CHECKBOX_STA	= 0;
+//	L->data.Aux5_CHECKBOX_STA	= 0;
+//	L->data.Aux6_CHECKBOX_STA	= 0;
+//	L->data.Aux7_CHECKBOX_STA	= 0;
+//	L->data.Aux8_CHECKBOX_STA	= 0;
+	
+	L->face_switch  	= 	INPUT_CHANNEL;  //获得选中的通道
+	L->String       	= 	face_string[INPUT_CHANNEL]; //头项目字符串
+	L->Time_count       =	0;
+	L->hItime			=	0;
+	L->Key_count		=	0;
+	L->Released			=	0;
+	L->checkbox_sta     =   0;
+	AT24C16_PageRead((u8 *)L,IIC_Addr[(L->face_switch)+7],sizeof(Input_Data3));  //提取数据
+}
+
 
 WM_HWIN Input_Third(void) {
 	WM_HWIN hWin;
-
+	
+	//申请数据
+	In_Third = (Input_Third_data *)mymalloc(0,sizeof(Input_Third_data));
+	
+	if(In_Third == NULL)
+	{
+		return 0;
+	}
+	else
+	{
+		Init_data(In_Third);
+	}
+	
+	
 	hWin = GUI_CreateDialogBox(_aDialogCreate, GUI_COUNTOF(_aDialogCreate), _cbDialog, WM_HBKWIN, 0, 0);
 	return hWin;
 }

@@ -651,6 +651,26 @@
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\inface_2\INPUT\Input_Third.c</FilePath>
             </File>
+            <File>
+              <FileName>Output_First.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\inface_2\OUTPUT\Output_First.c</FilePath>
+            </File>
+            <File>
+              <FileName>Output_Four.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\inface_2\OUTPUT\Output_Four.c</FilePath>
+            </File>
+            <File>
+              <FileName>Output_Second.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\inface_2\OUTPUT\Output_Second.c</FilePath>
+            </File>
+            <File>
+              <FileName>Output_Third.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\inface_2\OUTPUT\Output_Third.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

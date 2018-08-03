@@ -1,6 +1,10 @@
 #include "24c16.h"
 #include "iic.h"
+#include "delay.h"
 
+
+u8 AT24CXX_ReadOneByte(u16 ReadAddr);
+void AT24CXX_WriteOneByte(u16 WriteAddr,u8 DataToWrite);
 /*
 *********************************************************************************************************
 *	函 数 名: AT24C16_Check
@@ -10,17 +14,17 @@
 *********************************************************************************************************
 */
 
-u8 AT24C16_Check(void)
-{
-	u8 ucAck;
-	IIC_Start();  //开始信号
-	
-	IIC_SendByte(0xA0);  //设备地址
-	ucAck = IIC_WaitAck();  //看是否应答
-	
-	IIC_Stop();  //停止信号
-	return ucAck;
-}
+//u8 AT24C16_Check(void)
+//{
+//	u8 ucAck;
+//	IIC_Start();  //开始信号
+//	
+//	IIC_SendByte(0xA0);  //设备地址
+//	ucAck = IIC_WaitAck();  //看是否应答
+//	
+//	IIC_Stop();  //停止信号
+//	return ucAck;
+//}
 
 /*
 *********************************************************************************************************
@@ -34,6 +38,8 @@ u8 AT24C16_Check(void)
 */
 u8 AT24C16_PageWrite(u8 *_pWriteBuf,u16 _usAddress,u16 _usSize)
 {
+	
+	#if yehuo_use
 	u16 i,m;
 	u16 usAddr;
 	/* 
@@ -62,7 +68,7 @@ u8 AT24C16_PageWrite(u8 *_pWriteBuf,u16 _usAddress,u16 _usSize)
 				IIC_Start();
 				
 				/* 第2步：发起控制字节，高7bit是设备地址+页地址，bit0是读写控制位，0表示写，1表示读 */
-				IIC_SendByte(0xA0+((usAddr/256)<<1));
+				IIC_SendByte(0xA0|((usAddr>>8)<<1));
 				
 				/* 第3步：发送一个时钟，判断器件是否正确应答,应答了说明页写已经完成*/
 				if(IIC_WaitAck() == 0)
@@ -78,7 +84,7 @@ u8 AT24C16_PageWrite(u8 *_pWriteBuf,u16 _usAddress,u16 _usSize)
 			}
 			
 			/* 第4步：发送字节地址*/
-			IIC_SendByte(usAddr%256); //发送低地址
+			IIC_SendByte(usAddr&255); //发送低地址
 			
 			/* 第5步：等待ACK */
 			if(IIC_WaitAck() != 0)
@@ -102,6 +108,15 @@ u8 AT24C16_PageWrite(u8 *_pWriteBuf,u16 _usAddress,u16 _usSize)
 	/* 命令执行成功，发送I2C总线停止信号 */
 	IIC_Stop();
 	return 1;
+	
+	#else
+	while(_usSize--)
+	{
+		AT24CXX_WriteOneByte(_usAddress,*_pWriteBuf);
+		_usAddress++;
+		_pWriteBuf++;
+	}
+	#endif
 }
 
 /*
@@ -117,6 +132,7 @@ u8 AT24C16_PageWrite(u8 *_pWriteBuf,u16 _usAddress,u16 _usSize)
 
 u8 AT24C16_PageRead(u8 *_pReadBuf,u16 _usAddress, u16 _usSize)
 {
+	#if yehuo_use
 	u16 i;
 	
 	/* 采用串行EEPROM随即读取指令序列，连续读取若干字节 */
@@ -125,8 +141,7 @@ u8 AT24C16_PageRead(u8 *_pReadBuf,u16 _usAddress, u16 _usSize)
 	IIC_Start();
 	
 	/* 第2步：发起控制字节，高7bit是地址，bit0是读写控制位，0表示写，1表示读 */
-	IIC_SendByte(0xA0+((_usAddress/256)<<1)); /* 此处是写指令 */
-	
+	IIC_SendByte(0xA0|((_usAddress>>8)<<1)); /* 此处是写指令 */
 	
 	/* 第3步：等待ACK */
 	if(IIC_WaitAck() != 0)
@@ -136,7 +151,8 @@ u8 AT24C16_PageRead(u8 *_pReadBuf,u16 _usAddress, u16 _usSize)
 	}
 	
 	/* 第4步：发送字节地址，24C02只有256字节，因此1个字节就够了，如果是24C04以上，那么此处需要连发多个地址 */
-	IIC_SendByte(_usAddress%256);
+	IIC_SendByte(_usAddress&255);
+
 	
 	/* 第5步：等待ACK */
 	if(IIC_WaitAck() != 0)
@@ -149,7 +165,7 @@ u8 AT24C16_PageRead(u8 *_pReadBuf,u16 _usAddress, u16 _usSize)
 	IIC_Start();
 	
 	/* 第7步：发起控制字节，高7bit是地址，bit0是读写控制位，0表示写，1表示读 */
-	IIC_SendByte(0xA1);  //读命令
+	IIC_SendByte(0xA1|((_usAddress>>8)<<1));  //读命令
 	
 	/* 第8步：等待ACK */
 	if(IIC_WaitAck() != 0)
@@ -177,4 +193,69 @@ u8 AT24C16_PageRead(u8 *_pReadBuf,u16 _usAddress, u16 _usSize)
 	/* 发送I2C总线停止信号 */
 	IIC_Stop();
 	return 1;	/* 执行成功 */
+	
+	#else
+	while(_usSize)
+	{
+		*_pReadBuf++=AT24CXX_ReadOneByte(_usAddress++);	
+		_usSize--;
+	}
+	#endif
 }
+
+
+#if yehuo_use
+#else
+//在AT24CXX指定地址读出一个数据
+//ReadAddr:开始读数的地址  
+//返回值  :读到的数据
+u8 AT24CXX_ReadOneByte(u16 ReadAddr)
+{				  
+	u8 temp=0;		  	    																 
+    IIC_Start();  
+	if(EE_TYPE>AT24C16)
+	{
+		IIC_Send_Byte(0XA0);	   //发送写命令
+		IIC_Wait_Ack();
+		IIC_Send_Byte(ReadAddr>>8);//发送高地址
+		IIC_Wait_Ack();		 
+	}else 
+	{
+		IIC_Send_Byte(0XA0|((ReadAddr/256)<<1));   //发送器件地址0XA0,写数据 	
+	}		
+
+	IIC_Wait_Ack(); 
+    IIC_Send_Byte(ReadAddr&255);   //发送低地址
+	IIC_Wait_Ack();	    
+	IIC_Start();  	 	   
+	IIC_Send_Byte(0XA1|((ReadAddr/256)<<1));           //进入接收模式			   
+	IIC_Wait_Ack();	 
+    temp=IIC_Read_Byte(0);		   
+    IIC_Stop();//产生一个停止条件	    
+	return temp;
+}
+//在AT24CXX指定地址写入一个数据
+//WriteAddr  :写入数据的目的地址    
+//DataToWrite:要写入的数据
+void AT24CXX_WriteOneByte(u16 WriteAddr,u8 DataToWrite)
+{				   	  	    																 
+   IIC_Start();  
+	if(EE_TYPE>AT24C16)
+	{
+		IIC_Send_Byte(0XA0);	    //发送写命令
+		IIC_Wait_Ack();
+		IIC_Send_Byte(WriteAddr>>8);//发送高地址
+ 	}else
+	{
+		IIC_Send_Byte(0XA0|((WriteAddr/256)<<1));   //发送器件地址0XA0,写数据 
+	}	 
+	IIC_Wait_Ack();	   
+    IIC_Send_Byte(WriteAddr&255);   //发送低地址
+	IIC_Wait_Ack(); 	 										  		   
+	IIC_Send_Byte(DataToWrite);     //发送字节							   
+	IIC_Wait_Ack();  		    	   
+    IIC_Stop();//产生一个停止条件 
+	delay_ms(10);	 
+}
+#endif
+

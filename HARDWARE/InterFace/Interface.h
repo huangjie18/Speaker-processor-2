@@ -46,7 +46,7 @@ void Listbox_flex(void);
 WM_HWIN CreateMainface(void); //主界面窗口
 
 //IIC地址设置
-#define Addr_num  15
+#define Addr_num  100
 extern u16 IIC_Addr[Addr_num];
 
 /*********************************************第二次界面**********************************/
@@ -75,7 +75,7 @@ typedef struct
 
 /******************************************Input_First  End*********************************************/
 
-/******************************************Input_Second的数据列表****************************************/
+/******************************************Input_Second  数据****************************************/
 //要保存的数据
 typedef struct 
 {
@@ -157,13 +157,233 @@ enum
 };
 
 /*******************************************Input_Second  End*******************************************/
-/******************************
-***
-***函数
-***
-*******************************/
+
+/*******************************************Input_Third 数据**********************************/
+typedef struct 
+{
+	u8 Aux1_SLIDER_DATA;
+	u8 Aux2_SLIDER_DATA;
+	u8 Aux3_SLIDER_DATA;
+	u8 Aux4_SLIDER_DATA;
+	u8 Aux5_SLIDER_DATA;
+	u8 Aux6_SLIDER_DATA;
+	u8 Aux7_SLIDER_DATA;
+	u8 Aux8_SLIDER_DATA;
+	u8 Aux1_CHECKBOX_STA;
+	u8 Aux2_CHECKBOX_STA;
+	u8 Aux3_CHECKBOX_STA;
+	u8 Aux4_CHECKBOX_STA;
+	u8 Aux5_CHECKBOX_STA;
+	u8 Aux6_CHECKBOX_STA;
+	u8 Aux7_CHECKBOX_STA;
+	u8 Aux8_CHECKBOX_STA;
+}Input_Data3;
+
+
+typedef struct 
+{
+	Input_Data3  data;
+	//指示不同通道的数据
+	char face_switch;      //指示第几个通道页面
+	char Item;             //指示选中第几个子项目
+	char *String;          //用来存放字符串
+	
+	//用来计算长短按的
+	u16  Time_count;       //判断定时器长短按
+	u16  Key_count;        //判断旋转按钮快慢
+	
+	//定时器的句柄
+	WM_HTIMER  hItime;
+	
+	//用来判断按钮是否释放
+	u16 Released;         //0代表已经释放，1代表没释放
+	
+	//专门用来对应复选框
+	char checkbox_sta;
+	
+	
+}Input_Third_data;
+
+/***********************************************Input_Four 数据**************************************************/
+typedef struct 
+{
+	char 	ON_OFF;
+	s16		BAND_DATA;
+	s16		FREQ_DATA;
+	s16		TYPE_DATA;
+	s16		GAIN_DATA;
+	s16		Q_DATA;
+}Input_Data4;
+
+typedef struct
+{
+	Input_Data4 data;
+	
+	//指示不同通道的数据
+	char face_switch;      //指示第几个通道页面
+	char Item;             //指示选中第几个子项目
+	char *String;          //用来存放字符串
+	
+	//用来计算长短按的
+	u16  Time_count;       //判断定时器长短按
+	u16  Key_count;        //判断旋转按钮快慢
+	
+	//定时器的句柄
+	WM_HTIMER  hItime;
+	
+}Input_Four_data;
+
+//子项目标号
+enum
+{
+	ON_OFF_Four,
+	BAND_Four,
+	FREQ_Four,
+	TYPE_Four,
+	GAIN_Four,
+	Q_Four,
+};
+
+/***********************************************OUT_First 数据************************************************/
+//Out_First数据结构
+extern char OUTPUT_CHANNEL;
+
+typedef struct
+{
+	u8  OUT_DATA_1;
+	u8  OUT_DATA_2;
+	u8  OUT_DATA_3;
+	u8  OUT_DATA_4;
+	u8  OUT_DATA_5;
+	u8  OUT_DATA_6;
+	u8  OUT_DATA_7;
+	u8  OUT_DATA_8;
+}Output_First_data;
+
+/***********************************************OUT_Second 数据************************************************/
+typedef struct 
+{
+	s16 RMSTC_DATA;   //RMSTC数值
+	s16 DECAY_DATA;   //DECAT数值
+	s16 THRSH_DATA;   //THRESHOLD数值
+	s16 DELAY_DATA;   //DELAY数值
+	
+	u8  OUT_MUTE_STA; //OUT_MUTE状态
+	u8  OUT_INVERT_STA; //OUT_INVERT状态
+	
+}Output_Data1;
+
+
+typedef struct
+{
+	Output_Data1  data;
+	
+	//指示不同通道的数据
+	char face_switch;      //指示第几个通道页面
+	char Item;             //指示选中第几个子项目
+	char *String;          //用来存放字符串
+	
+	//用来计算长短按的
+	u16  Time_count;       //判断定时器长短按
+	u16  Key_count;        //判断旋转按钮快慢
+	
+	//定时器的句柄
+	WM_HTIMER  hItime;
+	
+	//专门用来对应复选框
+	char checkbox_sta;
+	
+}Output_Second_Data;
+
+enum
+{
+	RMSTC_Item_Out,
+	DECAY_Item_Out,
+	THRES_Item_Out,
+	MUTE_Item_Out,
+	INVERT_Item_Out,
+	DELAY_Item_Out,
+};
+
+
+/***********************************************OUT_Third 数据************************************************/
+typedef struct 
+{
+	s16  	TYPE_DATA_LOW;
+	s16		FREQ_DATA_LOW;
+	s16		GAIN_DATA_LOW;
+	s16		TYPE_DATA_HIGH;
+	s16		FREQ_DATA_HIGH;
+	s16 	GAIN_DATA_HIGH;
+	
+	u8		LOW_HIGH_STA;
+	u8		INVERT_LOW_STA;
+	u8		MID_HIGH_STA;
+	u8		INVERT_HIGH_STA;
+	
+	
+}Output_Data2;
+
+
+typedef struct
+{
+	Output_Data2  data;
+	
+	//指示不同通道的数据
+	char face_switch;      //指示第几个通道页面
+	char Item;             //指示选中第几个子项目
+	char *String;          //用来存放字符串
+	
+	//用来计算长短按的
+	u16  Time_count;       //判断定时器长短按
+	u16  Key_count;        //判断旋转按钮快慢
+	
+	//定时器的句柄
+	WM_HTIMER  hItime;
+	
+	//专门用来对应复选框
+	char checkbox_sta;
+	
+}Output_Third_Data;
+
+//对应子项目选项
+enum
+{
+	TYPE_LOW_Item_Out,
+	FREQ_LOW_Item_Out,
+	GAIN_LOW_Item_Out,
+	LOW_HIGH_Item_Out,
+	INVERT_LOW_Item_Out,
+	TYPE_HIGH_Item_Out,
+	FREQ_HIGH_Item_Out,
+	GAIN_HIGH_Item_Out,
+	MID_HIGH_Item_Out,
+	INVERT_HIGH_Item_Out,
+};
+
+/*
+*******************************************************************************************
+* *********************************函 数 名***********************************************
+* 
+*
+* 
+*******************************************************************************************
+*/
+
+/*************************INPUT********************************/
 WM_HWIN Input_First(void);
 WM_HWIN Input_Second(void);
 WM_HWIN Input_Third(void);
 WM_HWIN Input_Four(void);
+
+void Max_Min(void *p,u16 Max,u16 Min);  //最大和最小值
+void Value_Change_add(void *p,u16 *time); //值增加
+void Value_Change_dec(void *p,u16 *time); //值减少
+
+/**************************OUTPUT********************************/
+WM_HWIN Output_First(void);
+WM_HWIN Output_Second(void);
+WM_HWIN Output_Third(void);
+WM_HWIN Output_Four(void);
+
 #endif

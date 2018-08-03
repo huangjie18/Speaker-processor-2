@@ -262,14 +262,7 @@ static void _cbButton_right(WM_MESSAGE * pMsg) //--------------（3）
 	}
 }
 
-/*
-*******************************************************************************************
-* 函 数 名: Show_Value
-* 功能说明: 显示数值
-* 形 参: 无
-* 返 回 值: 无
-*******************************************************************************************
-*/
+
 //子项x，y坐标定义
 #define RMSTC_X  		125
 #define RMSTC_Y  		75
@@ -303,34 +296,54 @@ static const GUI_RECT InvaliRect_Value[][4] = {
 	{ 125, 104,	205,	124}, //HOLD_Item
 };
 
+/*
+*******************************************************************************************
+* 函 数 名: Max_Min
+* 功能说明: 限制最大和最小值
+* 形 参: 最大值和最小值
+* 返 回 值: 无
+*******************************************************************************************
+*/
+void Max_Min(void *p,u16 Max,u16 Min)
+{
+	s16 *q = (s16 *)p;
+	if((*q)>Max)
+	{
+		*q = Max;
+	}
+	else if((*q)<Min)
+	{
+		*q = Min;
+	}
+}
+
+/*
+*******************************************************************************************
+* 函 数 名: Show_Value
+* 功能说明: 显示数值
+* 形 参: 无
+* 返 回 值: 无
+*******************************************************************************************
+*/
+
+
+
 static void Show_Value(void)
 {
+	u16 max,min; //最大和最小值
 	GUI_SetColor(GUI_BLACK); 		//设置颜色
 	GUI_SetTextMode(GUI_TM_TRANS);  //设置透明模式
 	GUI_SetFont(&GUI_Font20_1); 	//设置字体
 	
 	//RMSTC
 	GUI_GotoXY(RMSTC_X, RMSTC_Y);  				//设置RMSTC位置
-	if(Data_p->data.RMSTC_DATA>RMSTC_DATA_MAX)       //超过最大值
-	{
-		Data_p->data.RMSTC_DATA = RMSTC_DATA_MAX;
-	}
-	else if(Data_p->data.RMSTC_DATA < RMSTC_DATA_MIN) //低于最小值
-	{
-		Data_p->data.RMSTC_DATA = RMSTC_DATA_MIN;
-	}
+	Max_Min(&Data_p->data.RMSTC_DATA,RMSTC_DATA_MAX,RMSTC_DATA_MIN);  //限制值
 	GUI_DispDecMin(Data_p->data.RMSTC_DATA); 		//显示设置RMSTC位值
 	
 	//HOLD
-	if(Data_p->data.HOLD_DATA > HOLD_DATA_MAX)
-	{
-		Data_p->data.HOLD_DATA = HOLD_DATA_MAX;
-	}
-	else if(Data_p->data.HOLD_DATA < HOLD_DATA_MIN)
-	{
-		Data_p->data.HOLD_DATA = HOLD_DATA_MIN;
-	}
+
 	GUI_GotoXY(HOLD_X, HOLD_Y);  				//设置HOLD位置
+	Max_Min(&Data_p->data.HOLD_DATA,HOLD_DATA_MAX,HOLD_DATA_MIN);    //限制值
 	GUI_DispDecMin(Data_p->data.HOLD_DATA); 			//显示设置HOLD位值
 	
 	
@@ -362,7 +375,60 @@ static void Show_Value(void)
 	AT24C16_PageWrite((u8 *)Data_p,IIC_Addr[Data_p->face_switch],sizeof(Input_Data));  //保存数据
 	
 }
+/*
+*******************************************************************************************
+* 函 数 名: Value_Change_add
+* 功能说明: 增加数值
+* 形 参: 数值的地址
+* 返 回 值: 无
+*******************************************************************************************
+*/
+void Value_Change_add(void *p,u16 *time)
+{
+	
+	s16 *q = (s16 *)p;
+	(*time)++;
+	if ((*time) < 10)
+	{
+		(*q)++;
+	}
+	else if ((*time) < 30)
+	{
+		(*q) += 10;
+	}
+	else if ((*time) >= 30)
+	{
+		(*q) += 100;
+	}
 
+}
+/*
+*******************************************************************************************
+* 函 数 名: Value_Change_dec
+* 功能说明: 减少数值
+* 形 参: 数值的地址
+* 返 回 值: 无
+*******************************************************************************************
+*/
+void Value_Change_dec(void *p,u16 *time)
+{
+	
+	s16 *q = (s16 *)p;
+	(*time)++;
+	if ((*time) < 10)
+	{
+		(*q)--;
+	}
+	else if ((*time) < 30)
+	{
+		(*q) -= 10;
+	}
+	else if ((*time) >= 30)
+	{
+		(*q) -= 100;
+	}
+
+}
 /*****************************************************Static code End**********************************************/
 /*********************************************************************
 *
@@ -424,7 +490,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		//ON_OFF
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_3);
 		BUTTON_SetFont(hItem, GUI_FONT_16B_1);  //设置字体
-		if(Data_p->data.ON_OFF == 0)
+		if((Data_p->data.ON_OFF&0x01) == 0)
 		{
 			BUTTON_SetText(hItem, "ON");          //设置显示的字符串
 		}
@@ -554,8 +620,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 	case WM_DELETE:
 		//后续需要添加保存数据到IC240C中的代码
 		myfree(0,Data_p); //释放动态内存
-		INPUT_CHANNEL = 1; //下次进入还是1通道
-		check_sate[0] = 0;
+		check_sate[0] = 0; //用来标记复选框的
 		check_sate[1] = 0;
 		break;
 	
@@ -620,11 +685,12 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				{
 					//复选框已被点击
 					case WM_NOTIFICATION_CLICKED:
+						WM_SetFocus(WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_0)); //改变聚焦
+						Data_p->Item = IN_MUTE_Item;  //子选项改变
                         break;
 					
 					//复选框已被释放
                     case WM_NOTIFICATION_RELEASED:
-						Data_p->Item = IN_MUTE_Item;
 						
 						break;
 					
@@ -657,11 +723,12 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				{
 					//复选框已被点击
 					case WM_NOTIFICATION_CLICKED:
+						WM_SetFocus(WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_1)); //改变聚焦
+						Data_p->Item = IN_INVERT_Item;  //子选项改变
                         break;
 					
 					//复选框已被释放
                     case WM_NOTIFICATION_RELEASED:
-						Data_p->Item = IN_INVERT_Item;
 						
 						break;
 					
@@ -696,13 +763,12 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 					//已点击按钮
 					case WM_NOTIFICATION_CLICKED:
 						
-						GUI_EndDialog(pMsg->hWin, 0);   //结束当前界面
-						hWin_now = Input_Third();      //切换下一个界面
 						break;
 					
 					//已释放按钮
 					case WM_NOTIFICATION_RELEASED:
-						
+						GUI_EndDialog(pMsg->hWin, 0);   //结束当前界面
+						hWin_now = Input_Third();      //切换下一个界面
 						break;
 				}
 				break;
@@ -713,13 +779,12 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 					//已点击按钮
 					case WM_NOTIFICATION_CLICKED:
 						
-						GUI_EndDialog(pMsg->hWin, 0);   //结束当前界面
-						hWin_now = Input_Four();      //切换下一个界面
 						break;
 					
 					//已释放按钮
 					case WM_NOTIFICATION_RELEASED:
-						
+						GUI_EndDialog(pMsg->hWin, 0);   //结束当前界面
+						hWin_now = Input_Four();      //切换下一个界面
 						break;
 				}
 				break;
@@ -779,7 +844,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 					//已释放按钮
 					case WM_NOTIFICATION_RELEASED:
 						Data_p->data.ON_OFF = ~Data_p->data.ON_OFF;  //切换显示的字符串
-						if(Data_p->data.ON_OFF == 0)
+						if((Data_p->data.ON_OFF&0x01) == 0)
 						{
 							BUTTON_SetText(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_3), "ON");          //设置显示的字符串
 						}
@@ -876,7 +941,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 						// USER START (Optionally insert code for reacting on notification message)
 						Data_p->data.RMSTC_DATA--;
 						WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[RMSTC_Item]); //无效化该区域重新刷新
-						Data_p->hItime = WM_CreateTimer(pMsg->hWin, RMSTC_Time_left, 200, 0); //创建主窗口一个定时器
+						Data_p->hItime = WM_CreateTimer(pMsg->hWin, RMSTC_Time_left, 100, 0); //创建主窗口一个定时器
 						// USER END
 					break;
 					
@@ -896,7 +961,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 						// USER START (Optionally insert code for reacting on notification message)
 						Data_p->data.RMSTC_DATA++;
 						WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[RMSTC_Item]); //无效化该区域重新刷新
-						Data_p->hItime = WM_CreateTimer(pMsg->hWin, RMSTC_Time_right, 200, 0); //创建主窗口一个定时器
+						Data_p->hItime = WM_CreateTimer(pMsg->hWin, RMSTC_Time_right, 100, 0); //创建主窗口一个定时器
 						// USER END
 					break;
 					
@@ -917,7 +982,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 						// USER START (Optionally insert code for reacting on notification message)
 						Data_p->data.HOLD_DATA--;
 						WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[HOLD_Item]); //无效化该区域重新刷新
-						Data_p->hItime = WM_CreateTimer(pMsg->hWin, HOLD_Time_left, 200, 0); //创建主窗口一个定时器
+						Data_p->hItime = WM_CreateTimer(pMsg->hWin, HOLD_Time_left, 100, 0); //创建主窗口一个定时器
 						// USER END
 					break;
 					
@@ -937,7 +1002,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 						// USER START (Optionally insert code for reacting on notification message)
 						Data_p->data.HOLD_DATA++;
 						WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[HOLD_Item]); //无效化该区域重新刷新
-						Data_p->hItime = WM_CreateTimer(pMsg->hWin, HOLD_Time_right, 200, 0); //创建主窗口一个定时器
+						Data_p->hItime = WM_CreateTimer(pMsg->hWin, HOLD_Time_right, 100, 0); //创建主窗口一个定时器
 						// USER END
 					break;
 					
@@ -958,26 +1023,27 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case RMSTC_Time_left:
 				if (BUTTON_IsPressed(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_9))) //判断按钮是否还在按下
 				{
-					Data_p->Time_count++;
-					
-					if(Data_p->Time_count < 5)
-					{
-						Data_p->data.RMSTC_DATA --;
-					}
-					else if(Data_p->Time_count < 10)  //略长按
-					{
-						Data_p->data.RMSTC_DATA = Data_p->data.RMSTC_DATA - 10;
-					}
-					else if(Data_p->Time_count < 15) //长按
-					{
-						Data_p->data.RMSTC_DATA = Data_p->data.RMSTC_DATA - 100;
-					}
-					else if(Data_p->Time_count >= 15) //超长按
-					{
-						Data_p->data.RMSTC_DATA = Data_p->data.RMSTC_DATA - 1000;
-					}
+//					Data_p->Time_count++;
+//					
+//					if(Data_p->Time_count < 5)
+//					{
+//						Data_p->data.RMSTC_DATA --;
+//					}
+//					else if(Data_p->Time_count < 10)  //略长按
+//					{
+//						Data_p->data.RMSTC_DATA = Data_p->data.RMSTC_DATA - 10;
+//					}
+//					else if(Data_p->Time_count < 15) //长按
+//					{
+//						Data_p->data.RMSTC_DATA = Data_p->data.RMSTC_DATA - 100;
+//					}
+//					else if(Data_p->Time_count >= 15) //超长按
+//					{
+//						Data_p->data.RMSTC_DATA = Data_p->data.RMSTC_DATA - 1000;
+//					}
+					Value_Change_dec(&Data_p->data.RMSTC_DATA,&Data_p->Time_count);
 					WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[RMSTC_Item]); //无效化该区域重新刷新
-					WM_RestartTimer(pMsg->Data.v, 200); // 重启定时器
+					WM_RestartTimer(pMsg->Data.v, 100); // 重启定时器
 			
 				}
 				break;
@@ -985,25 +1051,28 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case RMSTC_Time_right:
 				if (BUTTON_IsPressed(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_12))) //判断按钮是否还在按下
 				{
-					Data_p->Time_count++;
-					if(Data_p->Time_count < 5)
-					{
-						Data_p->data.RMSTC_DATA ++;
-					}
-					else if(Data_p->Time_count < 10)  //略长按
-					{
-						Data_p->data.RMSTC_DATA = Data_p->data.RMSTC_DATA + 10;
-					}
-					else if(Data_p->Time_count < 15) //长按
-					{
-						Data_p->data.RMSTC_DATA = Data_p->data.RMSTC_DATA + 100;
-					}
-					else if(Data_p->Time_count >= 15) //超长按
-					{
-						Data_p->data.RMSTC_DATA = Data_p->data.RMSTC_DATA + 1000;
-					}
+//					Data_p->Time_count++;
+//					if(Data_p->Time_count < 5)
+//					{
+//						Data_p->data.RMSTC_DATA ++;
+//					}
+//					else if(Data_p->Time_count < 10)  //略长按
+//					{
+//						Data_p->data.RMSTC_DATA = Data_p->data.RMSTC_DATA + 10;
+//					}
+//					else if(Data_p->Time_count < 15) //长按
+//					{
+//						Data_p->data.RMSTC_DATA = Data_p->data.RMSTC_DATA + 100;
+//					}
+//					else if(Data_p->Time_count >= 15) //超长按
+//					{
+//						Data_p->data.RMSTC_DATA = Data_p->data.RMSTC_DATA + 1000;
+//					}
+					
+					Value_Change_add(&Data_p->data.RMSTC_DATA,&Data_p->Time_count);
+					
 					WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[RMSTC_Item]); //无效化该区域重新刷新
-					WM_RestartTimer(pMsg->Data.v, 200); // 重启定时器
+					WM_RestartTimer(pMsg->Data.v, 100); // 重启定时器
 			
 				}
 				break;
@@ -1012,52 +1081,20 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case HOLD_Time_left:
 				if(BUTTON_IsPressed(WM_GetDialogItem(pMsg->hWin,ID_BUTTON_10)))
 				{
-					Data_p->Time_count++;
-					
-					if(Data_p->Time_count < 5)
-					{
-						Data_p->data.HOLD_DATA --;
-					}
-					else if(Data_p->Time_count < 10)  //略长按
-					{
-						Data_p->data.HOLD_DATA -= 10;
-					}
-					else if(Data_p->Time_count < 15) //长按
-					{
-						Data_p->data.HOLD_DATA -= 100;
-					}
-					else if(Data_p->Time_count >= 15) //超长按
-					{
-						Data_p->data.HOLD_DATA -= 1000;
-					}
+
+					Value_Change_dec(&Data_p->data.HOLD_DATA,&Data_p->Time_count);
 					WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[HOLD_Item]); //无效化该区域重新刷新
-					WM_RestartTimer(pMsg->Data.v, 200); // 重启定时器
+					WM_RestartTimer(pMsg->Data.v, 100); // 重启定时器
 				}
 				break;
 				
 			case HOLD_Time_right:
 				if(BUTTON_IsPressed(WM_GetDialogItem(pMsg->hWin,ID_BUTTON_13)))
 				{
-					Data_p->Time_count++;
-					
-					if(Data_p->Time_count < 5)
-					{
-						Data_p->data.HOLD_DATA ++;
-					}
-					else if(Data_p->Time_count < 10)  //略长按
-					{
-						Data_p->data.HOLD_DATA += 10;
-					}
-					else if(Data_p->Time_count < 15) //长按
-					{
-						Data_p->data.HOLD_DATA += 100;
-					}
-					else if(Data_p->Time_count >= 15) //超长按
-					{
-						Data_p->data.HOLD_DATA += 1000;
-					}
+
+					Value_Change_add(&Data_p->data.HOLD_DATA,&Data_p->Time_count);
 					WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[HOLD_Item]); //无效化该区域重新刷新
-					WM_RestartTimer(pMsg->Data.v, 200); // 重启定时器
+					WM_RestartTimer(pMsg->Data.v, 100); // 重启定时器
 				}
 				break;
 		}
@@ -1114,49 +1151,21 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 	
 	//INPUT左转
 	case MSG_KNOB_INPUT_LEFT:
-		Data_p->Key_count++;
 		//根据选中的子选项来做不同的操作
 		switch(Data_p->Item)
 		{
 			//RMSTC子项目
 			case RMSTC_Item:
-				if(Data_p->Key_count<10)
-				{
-					Data_p->data.RMSTC_DATA++;
-				}
-				else if(Data_p->Key_count<30)
-				{
-					Data_p->data.RMSTC_DATA += 10;
-				}
-				else if(Data_p->Key_count<50)
-				{
-					Data_p->data.RMSTC_DATA += 100;
-				}
-				else if(Data_p->Key_count>=50)
-				{
-					Data_p->data.RMSTC_DATA += 1000;
-				}
+
+				//RMSTC_DATA增加
+				Value_Change_add(&Data_p->data.RMSTC_DATA,&Data_p->Key_count);  
 				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[RMSTC_Item]); //无效化该区域重新刷新
 				break;
 			
 			//HOLD子项目
 			case HOLD_Item:
-				if(Data_p->Key_count<10)
-				{
-					Data_p->data.HOLD_DATA++;
-				}
-				else if(Data_p->Key_count<30)
-				{
-					Data_p->data.HOLD_DATA += 10;
-				}
-				else if(Data_p->Key_count<50)
-				{
-					Data_p->data.HOLD_DATA += 100;
-				}
-				else if(Data_p->Key_count>=50)
-				{
-					Data_p->data.HOLD_DATA += 1000;
-				}
+				//HOLD_DATA增加
+				Value_Change_add(&Data_p->data.HOLD_DATA,&Data_p->Key_count);
 				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[HOLD_Item]); //无效化该区域重新刷新
 				break;
 		}
@@ -1165,52 +1174,34 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 	
 	//INPUT右转
 	case MSG_KNOB_INPUT_RIGHT:
-		Data_p->Key_count++;
+//		Data_p->Key_count++;
 		//根据选中的子选项来做不同的操作
 		switch(Data_p->Item)
 		{
 			case RMSTC_Item:
-				if(Data_p->Key_count<10)
-				{
-					Data_p->data.RMSTC_DATA--;
-				}
-				else if(Data_p->Key_count<30)
-				{
-					Data_p->data.RMSTC_DATA -= 10;
-				}
-				else if(Data_p->Key_count<50)
-				{
-					Data_p->data.RMSTC_DATA -= 100;
-				}
-				else if(Data_p->Key_count>=50)
-				{
-					Data_p->data.RMSTC_DATA -= 1000;
-				}
+
+				//RMSTC减少
+				Value_Change_dec(&Data_p->data.RMSTC_DATA,&Data_p->Key_count);
 				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[RMSTC_Item]); //无效化该区域重新刷新
 				break;
 				
 			case HOLD_Item:
-				if(Data_p->Key_count<10)
-				{
-					Data_p->data.HOLD_DATA--;
-				}
-				else if(Data_p->Key_count<30)
-				{
-					Data_p->data.HOLD_DATA -= 10;
-				}
-				else if(Data_p->Key_count<50)
-				{
-					Data_p->data.HOLD_DATA -= 100;
-				}
-				else if(Data_p->Key_count>=50)
-				{
-					Data_p->data.HOLD_DATA -= 1000;
-				}
+				Value_Change_dec(&Data_p->data.HOLD_DATA,&Data_p->Key_count);
 				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[HOLD_Item]); //无效化该区域重新刷新
 				break;
 		}
 		break;
-		
+	
+	//页面切换
+	case MSG_KNOB_OUT_LEFT:	
+		GUI_EndDialog(pMsg->hWin, 0);   //结束当前界面
+		hWin_now = Input_Four();      //切换下一个界面
+		break;
+	
+	case MSG_KNOB_OUT_RIGHT:
+		GUI_EndDialog(pMsg->hWin, 0);   //结束当前界面
+		hWin_now = Input_Third();      //切换下一个界面
+		break;
 	//没有旋钮动作
 	case MSG_KNOB_NULL:
 		Data_p->Key_count = 0;
@@ -1223,6 +1214,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case GUI_KEY_ESCAPE:
             GUI_EndDialog(pMsg->hWin, 0); //关闭当前窗口
             hWin_now = Input_First();  //显示Input_First页面
+			INPUT_CHANNEL = 1;
             break;
 		}
 		break;

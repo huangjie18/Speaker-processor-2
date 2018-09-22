@@ -22,7 +22,8 @@
 // USER END
 
 #include "DIALOG.h"
-
+#include "data.h"
+#include "algorithm.h"
 /*********************************************************************
 *
 *       Defines
@@ -63,9 +64,9 @@
 
 /***************************************该页面需要用到的数据***************************************/
 //申请关于Input界面的数据
-static Input_First_data *In_first; //数据结构体指针
+//static Input_First_data *In_first; //数据结构体指针
 //选中通道指示器
-char INPUT_CHANNEL = 1;
+char INPUT_CHANNEL = 0;
 // USER START (Optionally insert additional static data)
 // USER END
 
@@ -91,7 +92,7 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_5, 250, 200, 45, 35, 0, 0x0, 0 },
 	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_6, 300, 200, 45, 35, 0, 0x0, 0 },
 	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_7, 350, 200, 48, 35, 0, 0x0, 0 },
-	{ TEXT_CreateIndirect, "Text", ID_TEXT_0, 162, 0, 80, 20, 0, 0x64, 0 },
+	{ TEXT_CreateIndirect, "Text", ID_TEXT_0, 59, 0, 294, 28, 0, 0x64, 0 },
 	{ TEXT_CreateIndirect, "Text", ID_TEXT_1, 370, 0, 30, 20, 0, 0x64, 0 },
 	// USER START (Optionally insert additional widgets)
 	// USER END
@@ -103,7 +104,7 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 *
 **********************************************************************
 */
-static char value[8]; //用来显示的值
+
 
 //无效区域设置
 static GUI_RECT Rect[] =
@@ -118,12 +119,20 @@ static GUI_RECT Rect[] =
 	{ 360, 17, 390, 37 },
 };
 
+#define siler_x  5  //位置x
+#define step_slider  0.04    //步进
+#define slider_max   2000
+
 //显示滑块值
 static void _ShowSlidervalue(void)
 {
 	GUI_SetColor(GUI_BLACK); //设置颜色
 	GUI_SetTextMode(GUI_TM_TRANS); //设置透明模式
-	GUI_SetFont(&GUI_Font20_1); //设置字体
+	GUI_SetFont(GUI_FONT_13B_1); //设置字体
+	
+	
+
+	
 
 //	GUI_GotoXY(10, Text_y);  //设置1位置
 //	GUI_DispDecMin(-value[0]); //显示值
@@ -143,42 +152,35 @@ static void _ShowSlidervalue(void)
 //	GUI_DispDecMin(-value[7]); //显示值
 	
 	//新的
-	GUI_GotoXY(10, Text_y);  //设置1位置
-	GUI_DispDecMin(-In_first->IN_DATA_1); //显示值
-	GUI_GotoXY(60, Text_y);  //设置2位置
-	GUI_DispDecMin(-In_first->IN_DATA_2); //显示值
-	GUI_GotoXY(110, Text_y);  //设置3位置
-	GUI_DispDecMin(-In_first->IN_DATA_3); //显示值
-	GUI_GotoXY(160, Text_y);  //设置4位置
-	GUI_DispDecMin(-In_first->IN_DATA_4); //显示值
-	GUI_GotoXY(210, Text_y);  //设置5位置
-	GUI_DispDecMin(-In_first->IN_DATA_5); //显示值
-	GUI_GotoXY(260, Text_y);  //设置6位置
-	GUI_DispDecMin(-In_first->IN_DATA_6); //显示值
-	GUI_GotoXY(310, Text_y);  //设置7位置
-	GUI_DispDecMin(-In_first->IN_DATA_7); //显示值
-	GUI_GotoXY(360, Text_y);  //设置8位置
-	GUI_DispDecMin(-In_first->IN_DATA_8); //显示值
+	GUI_GotoXY(siler_x, Text_y);  //设置1位置
+	GUI_DispFloatMin(-(In_first->data.IN_DATA_1*step_slider),2); //显示值
 	
-	AT24C16_PageWrite((u8 *)In_first,IIC_Addr[0],sizeof(Input_First_data));  //保存数据
+	GUI_GotoXY(siler_x+50, Text_y);  //设置2位置
+	GUI_DispFloatMin(-(In_first->data.IN_DATA_2*step_slider),2); //显示值
+	
+	GUI_GotoXY(siler_x+100, Text_y);  //设置3位置
+	GUI_DispFloatMin(-(In_first->data.IN_DATA_3*step_slider),2); //显示值
+	
+	GUI_GotoXY(siler_x+150, Text_y);  //设置4位置
+	GUI_DispFloatMin(-(In_first->data.IN_DATA_4*step_slider),2); //显示值
+	
+	GUI_GotoXY(siler_x+200, Text_y);  //设置5位置
+	GUI_DispFloatMin(-(In_first->data.IN_DATA_5*step_slider),2); //显示值
+	
+	GUI_GotoXY(siler_x+250, Text_y);  //设置6位置
+	GUI_DispFloatMin(-(In_first->data.IN_DATA_6*step_slider),2); //显示值
+	
+	GUI_GotoXY(siler_x+300, Text_y);  //设置7位置
+	GUI_DispFloatMin(-(In_first->data.IN_DATA_7*step_slider),2); //显示值
+	
+	GUI_GotoXY(siler_x+350, Text_y);  //设置8位置
+	GUI_DispFloatMin(-(In_first->data.IN_DATA_8*step_slider),2); //显示值
+	
+	//AT24C16_PageWrite((u8 *)In_first,IIC_Addr[0],sizeof(Input_First_data));  //保存数据
 
 }
 
-//左边三角形
-static void _DrawSkin_Button(const WIDGET_ITEM_DRAW_INFO * pDrawItemInfo) //--------------（3）
-{
-	switch (pDrawItemInfo->Cmd)
-	{
-	case WIDGET_ITEM_DRAW_BACKGROUND:
-		/* Draw the background */
-		GUI_SetBkColor(GUI_GREEN);
-		GUI_Clear();
-		break;
 
-	default:
-		BUTTON_DrawSkinFlex(pDrawItemInfo);
-	}
-}
 // USER START (Optionally insert additional static code)
 // USER END
 
@@ -249,46 +251,91 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 
 		//滑块
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_0);
-		SLIDER_SetRange(hItem, 0, 80);  //要取绝对值
-		SLIDER_SetValue(hItem, In_first->IN_DATA_1);
+		SLIDER_SetRange(hItem, 0, slider_max);  //要取绝对值
+		SLIDER_SetValue(hItem, In_first->data.IN_DATA_1);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_1);
-		SLIDER_SetRange(hItem, 0, 80);  //要取绝对值
-		SLIDER_SetValue(hItem, In_first->IN_DATA_2);
+		SLIDER_SetRange(hItem, 0, slider_max);  //要取绝对值
+		SLIDER_SetValue(hItem, In_first->data.IN_DATA_2);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_2);
-		SLIDER_SetRange(hItem, 0, 80);  //要取绝对值
-		SLIDER_SetValue(hItem, In_first->IN_DATA_3);
+		SLIDER_SetRange(hItem, 0, slider_max);  //要取绝对值
+		SLIDER_SetValue(hItem, In_first->data.IN_DATA_3);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_3);
-		SLIDER_SetRange(hItem, 0, 80);  //要取绝对值
-		SLIDER_SetValue(hItem, In_first->IN_DATA_4);
+		SLIDER_SetRange(hItem, 0, slider_max);  //要取绝对值
+		SLIDER_SetValue(hItem, In_first->data.IN_DATA_4);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_4);
-		SLIDER_SetRange(hItem, 0, 80);  //要取绝对值
-		SLIDER_SetValue(hItem, In_first->IN_DATA_5);
+		SLIDER_SetRange(hItem, 0, slider_max);  //要取绝对值
+		SLIDER_SetValue(hItem, In_first->data.IN_DATA_5);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_5);
-		SLIDER_SetRange(hItem, 0, 80);  //要取绝对值
-		SLIDER_SetValue(hItem, In_first->IN_DATA_6);
+		SLIDER_SetRange(hItem, 0, slider_max);  //要取绝对值
+		SLIDER_SetValue(hItem, In_first->data.IN_DATA_6);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_6);
-		SLIDER_SetRange(hItem, 0, 80);  //要取绝对值
-		SLIDER_SetValue(hItem, In_first->IN_DATA_7);
+		SLIDER_SetRange(hItem, 0, slider_max);  //要取绝对值
+		SLIDER_SetValue(hItem, In_first->data.IN_DATA_7);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_7);
-		SLIDER_SetRange(hItem, 0, 80);  //要取绝对值
-		SLIDER_SetValue(hItem, In_first->IN_DATA_8);
+		SLIDER_SetRange(hItem, 0, slider_max);  //要取绝对值
+		SLIDER_SetValue(hItem, In_first->data.IN_DATA_8);
 		//字符串
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_0);
-		TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
+		TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_TOP);
 		TEXT_SetText(hItem, "GAIN");
 		TEXT_SetFont(hItem, GUI_FONT_20B_1);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_1);
 		TEXT_SetText(hItem, "/dB");
 		TEXT_SetFont(hItem, GUI_FONT_20_1);
-
+		
+		//返回之前的聚焦
+		switch(INPUT_CHANNEL)
+		{
+			case 0:
+				hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_0);
+				In_first->Item = button_0;
+				break;
+			
+			case 1:
+				hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_1);
+				In_first->Item = button_1;
+				break;
+			
+			case 2:
+				hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_2);
+				In_first->Item = button_2;
+				break;
+			
+			case 3:
+				hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_3);
+				In_first->Item = button_3;
+				break;
+			
+			case 4:
+				hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_4);
+				In_first->Item = button_4;
+				break;
+			
+			case 5:
+				hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_5);
+				In_first->Item = button_5;
+				break;
+			
+			case 6:
+				hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_6);
+				In_first->Item = button_6;
+				break;
+			
+			case 7:
+				hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_7);
+				In_first->Item = button_7;
+				break;
+			
+		}
+		WM_SetFocus(hItem); //聚焦
 		break;
 	
 	/********************************************控件处理****************************************/
@@ -296,9 +343,21 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		Id = WM_GetId(pMsg->hWinSrc);
 		NCode = pMsg->Data.v;
 		switch (Id) {
+		//点击主标题  退出
+		case ID_TEXT_0:
+			switch(NCode)
+			{
+				case WM_NOTIFICATION_RELEASED:
+						GUI_EndDialog(pMsg->hWin, 0); //关闭当前窗口
+						hWin_now = CreateMainface();  //显示主页面
+						break;
+			}
+			break;	
+		
 		case ID_SLIDER_0: // Notifications sent by 'Slider'
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
+				In_first->Item = slider_0;
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
 				break;
@@ -309,8 +368,9 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_VALUE_CHANGED:
 				// USER START (Optionally insert code for reacting on notification message)
 				hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_0); //获得滑块句柄
-				In_first->IN_DATA_1 = SLIDER_GetValue(hItem); //保存滑块值
+				In_first->data.IN_DATA_1 = SLIDER_GetValue(hItem); //保存滑块值
 				WM_InvalidateRect(pMsg->hWin, &Rect[0]); //无效化该值重新刷新显示值
+				gain_control(IN1_GAIN_ADDR,-(In_first->data.IN_DATA_1*step_slider));
 				// USER END
 				break;
 				// USER START (Optionally insert additional code for further notification handling)
@@ -320,6 +380,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		case ID_SLIDER_1: // Notifications sent by 'Slider'
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
+				 In_first->Item = slider_1;
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
 				break;
@@ -330,8 +391,9 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_VALUE_CHANGED:
 				// USER START (Optionally insert code for reacting on notification message)
 				hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_1); //获得滑块句柄
-				In_first->IN_DATA_2 = SLIDER_GetValue(hItem); //保存滑块值	
+				In_first->data.IN_DATA_2 = SLIDER_GetValue(hItem); //保存滑块值	
 				WM_InvalidateRect(pMsg->hWin, &Rect[1]); //无效化该值重新刷新显示值
+				gain_control(IN6_GAIN_ADDR,-(In_first->data.IN_DATA_2*step_slider));
 				// USER END
 				break;
 				// USER START (Optionally insert additional code for further notification handling)
@@ -341,6 +403,8 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		case ID_SLIDER_2: // Notifications sent by 'Slider'
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
+
+				In_first->Item = slider_2;
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
 				break;
@@ -351,8 +415,9 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_VALUE_CHANGED:
 				// USER START (Optionally insert code for reacting on notification message)
 				hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_2); //获得滑块句柄
-				In_first->IN_DATA_3 = SLIDER_GetValue(hItem); //保存滑块值
+				In_first->data.IN_DATA_3 = SLIDER_GetValue(hItem); //保存滑块值
 				WM_InvalidateRect(pMsg->hWin, &Rect[2]); //无效化该值重新刷新显示值
+				gain_control(IN3_GAIN_ADDR,-(In_first->data.IN_DATA_3*step_slider));
 				// USER END
 				break;
 				// USER START (Optionally insert additional code for further notification handling)
@@ -362,6 +427,8 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		case ID_SLIDER_3: // Notifications sent by 'Slider'
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
+
+				In_first->Item = slider_3;
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
 				break;
@@ -372,8 +439,9 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_VALUE_CHANGED:
 				// USER START (Optionally insert code for reacting on notification message)
 				hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_3); //获得滑块句柄
-				In_first->IN_DATA_4 = SLIDER_GetValue(hItem); //保存滑块值
+				In_first->data.IN_DATA_4 = SLIDER_GetValue(hItem); //保存滑块值
 				WM_InvalidateRect(pMsg->hWin, &Rect[3]); //无效化该值重新刷新显示值
+				gain_control(IN4_GAIN_ADDR,-(In_first->data.IN_DATA_4*step_slider));
 				// USER END
 				break;
 				// USER START (Optionally insert additional code for further notification handling)
@@ -383,6 +451,8 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		case ID_SLIDER_4: // Notifications sent by 'Slider'
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
+
+			In_first->Item = slider_4;
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
 				break;
@@ -393,8 +463,9 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_VALUE_CHANGED:
 				// USER START (Optionally insert code for reacting on notification message)
 				hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_4); //获得滑块句柄
-				In_first->IN_DATA_5 = SLIDER_GetValue(hItem); //保存滑块值
+				In_first->data.IN_DATA_5 = SLIDER_GetValue(hItem); //保存滑块值
 				WM_InvalidateRect(pMsg->hWin, &Rect[4]); //无效化该值重新刷新显示值
+				gain_control(IN5_GAIN_ADDR,-(In_first->data.IN_DATA_5*step_slider));
 				// USER END
 				break;
 				// USER START (Optionally insert additional code for further notification handling)
@@ -404,6 +475,8 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		case ID_SLIDER_5: // Notifications sent by 'Slider'
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
+
+			In_first->Item = slider_5;
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
 				break;
@@ -414,8 +487,9 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_VALUE_CHANGED:
 				// USER START (Optionally insert code for reacting on notification message)
 				hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_5); //获得滑块句柄
-				In_first->IN_DATA_6 = SLIDER_GetValue(hItem); //保存滑块值
+				In_first->data.IN_DATA_6 = SLIDER_GetValue(hItem); //保存滑块值
 				WM_InvalidateRect(pMsg->hWin, &Rect[5]); //无效化该值重新刷新显示值
+				gain_control(IN2_GAIN_ADDR,-(In_first->data.IN_DATA_6*step_slider));
 				// USER END
 				break;
 				// USER START (Optionally insert additional code for further notification handling)
@@ -425,6 +499,8 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		case ID_SLIDER_6: // Notifications sent by 'Slider'
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
+
+			In_first->Item = slider_6;
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
 				break;
@@ -435,9 +511,11 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_VALUE_CHANGED:
 				// USER START (Optionally insert code for reacting on notification message)
 				hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_6); //获得滑块句柄
-				In_first->IN_DATA_7 = SLIDER_GetValue(hItem); //保存滑块值
+				In_first->data.IN_DATA_7 = SLIDER_GetValue(hItem); //保存滑块值
 				WM_InvalidateRect(pMsg->hWin, &Rect[6]); //无效化该值重新刷新显示值
-
+				gain_control(COAX_L_GAIN_ADDR,-(In_first->data.IN_DATA_7*step_slider));
+			
+				//COAR同路
 				//SLIDER_SetValue(WM_GetDialogItem(pMsg->hWin, ID_SLIDER_7), value[6]);
 				//WM_InvalidateRect(pMsg->hWin, &Rect[7]); //无效化该值重新刷新显示值
 				// USER END
@@ -449,6 +527,8 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		case ID_SLIDER_7: // Notifications sent by 'Slider'
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
+
+			In_first->Item = slider_7;
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
 				break;
@@ -459,9 +539,11 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_VALUE_CHANGED:
 				// USER START (Optionally insert code for reacting on notification message)
 				hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_7); //获得滑块句柄
-				In_first->IN_DATA_8 = SLIDER_GetValue(hItem); //保存滑块值
+				In_first->data.IN_DATA_8 = SLIDER_GetValue(hItem); //保存滑块值
 				WM_InvalidateRect(pMsg->hWin, &Rect[7]); //无效化该值重新刷新显示值
-
+				gain_control(COAX_R_GAIN_ADDR,-(In_first->data.IN_DATA_8*step_slider));
+			
+			
 				//SLIDER_SetValue(WM_GetDialogItem(pMsg->hWin, ID_SLIDER_6), value[7]);
 				//WM_InvalidateRect(pMsg->hWin, &Rect[6]); //无效化该值重新刷新显示值
 				// USER END
@@ -473,12 +555,13 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		case ID_BUTTON_0: // Notifications sent by 'Button'
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
+
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				INPUT_CHANNEL = 1;              //选中1通道
+				INPUT_CHANNEL = 0;              //选中1通道
 				GUI_EndDialog(pMsg->hWin, 0);   //结束当前界面
                 hWin_now = Input_Second();      //显示第三页面
 				// USER END
@@ -490,12 +573,13 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		case ID_BUTTON_1: // Notifications sent by 'Button'
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
+
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				INPUT_CHANNEL = 2;              //选中2通道
+				INPUT_CHANNEL = 1;              //选中2通道
 				GUI_EndDialog(pMsg->hWin, 0);   //结束当前界面
                 hWin_now = Input_Second(); //显示第三页面
 				// USER END
@@ -507,12 +591,13 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		case ID_BUTTON_2: // Notifications sent by 'Button'
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
+
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				INPUT_CHANNEL = 3;              //选中3通道
+				INPUT_CHANNEL = 2;              //选中3通道
 				GUI_EndDialog(pMsg->hWin, 0);   //结束当前界面
                 hWin_now = Input_Second(); 		//显示第三页面
 				// USER END
@@ -524,12 +609,13 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		case ID_BUTTON_3: // Notifications sent by 'Button'
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
+
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				INPUT_CHANNEL = 4;              //选中4通道
+				INPUT_CHANNEL = 3;              //选中4通道
 				GUI_EndDialog(pMsg->hWin, 0);   //结束当前界面
                 hWin_now = Input_Second(); //显示第三页面
 				// USER END
@@ -541,12 +627,13 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		case ID_BUTTON_4: // Notifications sent by 'Button'
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
+
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				INPUT_CHANNEL = 5;              //选中5通道
+				INPUT_CHANNEL = 4;              //选中5通道
 				GUI_EndDialog(pMsg->hWin, 0);   //结束当前界面
                 hWin_now = Input_Second(); //显示第三页面
 				// USER END
@@ -558,12 +645,13 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		case ID_BUTTON_5: // Notifications sent by 'Button'
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
+
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				INPUT_CHANNEL = 6;              //选中6通道
+				INPUT_CHANNEL = 5;              //选中6通道
 				GUI_EndDialog(pMsg->hWin, 0);   //结束当前界面
                 hWin_now = Input_Second(); //显示第三页面
 				// USER END
@@ -575,12 +663,13 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		case ID_BUTTON_6: // Notifications sent by 'Button'
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
+
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				INPUT_CHANNEL = 7;              //选中7通道
+				INPUT_CHANNEL = 6;              //选中7通道
 				GUI_EndDialog(pMsg->hWin, 0);   //结束当前界面
                 hWin_now = Input_Second(); //显示第三页面
 				// USER END
@@ -597,7 +686,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				INPUT_CHANNEL = 7;              //选中7通道
+				INPUT_CHANNEL = 7;              //选中8通道
 				GUI_EndDialog(pMsg->hWin, 0);   //结束当前界面
                 hWin_now = Input_Second(); //显示第三页面
 				// USER END
@@ -643,19 +732,18 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		_ShowSlidervalue(); //显示滑动值
 		break;
 		
-	case WM_DELETE:
-		//后续需要添加保存数据到IC240C中的代码
-		myfree(0,In_first); //释放动态内存
-		break;
+
 	
 	/*********************************************自定义信息处理**************************************************/
 	//旋钮左转
 	case MSG_KNOB_CONTROL_LEFT:
+		Item_change(&(In_first->Item),slider_0,button_7,Next_dir); //项目指示改变
 		GUI_SendKeyMsg(GUI_KEY_TAB, 1);     //下一个聚焦点
 		break;
 	
 	//旋钮右转
 	case MSG_KNOB_CONTROL_RIGHT:
+		Item_change(&(In_first->Item),slider_0,button_7,Last_dir);
 		GUI_SendKeyMsg(GUI_KEY_BACKTAB, 1); //上一个聚焦
 		break;
 	
@@ -671,18 +759,150 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 	
 	//INPUT左转
 	case MSG_KNOB_INPUT_LEFT:
-		GUI_SendKeyMsg(GUI_KEY_LEFT,1); //滑块数值减少
+//		GUI_SendKeyMsg(GUI_KEY_LEFT,1); //滑块数值减少
+		if(In_first->dir == 2)
+		{
+			In_first->Key_count = 0;
+		}
+		In_first->dir = 1;
+		switch(In_first->Item)
+		{
+			//滑块1
+			case slider_0:
+				Value_Change_dec(&(In_first->data.IN_DATA_1),&(In_first->Key_count));
+				Max_Min(&(In_first->data.IN_DATA_1),slider_max,0);
+				SLIDER_SetValue(WM_GetDialogItem(pMsg->hWin, ID_SLIDER_0), In_first->data.IN_DATA_1);
+				break;
+			
+			//滑块2
+			case slider_1:
+				Value_Change_dec(&(In_first->data.IN_DATA_2),&(In_first->Key_count));
+				Max_Min(&(In_first->data.IN_DATA_2),slider_max,0);
+				SLIDER_SetValue(WM_GetDialogItem(pMsg->hWin, ID_SLIDER_1), In_first->data.IN_DATA_2);
+				break;
+			
+			//滑块3
+			case slider_2:
+				Value_Change_dec(&(In_first->data.IN_DATA_3),&(In_first->Key_count));
+				Max_Min(&(In_first->data.IN_DATA_3),slider_max,0);
+				SLIDER_SetValue(WM_GetDialogItem(pMsg->hWin, ID_SLIDER_2), In_first->data.IN_DATA_3);
+				break;
+			
+			//滑块4
+			case slider_3:
+				Value_Change_dec(&(In_first->data.IN_DATA_4),&(In_first->Key_count));
+				Max_Min(&(In_first->data.IN_DATA_4),slider_max,0);
+				SLIDER_SetValue(WM_GetDialogItem(pMsg->hWin, ID_SLIDER_3), In_first->data.IN_DATA_4);
+				break;
+			
+			//滑块5
+			case slider_4:
+				Value_Change_dec(&(In_first->data.IN_DATA_5),&(In_first->Key_count));
+				Max_Min(&(In_first->data.IN_DATA_5),slider_max,0);
+				SLIDER_SetValue(WM_GetDialogItem(pMsg->hWin, ID_SLIDER_4), In_first->data.IN_DATA_5);
+				break;
+			
+			//滑块6
+			case slider_5:
+				Value_Change_dec(&(In_first->data.IN_DATA_6),&(In_first->Key_count));
+				Max_Min(&(In_first->data.IN_DATA_6),slider_max,0);
+				SLIDER_SetValue(WM_GetDialogItem(pMsg->hWin, ID_SLIDER_5), In_first->data.IN_DATA_6);
+				break;
+			
+			//滑块7
+			case slider_6:
+				Value_Change_dec(&(In_first->data.IN_DATA_7),&(In_first->Key_count));
+				Max_Min(&(In_first->data.IN_DATA_7),slider_max,0);
+				SLIDER_SetValue(WM_GetDialogItem(pMsg->hWin, ID_SLIDER_6), In_first->data.IN_DATA_7);
+				break;
+			
+			//滑块8
+			case slider_7:
+				Value_Change_dec(&(In_first->data.IN_DATA_8),&(In_first->Key_count));
+				Max_Min(&(In_first->data.IN_DATA_8),slider_max,0);
+				SLIDER_SetValue(WM_GetDialogItem(pMsg->hWin, ID_SLIDER_7), In_first->data.IN_DATA_8);
+				break;
+		}
 		break;
 	
 	//INPUT右转
 	case MSG_KNOB_INPUT_RIGHT:
-		GUI_SendKeyMsg(GUI_KEY_RIGHT,1); //滑块数值增加
+//		GUI_SendKeyMsg(GUI_KEY_RIGHT,1); //滑块数值增加
+		if(In_first->dir == 1)
+		{
+			In_first->Key_count = 0;  //上一次为减少数值
+		}
+		In_first->dir = 2;
+		switch(In_first->Item)
+		{
+			//滑块1
+			case slider_0:
+				Value_Change_add(&(In_first->data.IN_DATA_1),&(In_first->Key_count));
+				Max_Min(&(In_first->data.IN_DATA_1),slider_max,0);
+				SLIDER_SetValue(WM_GetDialogItem(pMsg->hWin, ID_SLIDER_0), In_first->data.IN_DATA_1);
+				break;
+			
+			//滑块2
+			case slider_1:
+				Value_Change_add(&(In_first->data.IN_DATA_2),&(In_first->Key_count));
+				Max_Min(&(In_first->data.IN_DATA_2),slider_max,0);
+				SLIDER_SetValue(WM_GetDialogItem(pMsg->hWin, ID_SLIDER_1), In_first->data.IN_DATA_2);
+				break;
+			
+			//滑块3
+			case slider_2:
+				Value_Change_add(&(In_first->data.IN_DATA_3),&(In_first->Key_count));
+				Max_Min(&(In_first->data.IN_DATA_3),slider_max,0);
+				SLIDER_SetValue(WM_GetDialogItem(pMsg->hWin, ID_SLIDER_2), In_first->data.IN_DATA_3);
+				break;
+			
+			//滑块4
+			case slider_3:
+				Value_Change_add(&(In_first->data.IN_DATA_4),&(In_first->Key_count));
+				Max_Min(&(In_first->data.IN_DATA_4),slider_max,0);
+				SLIDER_SetValue(WM_GetDialogItem(pMsg->hWin, ID_SLIDER_3), In_first->data.IN_DATA_4);
+				break;
+			
+			//滑块5
+			case slider_4:
+				Value_Change_add(&(In_first->data.IN_DATA_5),&(In_first->Key_count));
+				Max_Min(&(In_first->data.IN_DATA_5),slider_max,0);
+				SLIDER_SetValue(WM_GetDialogItem(pMsg->hWin, ID_SLIDER_4), In_first->data.IN_DATA_5);
+				break;
+			
+			//滑块6
+			case slider_5:
+				Value_Change_add(&(In_first->data.IN_DATA_6),&(In_first->Key_count));
+				Max_Min(&(In_first->data.IN_DATA_6),slider_max,0);
+				SLIDER_SetValue(WM_GetDialogItem(pMsg->hWin, ID_SLIDER_5), In_first->data.IN_DATA_6);
+				break;
+			
+			//滑块7
+			case slider_6:
+				Value_Change_add(&(In_first->data.IN_DATA_7),&(In_first->Key_count));
+				Max_Min(&(In_first->data.IN_DATA_7),slider_max,0);
+				SLIDER_SetValue(WM_GetDialogItem(pMsg->hWin, ID_SLIDER_6), In_first->data.IN_DATA_7);
+				break;
+			
+			//滑块8
+			case slider_7:
+				Value_Change_add(&(In_first->data.IN_DATA_8),&(In_first->Key_count));
+				Max_Min(&(In_first->data.IN_DATA_8),slider_max,0);
+				SLIDER_SetValue(WM_GetDialogItem(pMsg->hWin, ID_SLIDER_7), In_first->data.IN_DATA_8);
+				break; 
+		}
 		break;
 	
 	//INPUT
 	case MSG_KEY_INPUT:
-        GUI_EndDialog(pMsg->hWin, 0); //结束本界面
-		hWin_now = Input_Second(); //显示INPUT第二个界面
+//        GUI_EndDialog(pMsg->hWin, 0); //结束本界面
+//		hWin_now = Input_Second(); //显示INPUT第二个界面
+		break;
+	
+	//没有旋钮动作
+	case MSG_KNOB_NULL:
+		In_first->Key_count = 0;
+		In_first->dir		= 0; //无动作
 		break;
 	/*********************************按键处理******************************************/
 	case WM_KEY:
@@ -692,10 +912,17 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case GUI_KEY_ESCAPE:
             GUI_EndDialog(pMsg->hWin, 0); //关闭当前窗口
             hWin_now = CreateMainface();  //显示主页面
+			INPUT_CHANNEL = 0;
             break;
 		}
 		break;
-	
+		
+		
+	case WM_DELETE:
+	//后续需要添加保存数据到IC240C中的代码
+//		myfree(0,In_first); //释放动态内存
+		break;
+		
 	default:
 		WM_DefaultProc(pMsg);
 		break;
@@ -715,7 +942,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 //初始化数据
 static void Init_data(Input_First_data *L)
 {
-	AT24C16_PageRead((u8 *)L,IIC_Addr[0],sizeof(Input_First_data));  //提取数据
+//	AT24C16_PageRead((u8 *)L,IIC_Addr[0],sizeof(Input_First_data));  //提取数据
 //	L->IN_DATA_1 = 80;
 //	L->IN_DATA_2 = 80;
 //	L->IN_DATA_3 = 80;
@@ -724,19 +951,23 @@ static void Init_data(Input_First_data *L)
 //	L->IN_DATA_6 = 80;
 //	L->IN_DATA_7 = 80;
 //	L->IN_DATA_8 = 80;
-	
+
 }
 
 WM_HWIN Input_First(void) {
 	WM_HWIN hWin;
 	
 	//申请动态数据
-	In_first = (Input_First_data *)mymalloc(0,sizeof(Input_First_data));
-	if(In_first == NULL) //如果申请不成功，会错误
-		return 0;
-	else 
-		Init_data(In_first);   //申请成功就初始化数据
+//	In_first = (Input_First_data *)mymalloc(0,sizeof(Input_First_data));
+//	if(In_first == NULL) //如果申请不成功，会错误
+//		return 0;
+//	else 
+//	{
+//		EEPROM_FREE = 1;
+//		Init_data(In_first);   //申请成功就初始化数据
+//	}
 	
+	Init_data(In_first);   //申请成功就初始化数据
 	Button_flex_2();
 	hWin = GUI_CreateDialogBox(_aDialogCreate, GUI_COUNTOF(_aDialogCreate), _cbDialog, WM_HBKWIN, 0, 0);
 	return hWin;

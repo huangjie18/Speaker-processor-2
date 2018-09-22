@@ -53,7 +53,7 @@ Purpose     : Display controller initialization
 
 #include "GUI.h"
 #include "malloc.h"
-
+#include "24c16.h"
 /*********************************************************************
 *
 *       Defines
@@ -67,8 +67,9 @@ Purpose     : Display controller initialization
 
 //自己修改的代码
 #define USE_EXRAM  0//不使用外部SRAM
-#define GUI_NUMBYTES  150*1024 //设置STemWin内存大小
+#define GUI_NUMBYTES  30*1024 //设置STemWin内存大小
 #define GUI_BLOCKSIZE 0X80  //块大小
+
 /*********************************************************************
 *
 *       Public code
@@ -98,6 +99,8 @@ Purpose     : Display controller initialization
 //  GUI_SetDefaultFont(GUI_FONT_6X8);
 //}
 /*************************** 自己修改的程序 ****************************/
+extern u8 FLASH_EXTER;
+
 void GUI_X_Config(void)
 {
 	if(USE_EXRAM) //使用外部RAM
@@ -122,8 +125,9 @@ void GUI_X_Config(void)
 //		//设置默认字体
 //		GUI_SetDefaultFont(GUI_FONT_6X8);
 		
-		
+
 		static U32 aMemory[GUI_NUMBYTES / 4];
+//		aMem = aMemory;
 		/*  Assign memory to emWin */
 		GUI_ALLOC_AssignMemory(aMemory, GUI_NUMBYTES);
 		GUI_ALLOC_SetAvBlockSize(GUI_BLOCKSIZE); 

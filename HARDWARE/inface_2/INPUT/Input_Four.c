@@ -23,7 +23,7 @@
 
 #include "DIALOG.h"
 #include "BUTTON_Private.h"
-
+#include "data.h"
 /*********************************************************************
 *
 *       Defines
@@ -65,16 +65,21 @@
 #define Secend_x    104
 #define Thirt_x     202
 #define Four_x      304
+
+#define dec_size	40
+static WM_HWIN hButton;
 // USER START (Optionally insert additional defines)
 // USER END
-
+static Current USE_Data;
 /*********************************************************************
 *
 *       Static data
 *
 **********************************************************************
 */
-static Input_Four_data* In_Four;
+//static Input_Four_data* In_Four;
+
+static char input_channel_four;
 
 static const GUI_POINT pPoint_left[] = {
 	{ 0, 10 },
@@ -83,22 +88,23 @@ static const GUI_POINT pPoint_left[] = {
 };
 
 static const GUI_POINT pPoint_right[] = {
-	{ 10, 0 },
-	{ 20, 10 },
-	{ 10, 20 },
+	{ 10+20, 0 },
+	{ 20+20, 10 },
+	{ 10+20, 20 },
 };
 
 //页面显示的字符串数据
 static char face_string[][20] = 
 {
-	"NULL",
-	"INPUT1 PAGE 2/3",
-	"INPUT2 PAGE 2/3",
-	"INPUT3 PAGE 2/3",
-	"INPUT4 PAGE 2/3",
-	"INPUT5 PAGE 2/3",
-	"INPUT6 PAGE 2/3",
-	"COAX PAGE 2/3",
+//	"NULL",
+	"INPUT1 PAGE 2/4",
+	"INPUT2 PAGE 2/4",
+	"INPUT3 PAGE 2/4",
+	"INPUT4 PAGE 2/4",
+	"INPUT5 PAGE 2/4",
+	"INPUT6 PAGE 2/4",
+	"COAL PAGE 2/4",
+	"COAR PAGE 2/4",
 
 };
 // USER START (Optionally insert additional static data)
@@ -128,22 +134,22 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 
 	/*增减按钮*/
 	//left 
-	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_6,  208, 73, 20, 25, 0, 0x0, 0 },
-	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_7,  208, 107, 20, 25, 0, 0x0, 0 },
-	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_8,  208, 141, 20, 25, 0, 0x0, 0 },
-	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_9,  208, 174, 20, 25, 0, 0x0, 0 },
-	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_10, 208, 208, 20, 25, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_6,  208, 73, dec_size, 25, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_7,  208, 107, dec_size, 25, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_8,  208, 141, dec_size, 25, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_9,  208, 174, dec_size, 25, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_10, 208, 208, dec_size, 25, 0, 0x0, 0 },
 
 	//right
-	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_11, 170 + 200, 73, 20, 25, 0, 0x0, 0 },
-	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_12, 170 + 200, 107, 20, 25, 0, 0x0, 0 },
-	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_13, 170 + 200, 141, 20, 25, 0, 0x0, 0 },
-	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_14, 170 + 200, 174, 20, 25, 0, 0x0, 0 },
-	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_15, 170 + 200, 208, 20, 25, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_11, 170 + 180, 73, dec_size, 25, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_12, 170 + 180, 107, dec_size, 25, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_13, 170 + 180, 141, dec_size, 25, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_14, 170 + 180, 174, dec_size, 25, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_15, 170 + 180, 208, dec_size, 25, 0, 0x0, 0 },
 
 	/*页面切换*/
-	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_16, 5, 5, 20, 25, 0, 0x0, 0 },
-	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_17, 375, 5, 20, 25, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_16, 5, 5, dec_size, 25, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_17, 375-20, 5, dec_size, 25, 0, 0x0, 0 },
 };
 
 /*********************************************************************
@@ -189,7 +195,7 @@ static void _cbButton_right(WM_MESSAGE * pMsg) //--------------（3）
 	WM_HWIN hWin;
 	BUTTON_Obj * pObj; //用来提取出按钮的指针结构体，包含了各种信息
 
-	const GUI_PID_STATE* pState = (const GUI_PID_STATE*)pMsg->Data.p;
+//	const GUI_PID_STATE* pState = (const GUI_PID_STATE*)pMsg->Data.p;
 	hWin = pMsg->hWin;
 	pObj = BUTTON_H2P(hWin);
 
@@ -239,7 +245,197 @@ static void _cbButton_right(WM_MESSAGE * pMsg) //--------------（3）
 		BUTTON_Callback(pMsg);
 	}
 }
+/*
+*******************************************************************************************
+* 函 数 名: Use_data_choose
+* 功能说明: 改变段的数据
+* 形 参: 段值
+* 返 回 值: 无
+*******************************************************************************************
+*/
+static void Use_data_choose(s16 band)
+{
+	band = band;
+	switch(band)
+	{
+		case 1:
+			USE_Data.First_data =  &In_Four[input_channel_four]->data.FREQ_DATA_1;
+			USE_Data.Second_data = &In_Four[input_channel_four]->data.TYPE_DATA_1;
+			USE_Data.Third_data =  &In_Four[input_channel_four]->data.GAIN_DATA_1;
+			USE_Data.Four_data=    &In_Four[input_channel_four]->data.Q_DATA_1;
+			break;
+		
+		case 2:
+			USE_Data.First_data =  &In_Four[input_channel_four]->data.FREQ_DATA_2;
+			USE_Data.Second_data = &In_Four[input_channel_four]->data.TYPE_DATA_2;
+			USE_Data.Third_data =  &In_Four[input_channel_four]->data.GAIN_DATA_2;
+			USE_Data.Four_data=    &In_Four[input_channel_four]->data.Q_DATA_2;
+			break;
+		
+		case 3:
+			USE_Data.First_data =  &In_Four[input_channel_four]->data.FREQ_DATA_3;
+			USE_Data.Second_data = &In_Four[input_channel_four]->data.TYPE_DATA_3;
+			USE_Data.Third_data =  &In_Four[input_channel_four]->data.GAIN_DATA_3;
+			USE_Data.Four_data=    &In_Four[input_channel_four]->data.Q_DATA_3;
+			break;
+		
+		case 4:
+			USE_Data.First_data =  &In_Four[input_channel_four]->data.FREQ_DATA_4;
+			USE_Data.Second_data = &In_Four[input_channel_four]->data.TYPE_DATA_4;
+			USE_Data.Third_data =  &In_Four[input_channel_four]->data.GAIN_DATA_4;
+			USE_Data.Four_data=    &In_Four[input_channel_four]->data.Q_DATA_4;
+			break;
+		
+		case 5:
+			USE_Data.First_data =  &In_Four[input_channel_four]->data.FREQ_DATA_5;
+			USE_Data.Second_data = &In_Four[input_channel_four]->data.TYPE_DATA_5;
+			USE_Data.Third_data =  &In_Four[input_channel_four]->data.GAIN_DATA_5;
+			USE_Data.Four_data=    &In_Four[input_channel_four]->data.Q_DATA_5;
+			break;
+		
+		case 6:
+			USE_Data.First_data =  &In_Four[input_channel_four]->data.FREQ_DATA_6;
+			USE_Data.Second_data = &In_Four[input_channel_four]->data.TYPE_DATA_6;
+			USE_Data.Third_data =  &In_Four[input_channel_four]->data.GAIN_DATA_6;
+			USE_Data.Four_data=    &In_Four[input_channel_four]->data.Q_DATA_6;
+			break;
+		
+		case 7:
+			USE_Data.First_data =  &In_Four[input_channel_four]->data.FREQ_DATA_7;
+			USE_Data.Second_data = &In_Four[input_channel_four]->data.TYPE_DATA_7;
+			USE_Data.Third_data =  &In_Four[input_channel_four]->data.GAIN_DATA_7;
+			USE_Data.Four_data=    &In_Four[input_channel_four]->data.Q_DATA_7;
+			break;
+		
+	}
+}
 
+/*
+*******************************************************************************************
+* 函 数 名: Item_change
+* 功能说明: 改变选项指示器的值
+* 形 参: 指示器; 第一项; 最后一项; 方向
+* 返 回 值: 无
+*******************************************************************************************
+*/
+void Item_change(char *Item,u8 First_Item,u8 Last_Item,u8 dir)
+{
+	if(dir == Next_dir)
+	{
+		if(*Item == Last_Item)
+		{
+			*Item = First_Item;
+		}
+		else
+		{
+			(*Item)++;
+		}
+	}
+	else if(dir == Last_dir)
+	{
+		if(*Item == First_Item)
+		{
+			*Item = Last_Item;
+		}
+		else
+		{
+			(*Item)--;
+		}
+	}
+	
+}
+//按钮状态转换
+static void Band_Sta(WM_HWIN hItem,s16 band,u8 sta)
+{
+	u8 i;
+	if(band < 1)
+	{
+		band = 1;
+	}
+	else if(band > 7)
+	{
+		band = 7;
+	}
+	//ON_OFF转换
+	if(sta == 1)
+	{
+		if(In_Four[input_channel_four]->data.ON_OFF&(1<<band))
+		{
+			//清零
+			In_Four[input_channel_four]->data.ON_OFF &= ~(1<<band);
+		}
+		else
+		{
+			//置1
+			In_Four[input_channel_four]->data.ON_OFF |= (1<<band);
+		}
+	}
+	
+	//按钮的字符串显示
+	if ((In_Four[input_channel_four]->data.ON_OFF&(1<<band)) == 0)
+	{
+		BUTTON_SetText(hItem, "ON");          //设置显示的字符串
+	}
+	else
+	{
+		BUTTON_SetText(hItem, "OFF");          //设置显示的字符串
+	}
+	WM_InvalidateWindow(hItem);//无效化该窗口
+}
+/*
+*******************************************************************************************
+* 函 数 名: 进行数据传输
+* 功能说明: 对此界面中的一些数据传输给DSP
+* 形 参: 无
+* 返 回 值: 无
+*******************************************************************************************
+*/
+static void tranrfer_data(signed char param)
+{
+	float gain_temp; //gain中间变量
+	float q_temp;    //q中间变量
+	u8 sta;
+	sta = In_Four[input_channel_four]->data.ON_OFF & (1<<In_Four[input_channel_four]->data.BAND_DATA);
+	
+	if(In_Four[input_channel_four]->overflow != 0)
+	{
+		//表示这次更改数据超范围，不用发送数据
+		In_Four[input_channel_four]->overflow = 0; //清零溢出
+		param = -1; //不发送数据
+	}
+	
+	gain_temp = *USE_Data.Third_data * 0.1;
+	q_temp = *USE_Data.Four_data * 0.01;
+	//更改哪项就发送哪一项数据
+	switch(param)
+	{
+		case ON_OFF_Four:
+		case BAND_Four:
+		case FREQ_Four:
+		case TYPE_Four:
+		case GAIN_Four:
+		case Q_Four:
+			
+			if(*USE_Data.Second_data == 0) //FEQ项
+			{
+				Data_input_eq_param(input_channel_four,In_Four[input_channel_four]->data.BAND_DATA,gain_temp,
+				*USE_Data.First_data,q_temp,0,input_flag,sta);
+			}
+			else if(*USE_Data.Second_data == 1) //HS项
+			{
+				Data_input_eq_param(input_channel_four,In_Four[input_channel_four]->data.BAND_DATA,gain_temp,
+				*USE_Data.First_data,q_temp,1,input_flag,sta);
+			}
+			else if(*USE_Data.Second_data == 2) //LS项
+			{
+				Data_input_eq_param(input_channel_four,In_Four[input_channel_four]->data.BAND_DATA,gain_temp,
+				*USE_Data.First_data,q_temp,2,input_flag,sta);
+			}
+			break;
+	}
+	
+	In_Four[input_channel_four]->change_item = -1;
+}
 
 /*
 *******************************************************************************************
@@ -250,38 +446,97 @@ static void _cbButton_right(WM_MESSAGE * pMsg) //--------------（3）
 *******************************************************************************************
 */
 #include "stdio.h"
+#include "math.h"
+#include "string.h"
+#define		BAND_X		300
 #define 	BAND_Y   	75
 #define 	FREQ_Y   	BAND_Y+34
 #define  	TYPE_Y		FREQ_Y+34
 #define 	GAIN_Y		TYPE_Y+34
 #define		Q_Y			GAIN_Y+34
 
-#define		BAND_MAX    30
-#define		BAND_MIN	0
+//最大和最小值
+#define		BAND_MAX    7
+#define		BAND_MIN	1
+#define		FREQ_MAX	20000
+#define		FREQ_MIX	20
+#define		GAIN_MAX	300
+#define		GAIN_MIN	-600
+#define		Q_MAX		2000
+#define		Q_MIN		5
+#define		TYPE_MAX	2
+#define		TYPE_MIN	0
 
+//定义无效区域
+static const GUI_RECT InvaliRect_Value[][4] = {
+	{0},
+	{ BAND_X-50, BAND_Y, BAND_X+50, Q_Y+20},
+	{ BAND_X-50, FREQ_Y, BAND_X+50, FREQ_Y+20},
+	{ BAND_X-50, TYPE_Y, BAND_X+50, TYPE_Y+20},
+	{ BAND_X-50, GAIN_Y, BAND_X+50, GAIN_Y+20},
+	{ BAND_X-50, Q_Y, 	 BAND_X+50, Q_Y+20},
+};
 
 static void Show_Value(void)
 {
 	char str[10];
+	char over;  //数据溢出临时变量
+	float temp; //数据的中间变量
 	GUI_SetColor(GUI_BLACK); 		//设置颜色
 	GUI_SetTextMode(GUI_TM_TRANS);  //设置透明模式
 	GUI_SetFont(&GUI_Font20_1); 	//设置字体
 	
-	Max_Min(&In_Four->data.BAND_DATA,BAND_MAX,BAND_MIN); //设置最大和最小值
-	snprintf(str,9,"%d",In_Four->data.BAND_DATA);  //把数值转为字符串
-	GUI_DispStringHCenterAt(str,300,BAND_Y);          //以当前坐标为中心显示字符串
+	//BAND
+	over = Max_Min(&In_Four[input_channel_four]->data.BAND_DATA,BAND_MAX,BAND_MIN); //设置最大和最小值
+	In_Four[input_channel_four]->overflow |= (over<<BAND_Four);
+	snprintf(str,sizeof(str) - 1,"%d",In_Four[input_channel_four]->data.BAND_DATA);  //把数值转为字符串
+	GUI_DispStringHCenterAt(str,BAND_X,BAND_Y);          //以当前坐标为中心显示字符串
 	
-	snprintf(str,9,"%d",In_Four->data.FREQ_DATA);  //把数值转为字符串
-	GUI_DispStringHCenterAt(str,300,FREQ_Y);
+	//FREQ
+	over = Max_Min(USE_Data.First_data,FREQ_MAX,FREQ_MIX);
+	In_Four[input_channel_four]->overflow |= (over<<FREQ_Four);
+	snprintf(str,sizeof(str) - 1,"%d",*USE_Data.First_data);  //把数值转为字符串
+	GUI_DispStringHCenterAt(str,BAND_X,FREQ_Y);
 	
-	snprintf(str,9,"%d",In_Four->data.TYPE_DATA);  //把数值转为字符串
-	GUI_DispStringHCenterAt(str,300,TYPE_Y);
 	
-	snprintf(str,9,"%d",In_Four->data.GAIN_DATA);  //把数值转为字符串
-	GUI_DispStringHCenterAt(str,300,GAIN_Y);
+	//GAIN
+	over = Max_Min(USE_Data.Third_data,GAIN_MAX,GAIN_MIN);
+	In_Four[input_channel_four]->overflow |= (over<<GAIN_Four);
+	temp = (*USE_Data.Third_data) * 0.1;
+	snprintf(str,sizeof(str) - 1,"%.1f",temp);  //把数值转为字符串，只保留1位小数
+	GUI_DispStringHCenterAt(str,BAND_X,GAIN_Y);
 	
-	snprintf(str,9,"%d",In_Four->data.Q_DATA);  //把数值转为字符串
-	GUI_DispStringHCenterAt(str,300,Q_Y);
+	
+	//Q
+	over = Max_Min(USE_Data.Four_data,Q_MAX,Q_MIN);
+	In_Four[input_channel_four]->overflow |= (over<<Q_Four);
+	temp = (*USE_Data.Four_data) * 0.01;
+	snprintf(str,sizeof(str) - 1,"%.2f",temp);  //把数值转为字符串,只保留两位小数
+	GUI_DispStringHCenterAt(str,BAND_X,Q_Y);
+	
+	
+	//TYPE
+	over = Max_Min(USE_Data.Second_data,TYPE_MAX,TYPE_MIN);
+	In_Four[input_channel_four]->overflow |= (over<<TYPE_Four);
+	if(*USE_Data.Second_data == 0)
+	{
+		strcpy(str,"PEQ");
+	}
+	else if(*USE_Data.Second_data == 1)
+	{
+		strcpy(str,"HS");
+	}
+	else if(*USE_Data.Second_data == 2)
+	{
+		strcpy(str,"LS");
+	}
+//	snprintf(str,sizeof(str) - 1,"%d",In_Four[input_channel_four]->data.TYPE_DATA);  //把数值转为字符串
+	GUI_DispStringHCenterAt(str,BAND_X,TYPE_Y);
+	//AT24C16_PageWrite((u8 *)(&(In_Four[input_channel_four]->data)),IIC_Addr[In_Four[input_channel_four]->face_switch+14],sizeof(In_Four[input_channel_four]->data));
+	//判断更改项，然后进行数据传输
+	tranrfer_data(In_Four[input_channel_four]->change_item);
+	
+	
 }
 // USER START (Optionally insert additional static code)
 // USER END
@@ -303,7 +558,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 	case WM_INIT_DIALOG:
 		//TEXT设置
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_0);
-		TEXT_SetText(hItem, In_Four->String);
+		TEXT_SetText(hItem, In_Four[input_channel_four]->String);
 		TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
 		TEXT_SetFont(hItem, GUI_FONT_24B_1);
 		TEXT_SetTextColor(hItem, GUI_MAKE_COLOR(0x00FFFFFF));
@@ -390,15 +645,17 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		
 		//ON_OFF
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_5);
+		hButton = hItem;
 		BUTTON_SetFont(hItem, GUI_FONT_16B_1);  //设置字体
-		if ((In_Four->data.ON_OFF&0x01) == 0)
-		{
-			BUTTON_SetText(hItem, "ON");          //设置显示的字符串
-		}
-		else
-		{
-			BUTTON_SetText(hItem, "OFF");          //设置显示的字符串
-		}
+//		if ((In_Four[input_channel_four]->data.ON_OFF&0x01) == 0)
+//		{
+//			BUTTON_SetText(hItem, "ON");          //设置显示的字符串
+//		}
+//		else
+//		{
+//			BUTTON_SetText(hItem, "OFF");          //设置显示的字符串
+//		}
+		Band_Sta(hItem,In_Four[input_channel_four]->data.BAND_DATA,0);
 		break;
 		
 
@@ -435,6 +692,17 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		//消息处理
 		switch(Id)
 		{
+			//点击主标题  退出
+			case ID_TEXT_0:
+				switch(NCode)
+				{
+					case WM_NOTIFICATION_RELEASED:
+							GUI_EndDialog(pMsg->hWin, 0); //关闭当前窗口
+							hWin_now = Input_First();  //显示Input_First页面
+							break;
+				}
+				break;
+				
 			//页面切换
 			case ID_BUTTON_16:
 				switch (NCode)
@@ -450,7 +718,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 						hWin_now = Input_Second();      //切换下一个界面
 						break;
 				}	
-			break;
+				break;
 				
 			case ID_BUTTON_17:
 				switch (NCode)
@@ -466,7 +734,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 						hWin_now = Input_Third();      //切换下一个界面
 						break;
 				}	
-			break;
+				break;
 			
 			//ON_OFF
 			case ID_BUTTON_5:
@@ -475,26 +743,349 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 					//已点击按钮
 					case WM_NOTIFICATION_CLICKED:
 						WM_SetFocus(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_5));
-						In_Four->Item = ON_OFF_Item;
+						In_Four[input_channel_four]->Item = ON_OFF_Four;
 						break;
 
 					//已释放按钮
 					case WM_NOTIFICATION_RELEASED:
-						In_Four->data.ON_OFF = ~In_Four->data.ON_OFF;  //切换显示的字符串
-						if ((In_Four->data.ON_OFF&0x01) == 0)
-						{
-							BUTTON_SetText(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_5), "ON");          //设置显示的字符串
-						}
-						else
-						{
-							BUTTON_SetText(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_5), "OFF");
-						}
-						WM_InvalidateWindow(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_5));//无效化该窗口
+						In_Four[input_channel_four]->change_item = ON_OFF_Four;
+						Band_Sta(hButton,In_Four[input_channel_four]->data.BAND_DATA,1);
 						break;
+				}
+				break;
+				
+			//子选项
+			case ID_BUTTON_0:
+				switch(NCode)
+				{
+					//已点击按钮
+					case WM_NOTIFICATION_CLICKED:
+						WM_SetFocus(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_0)); //改变聚焦
+						In_Four[input_channel_four]->Item = BAND_Four;  //子选项改变
+						break;
+				}
+				break; 
+				
+			case ID_BUTTON_1:
+				switch(NCode)
+				{
+					//已点击按钮
+					case WM_NOTIFICATION_CLICKED:
+						WM_SetFocus(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_1)); //改变聚焦
+						In_Four[input_channel_four]->Item = FREQ_Four;  //子选项改变
+						break;
+				}
+				break;
+				
+			case ID_BUTTON_2:
+				switch(NCode)
+				{
+					//已点击按钮
+					case WM_NOTIFICATION_CLICKED:
+						WM_SetFocus(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_2)); //改变聚焦
+						In_Four[input_channel_four]->Item = TYPE_Four;  //子选项改变
+						break;
+				}
+				break;
+				
+			case ID_BUTTON_3:
+				switch(NCode)
+				{
+					//已点击按钮
+					case WM_NOTIFICATION_CLICKED:
+						WM_SetFocus(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_3)); //改变聚焦
+						In_Four[input_channel_four]->Item = GAIN_Four;  //子选项改变
+						break;
+				}
+				break;
+				
+			case ID_BUTTON_4:
+				switch(NCode)
+				{
+					//已点击按钮
+					case WM_NOTIFICATION_CLICKED:
+						WM_SetFocus(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_4)); //改变聚焦
+						In_Four[input_channel_four]->Item = Q_Four;  //子选项改变
+						break;
+				}
+				break;
+			
+			/**********************************增减****************************************/
+			case ID_BUTTON_6:
+				switch(NCode)
+				{
+					//已点击按钮
+					case WM_NOTIFICATION_CLICKED:
+						// USER START (Optionally insert code for reacting on notification message)
+						In_Four[input_channel_four]->change_item = BAND_Four;
+						Time_add_dec(&In_Four[input_channel_four]->data.BAND_DATA,InvaliRect_Value[BAND_Four],&In_Four[input_channel_four]->hItime,First_Time_left,pMsg);
+						Band_Sta(hButton,In_Four[input_channel_four]->data.BAND_DATA,0);
+						Use_data_choose(In_Four[input_channel_four]->data.BAND_DATA);
+					break;
+					
+					//已释放按钮
+					case WM_NOTIFICATION_RELEASED:
+						Time_end(&In_Four[input_channel_four]->Time_count,In_Four[input_channel_four]->hItime);
+					break;
+				}
+				break; 
+				
+			case ID_BUTTON_7:
+				switch(NCode)
+				{
+					//已点击按钮
+					case WM_NOTIFICATION_CLICKED:
+						// USER START (Optionally insert code for reacting on notification message)
+						In_Four[input_channel_four]->change_item = FREQ_Four;
+						Time_add_dec(USE_Data.First_data,InvaliRect_Value[FREQ_Four],&In_Four[input_channel_four]->hItime,Second_Time_left,pMsg);
+	
+					break;
+					
+					//已释放按钮
+					case WM_NOTIFICATION_RELEASED:
+						Time_end(&In_Four[input_channel_four]->Time_count,In_Four[input_channel_four]->hItime);
+					break;
+				}
+				break;
+				
+			case ID_BUTTON_8:
+				switch(NCode)
+				{
+					//已点击按钮
+					case WM_NOTIFICATION_CLICKED:
+						// USER START (Optionally insert code for reacting on notification message)
+						In_Four[input_channel_four]->change_item = TYPE_Four;
+						Time_add_dec(USE_Data.Second_data,InvaliRect_Value[TYPE_Four],&In_Four[input_channel_four]->hItime,Third_Time_left,pMsg);
+	
+					break;
+					
+					//已释放按钮
+					case WM_NOTIFICATION_RELEASED:
+						Time_end(&In_Four[input_channel_four]->Time_count,In_Four[input_channel_four]->hItime);
+					break;
+				}
+				break;
+				
+			case ID_BUTTON_9:
+				switch(NCode)
+				{
+					//已点击按钮
+					case WM_NOTIFICATION_CLICKED:
+						// USER START (Optionally insert code for reacting on notification message)
+						In_Four[input_channel_four]->change_item = GAIN_Four;
+						Time_add_dec(USE_Data.Third_data,InvaliRect_Value[GAIN_Four],&In_Four[input_channel_four]->hItime,Four_Time_left,pMsg);
+	
+					break;
+					
+					//已释放按钮
+					case WM_NOTIFICATION_RELEASED:
+						Time_end(&In_Four[input_channel_four]->Time_count,In_Four[input_channel_four]->hItime);
+					break;
+				}
+				break;
+				
+			case ID_BUTTON_10:
+				switch(NCode)
+				{
+					//已点击按钮
+					case WM_NOTIFICATION_CLICKED:
+						// USER START (Optionally insert code for reacting on notification message)
+						In_Four[input_channel_four]->change_item = Q_Four;
+						Time_add_dec(USE_Data.Four_data,InvaliRect_Value[Q_Four],&In_Four[input_channel_four]->hItime,Five_Time_left,pMsg);
+	
+					break;
+					
+					//已释放按钮
+					case WM_NOTIFICATION_RELEASED:
+						Time_end(&In_Four[input_channel_four]->Time_count,In_Four[input_channel_four]->hItime);
+					break;
+				}
+				break;
+			
+			//right
+			case ID_BUTTON_11:
+				switch(NCode)
+				{
+					//已点击按钮
+					case WM_NOTIFICATION_CLICKED:
+						// USER START (Optionally insert code for reacting on notification message)
+						In_Four[input_channel_four]->change_item = BAND_Four;
+						Time_add_dec(&In_Four[input_channel_four]->data.BAND_DATA,InvaliRect_Value[BAND_Four],&In_Four[input_channel_four]->hItime,First_Time_right,pMsg);
+						Band_Sta(hButton,In_Four[input_channel_four]->data.BAND_DATA,0);
+						Use_data_choose(In_Four[input_channel_four]->data.BAND_DATA);
+					break;
+					
+					//已释放按钮
+					case WM_NOTIFICATION_RELEASED:
+						Time_end(&In_Four[input_channel_four]->Time_count,In_Four[input_channel_four]->hItime);
+					break;
+				}
+				break; 
+				
+			case ID_BUTTON_12:
+				switch(NCode)
+				{
+					//已点击按钮
+					case WM_NOTIFICATION_CLICKED:
+						// USER START (Optionally insert code for reacting on notification message)
+						In_Four[input_channel_four]->change_item = FREQ_Four;
+						Time_add_dec(USE_Data.First_data,InvaliRect_Value[FREQ_Four],&In_Four[input_channel_four]->hItime,Second_Time_right,pMsg);
+	
+					break;
+					
+					//已释放按钮
+					case WM_NOTIFICATION_RELEASED:
+						Time_end(&In_Four[input_channel_four]->Time_count,In_Four[input_channel_four]->hItime);
+					break;
+				}
+				break;
+				
+			case ID_BUTTON_13:
+				switch(NCode)
+				{
+					//已点击按钮
+					case WM_NOTIFICATION_CLICKED:
+						// USER START (Optionally insert code for reacting on notification message)
+						In_Four[input_channel_four]->change_item = TYPE_Four;
+						Time_add_dec(USE_Data.Second_data,InvaliRect_Value[TYPE_Four],&In_Four[input_channel_four]->hItime,Third_Time_right,pMsg);
+	
+					break;
+					
+					//已释放按钮
+					case WM_NOTIFICATION_RELEASED:
+						Time_end(&In_Four[input_channel_four]->Time_count,In_Four[input_channel_four]->hItime);
+					break;
+				}
+				break;
+				
+			case ID_BUTTON_14:
+				switch(NCode)
+				{
+					//已点击按钮
+					case WM_NOTIFICATION_CLICKED:
+						// USER START (Optionally insert code for reacting on notification message)
+						In_Four[input_channel_four]->change_item = GAIN_Four;
+						Time_add_dec(USE_Data.Third_data,InvaliRect_Value[GAIN_Four],&In_Four[input_channel_four]->hItime,Four_Time_right,pMsg);
+	
+					break;
+					
+					//已释放按钮
+					case WM_NOTIFICATION_RELEASED:
+						Time_end(&In_Four[input_channel_four]->Time_count,In_Four[input_channel_four]->hItime);
+					break;
+				}
+				break;
+				
+			case ID_BUTTON_15:
+				switch(NCode)
+				{
+					//已点击按钮
+					case WM_NOTIFICATION_CLICKED:
+						// USER START (Optionally insert code for reacting on notification message)
+						In_Four[input_channel_four]->change_item = Q_Four;
+						Time_add_dec(USE_Data.Four_data,InvaliRect_Value[Q_Four],&In_Four[input_channel_four]->hItime,Five_Time_right,pMsg);
+	
+					break;
+					
+					//已释放按钮
+					case WM_NOTIFICATION_RELEASED:
+						Time_end(&In_Four[input_channel_four]->Time_count,In_Four[input_channel_four]->hItime);
+					break;
 				}
 				break;
 		}
 		break;
+		
+	/*****************************************定时器****************************************/
+	case WM_TIMER:
+		switch(WM_GetTimerId(pMsg->Data.v))  //根据不同定时器的ID号来处理不同的信息
+		{
+			case First_Time_left:
+				if(BUTTON_IsPressed(WM_GetDialogItem(pMsg->hWin,ID_BUTTON_6)))
+				{
+					In_Four[input_channel_four]->change_item = BAND_Four;
+					Time_long_press(pMsg,&In_Four[input_channel_four]->data.BAND_DATA,&In_Four[input_channel_four]->Time_count,InvaliRect_Value[BAND_Four],First_Time_left);
+					Band_Sta(hButton,In_Four[input_channel_four]->data.BAND_DATA,0);
+					Use_data_choose(In_Four[input_channel_four]->data.BAND_DATA);
+				}
+				break;
+				
+			case Second_Time_left:
+				if(BUTTON_IsPressed(WM_GetDialogItem(pMsg->hWin,ID_BUTTON_7)))
+				{
+					In_Four[input_channel_four]->change_item = FREQ_Four;
+					Time_long_press(pMsg,USE_Data.First_data,&In_Four[input_channel_four]->Time_count,InvaliRect_Value[FREQ_Four],Second_Time_left);
+				}
+				break;
+				
+			case Third_Time_left:
+				if(BUTTON_IsPressed(WM_GetDialogItem(pMsg->hWin,ID_BUTTON_8)))
+				{
+					In_Four[input_channel_four]->change_item = TYPE_Four;
+					Time_long_press(pMsg,USE_Data.Second_data,&In_Four[input_channel_four]->Time_count,InvaliRect_Value[TYPE_Four],Third_Time_left);
+				}
+				break;
+				
+			case Four_Time_left:
+				if(BUTTON_IsPressed(WM_GetDialogItem(pMsg->hWin,ID_BUTTON_9)))
+				{
+					In_Four[input_channel_four]->change_item = GAIN_Four;
+					Time_long_press(pMsg,USE_Data.Third_data,&In_Four[input_channel_four]->Time_count,InvaliRect_Value[GAIN_Four],Four_Time_left);
+				}
+				break;
+				
+			case Five_Time_left:
+				if(BUTTON_IsPressed(WM_GetDialogItem(pMsg->hWin,ID_BUTTON_10)))
+				{
+					In_Four[input_channel_four]->change_item = Q_Four;
+					Time_long_press(pMsg,USE_Data.Four_data,&In_Four[input_channel_four]->Time_count,InvaliRect_Value[Q_Four],Five_Time_left);
+				}
+				break;
+				
+			case First_Time_right:
+				if(BUTTON_IsPressed(WM_GetDialogItem(pMsg->hWin,ID_BUTTON_11)))
+				{
+					In_Four[input_channel_four]->change_item = BAND_Four;
+					Time_long_press(pMsg,&In_Four[input_channel_four]->data.BAND_DATA,&In_Four[input_channel_four]->Time_count,InvaliRect_Value[BAND_Four],First_Time_right);
+					Band_Sta(hButton,In_Four[input_channel_four]->data.BAND_DATA,0);
+					Use_data_choose(In_Four[input_channel_four]->data.BAND_DATA);
+				}
+				break;
+				
+			case Second_Time_right:
+				if(BUTTON_IsPressed(WM_GetDialogItem(pMsg->hWin,ID_BUTTON_12)))
+				{
+					In_Four[input_channel_four]->change_item = FREQ_Four;
+					Time_long_press(pMsg,USE_Data.First_data,&In_Four[input_channel_four]->Time_count,InvaliRect_Value[FREQ_Four],Second_Time_right);
+				}
+				break;
+				
+			case Third_Time_right:
+				if(BUTTON_IsPressed(WM_GetDialogItem(pMsg->hWin,ID_BUTTON_13)))
+				{
+					In_Four[input_channel_four]->change_item = TYPE_Four;
+					Time_long_press(pMsg,USE_Data.Second_data,&In_Four[input_channel_four]->Time_count,InvaliRect_Value[TYPE_Four],Third_Time_right);
+				}
+				break;
+				
+			case Four_Time_right:
+				if(BUTTON_IsPressed(WM_GetDialogItem(pMsg->hWin,ID_BUTTON_14)))
+				{
+					In_Four[input_channel_four]->change_item = GAIN_Four;
+					Time_long_press(pMsg,USE_Data.Third_data,&In_Four[input_channel_four]->Time_count,InvaliRect_Value[GAIN_Four],Four_Time_right);
+				}
+				break;
+				
+			case Five_Time_right:
+				if(BUTTON_IsPressed(WM_GetDialogItem(pMsg->hWin,ID_BUTTON_15)))
+				{
+					In_Four[input_channel_four]->change_item = Q_Four;
+					Time_long_press(pMsg,USE_Data.Four_data,&In_Four[input_channel_four]->Time_count,InvaliRect_Value[Q_Four],Five_Time_right);
+				}
+				break;
+		}
+		break;
+		
 	/*********************************************自定义信息处理**************************************************/	
 	
 	//页面切换
@@ -511,11 +1102,14 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 	//CONTROL 左转
 	case MSG_KNOB_CONTROL_LEFT:
 		//子选项指示
+		Item_change(&(In_Four[input_channel_four]->Item),ON_OFF_Four,Q_Four,Next_dir);
 		GUI_SendKeyMsg(GUI_KEY_TAB, 1);     //下一个聚焦点
 		break;
 	
 	//CONTROL 右转
 	case MSG_KNOB_CONTROL_RIGHT:
+		//子选项指示
+		Item_change(&(In_Four[input_channel_four]->Item),ON_OFF_Four,Q_Four,Last_dir);
 		GUI_SendKeyMsg(GUI_KEY_BACKTAB, 1); //上一个聚焦
 		break;
 	
@@ -528,12 +1122,108 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 	case MSG_KEY_ESC:
 		GUI_EndDialog(pMsg->hWin, 0); //关闭当前窗口
 		hWin_now = Input_First();  //显示Input_First页面
-		INPUT_CHANNEL = 1;
+//		input_channel_four = 1;
+		break;
+	
+	//没有旋钮动作
+	case MSG_KNOB_NULL:
+		In_Four[input_channel_four]->Key_count = 0;
+		break;
+	
+	//INPUT右转
+	case MSG_KNOB_INPUT_RIGHT:
+		if(In_Four[input_channel_four]->dir == 2)
+		{
+			In_Four[input_channel_four]->Key_count = 0;
+		}
+		In_Four[input_channel_four]->dir = 1;
+		switch(In_Four[input_channel_four]->Item)
+		{
+			//值减少
+			case BAND_Four:
+				In_Four[input_channel_four]->change_item = BAND_Four; //改变项为BAND
+				Value_Change_dec(&In_Four[input_channel_four]->data.BAND_DATA,&In_Four[input_channel_four]->Key_count);
+				Band_Sta(hButton,In_Four[input_channel_four]->data.BAND_DATA,0);
+			
+				Use_data_choose(In_Four[input_channel_four]->data.BAND_DATA);
+				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[BAND_Four]); //无效化该区域重新刷新
+				break;
+			
+			case FREQ_Four:
+				In_Four[input_channel_four]->change_item = FREQ_Four; //改变项
+				Value_Change_dec(USE_Data.First_data,&In_Four[input_channel_four]->Key_count);
+				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[FREQ_Four]); //无效化该区域重新刷新
+				break;
+			
+			case TYPE_Four:
+				In_Four[input_channel_four]->change_item = TYPE_Four; //改变项
+				Value_Change_dec(USE_Data.Second_data,&In_Four[input_channel_four]->Key_count);
+				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[TYPE_Four]); //无效化该区域重新刷新
+				break;
+			
+			case GAIN_Four:
+				In_Four[input_channel_four]->change_item = GAIN_Four; //改变项
+				Value_Change_dec(USE_Data.Third_data,&In_Four[input_channel_four]->Key_count);
+				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[GAIN_Four]); //无效化该区域重新刷新
+				break;
+			
+			case Q_Four:
+				In_Four[input_channel_four]->change_item = Q_Four; //改变项
+				Value_Change_dec(USE_Data.Four_data,&In_Four[input_channel_four]->Key_count);
+				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[Q_Four]); //无效化该区域重新刷新
+				break;
+		}
+		break;
+	
+	//INPUT左转
+	case MSG_KNOB_INPUT_LEFT:
+		if(In_Four[input_channel_four]->dir == 1)
+		{
+			In_Four[input_channel_four]->Key_count = 0;
+		}
+		In_Four[input_channel_four]->dir = 2;
+		switch(In_Four[input_channel_four]->Item)
+		{
+			//值增加
+			case BAND_Four:
+				In_Four[input_channel_four]->change_item = BAND_Four; //改变项
+				Value_Change_add(&In_Four[input_channel_four]->data.BAND_DATA,&In_Four[input_channel_four]->Key_count);
+				Band_Sta(hButton,In_Four[input_channel_four]->data.BAND_DATA,0);
+			
+				Use_data_choose(In_Four[input_channel_four]->data.BAND_DATA);
+				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[BAND_Four]); //无效化该区域重新刷新
+				break;
+			
+			case FREQ_Four:
+				In_Four[input_channel_four]->change_item = FREQ_Four; //改变项
+				Value_Change_add(USE_Data.First_data,&In_Four[input_channel_four]->Key_count);
+				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[FREQ_Four]); //无效化该区域重新刷新
+				break;
+			
+			case TYPE_Four:
+				In_Four[input_channel_four]->change_item = TYPE_Four; //改变项
+				Value_Change_add(USE_Data.Second_data,&In_Four[input_channel_four]->Key_count);
+				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[TYPE_Four]); //无效化该区域重新刷新
+				break;
+			
+			case GAIN_Four:
+				In_Four[input_channel_four]->change_item = GAIN_Four; //改变项
+				Value_Change_add(USE_Data.Third_data,&In_Four[input_channel_four]->Key_count);
+				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[GAIN_Four]); //无效化该区域重新刷新
+				break;
+			
+			case Q_Four:
+				In_Four[input_channel_four]->change_item = Q_Four; //改变项
+				Value_Change_add(USE_Data.Four_data,&In_Four[input_channel_four]->Key_count);
+				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[Q_Four]); //无效化该区域重新刷新
+				break;
+		}
 		break;
 	
 	//可以在这里释放数据结构
 	case WM_DELETE:
-		myfree(0,In_Four); //释放动态内存
+//		myfree(0,In_Four[input_channel_four]); //释放动态内存
+
 		break;
 	
 	default:
@@ -555,36 +1245,50 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 //初始化数据
 static void Init_data(Input_Four_data *L)
 {
-	L->face_switch  	= 	INPUT_CHANNEL;  //获得选中的通道
-//	L->Item         	= 	RMSTC_Item;              //子选项
-	L->String       	= 	face_string[INPUT_CHANNEL]; //头项目字符串
+
+	L->face_switch  	= 	input_channel_four;  //获得选中的通道
+	L->Item         	= 	ON_OFF_Four;              //子选项
+	L->String       	= 	face_string[input_channel_four]; //头项目字符串
 	L->Time_count       =	0;
 	L->hItime			=	0;
 	L->Key_count		=	0;
+	L->change_item		=	-1;  //表示没有更改项
+	L->overflow			=	0;
 	
-	L->data.ON_OFF		=	0;
-	L->data.BAND_DATA	=	0;
-	L->data.FREQ_DATA	=	0;
-	L->data.TYPE_DATA	=	0;
-	L->data.GAIN_DATA	=	0;
-	L->data.Q_DATA		=	0;
+
+	
+//	AT24C16_PageRead((u8 *)(&(L->data)),IIC_Addr[L->face_switch+14],sizeof(L->data));
+	if(L->data.BAND_DATA == 0)
+	{
+		L->data.BAND_DATA = 1;
+	}
+	
+	//选择使用的数据
+	Use_data_choose(L->data.BAND_DATA);
 }
 
 WM_HWIN Input_Four(void) {
 	WM_HWIN hWin;
 	
 	//申请数据
-	In_Four = (Input_Four_data *)mymalloc(0,sizeof(Input_Four_data));
+//	In_Four = (Input_Four_data *)mymalloc(0,sizeof(Input_Four_data));
+//	
+//	if(In_Four == NULL)
+//	{
+//		return 0;
+//	}
+//	else
+//	{
+//		Inface_data = In_Four;
+//		Init_data(In_Four);
+//	}
 	
-	if(In_Four == NULL)
-	{
-		return 0;
-	}
-	else
-	{
-		Init_data(In_Four);
-	}
-	
+	input_channel_four = INPUT_CHANNEL;
+//	if(input_channel_four == 7)
+//	{
+//		input_channel_four = 6;  //COAL和COAR共用变量
+//	}
+	Init_data(In_Four[input_channel_four]);
 	
 	hWin = GUI_CreateDialogBox(_aDialogCreate, GUI_COUNTOF(_aDialogCreate), _cbDialog, WM_HBKWIN, 0, 0);
 	return hWin;

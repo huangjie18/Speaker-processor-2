@@ -125,10 +125,10 @@ u8 my_mem_free(u8 memx,u32 offset)
 //ptr:内存首地址 
 void myfree(u8 memx,void *ptr)  
 {  
-	u32 i;
+
 	u32 offset; 
-	char *p = (char *)ptr;
-	int index,nmemb;
+
+
 	
 	if(ptr==NULL)return;//地址为0.  
  	offset=(u32)ptr-(u32)mallco_dev.membase[memx];//申请的地址-内存池数组的首地址=偏移地址，再强制转为常量。	

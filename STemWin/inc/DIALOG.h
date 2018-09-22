@@ -73,10 +73,12 @@ Purpose     : Dialog box include
 #include "TEXT.h"
 #include "TREEVIEW.h"
 #include "KNOB.h"
+#include "MESSAGEBOX.h"
 
 //自己写的头文件
 #include "interface.h"
 #include "malloc.h"	 
+
 
 #if GUI_WINSUPPORT
 

@@ -103,10 +103,8 @@ BUTTON_SKINFLEX_PROPS Props_Default; //按钮初始颜色
 u8 te[] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,25,35,45,55};
 u8 te_r[5] = {0};
 #define Write_Add (500)
-
 void MainTask(void)
 {
-	u8 key_value;
     WM_SetCreateFlags(WM_CF_MEMDEV);  //开启存储设备，要消耗内存RAM 
 	GUI_Init();                    //emwin初始化
 	WM_SetDesktopColor(GUI_BLACK); //背景色
@@ -118,7 +116,10 @@ void MainTask(void)
 #else
 #endif
 	BUTTON_GetSkinFlexProps(&Props_Default, BUTTON_SKINFLEX_PI_ENABLED); //按钮初始状态颜色
+	//hWin_now = System_Second(); 
 	hWin_now = CreateMainface(); //创建主界面
+	GUI_Delay(1);
+//	hWin_now = Gen_First();
 	
 //  Pratice();  //练习用
 //  example();  //例子用
@@ -290,7 +291,7 @@ static void _cbButton(WM_MESSAGE * pMsg) //--------------（3）
 static void _cbButton_1(WM_MESSAGE * pMsg) //--------------（3）
 {
 	WM_HWIN hWin;
-	const GUI_PID_STATE* pState = (const GUI_PID_STATE*)pMsg->Data.p;
+//	const GUI_PID_STATE* pState = (const GUI_PID_STATE*)pMsg->Data.p;
 
 	hWin = pMsg->hWin;
 	switch (pMsg->MsgId)

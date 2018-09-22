@@ -78,7 +78,12 @@
 ..\obj\iic.o: ..\STemWin\inc\TEXT.h
 ..\obj\iic.o: ..\STemWin\inc\TREEVIEW.h
 ..\obj\iic.o: ..\STemWin\inc\KNOB.h
+..\obj\iic.o: ..\STemWin\inc\MESSAGEBOX.h
 ..\obj\iic.o: ..\HARDWARE\InterFace\interface.h
 ..\obj\iic.o: ..\MALLOC\malloc.h
 ..\obj\iic.o: ..\HARDWARE\Test\example.h
 ..\obj\iic.o: ..\HARDWARE\IC24C16\24c16.h
+..\obj\iic.o: ..\adau1452\inc\ak4612.h
+..\obj\iic.o: ..\adau1452\inc\spi.h
+..\obj\iic.o: ..\SYSTEM\usart\usart.h
+..\obj\iic.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h

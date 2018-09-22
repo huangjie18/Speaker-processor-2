@@ -45,7 +45,7 @@ u8 tpstate(void);
 void spistar(void);  
 void Touch_Adjust(void);
 void point(void); //绘图函数
-u16 ReadFromCharFrom7843();         //SPI 读数据
+//u16 ReadFromCharFrom7843();         //SPI 读数据
 
 
 u8 TP_Init(void);  //引脚初始化
@@ -53,4 +53,6 @@ u16 TP_Read_XOY(u8 xy);							//带滤波的坐标读取(X/Y)
 u16 TP_Read_XOY2(u8 xy);
 void ReadTouch(void);
 void Init_touch_adj(void);
+
 #endif  
+

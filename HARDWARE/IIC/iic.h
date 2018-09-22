@@ -40,6 +40,9 @@ void IIC_Ack(void);
 void IIC_NAck(void);
 void IIC_SendByte_16(u16 _ucByte);
 
+
+void AT24CXX_WriteOneByte(u16 WriteAddr,u8 DataToWrite);
+u8 AT24CXX_ReadOneByte(u16 ReadAddr);
 #else
 //IIC所有操作函数
 void IIC_Init(void);                //初始化IIC的IO口				 

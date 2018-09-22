@@ -65,8 +65,8 @@ void KEY_GPIO_Init(void)
 
 u8 KEY_Scan(u8 mode)
 {
-	GPIO_InitTypeDef GPIO_InitStructure;
-    u8 i, j;
+//	GPIO_InitTypeDef GPIO_InitStructure;
+    u8 i;
     static u8 key_up = 1;  //按键按松开标志
     if(mode)key_up = 1;    //支持连按
     if(key_up)
@@ -124,6 +124,7 @@ u8 KEY_Scan(u8 mode)
         if(row1 == 1 && row2 == 1 && row3 == 1) 
 		{
 			key_up = 1;
+			return 0xff;
 		}
     }
     return 0;
@@ -564,47 +565,61 @@ Encoder_State Encoder_Check_Three(void)
 //{
 //	static u8 last_a = 1;
 //	static u8 last_b = 1;
-////	static u8 front_flag=0;
-////	static u8 back_flag=0;
+//	static u8 front_flag=0;
+//	static u8 back_flag=0;
 
 //	
 //	if(ES3_A != last_a)//A脚发生变化
 //	{
-//		delay_ms(2);   //消抖
+//		delay_us(200);   //消抖
 //		if(ES3_A != last_a)  //A脚发生变化
 //		{
-//			if(last_a) //说明是A产生下降沿
+//			if(last_a == 1) //说明是A产生下降沿
 //			{
-////				key_value_b = ES3_B;
-////				if(ES3_B == ES3_A) 
-////				{
-////					front_flag = 1;
-////				}
-////				else
-////				{
-////					back_flag = 1;
-////				}
-//			}
-//			else   //说明A是上升沿
-//			{
-//				delay_us(200);
-//				count_key++;
-//				if(ES3_B)
+//				if(ES3_B == 1) 
 //				{
-//					WM_SendMessageNoPara(hWin_now, MSG_KNOB_CONTROL_RIGHT);
+//					front_flag = 1;
 //				}
 //				else
 //				{
-//					WM_SendMessageNoPara(hWin_now, MSG_KNOB_CONTROL_LEFT);
+//					back_flag = 1;
 //				}
-//				
 //			}
-//			WM_Exec();
-//			last_a = ES3_A;
-//			return 0;
+//			else   //说明A是上升沿
+//			{
+////				if(ES3_B)
+////				{
+////					WM_SendMessageNoPara(hWin_now, MSG_KNOB_CONTROL_RIGHT);
+////				}
+////				else
+////				{
+////					WM_SendMessageNoPara(hWin_now, MSG_KNOB_CONTROL_LEFT);
+////				}
+////				
+//				if(back_flag == 1)
+//				{
+//					if(ES3_B == 0)
+//					{
+//						Encoder_sample[three].encoder_state = Encoder3_left; 
+//					}
+//				}
+//				else if(front_flag == 1)
+//				{
+//					if(ES3_B)
+//					{
+//						Encoder_sample[three].encoder_state = Encoder3_right; 
+//					}
+//				}
+//				back_flag = 0;
+//				front_flag = 0;
+//			}
 //		}
 //	}
-//	Encoder_sample[three].encoder_state = Encoder_static; //编码器静止状态
+//	else
+//	{
+//		Encoder_sample[three].encoder_state = Encoder_static; //编码器静止状态
+//	}
+//	last_a = ES3_A;
 //	return Encoder_sample[three].encoder_state;
 //	
 //	
@@ -627,13 +642,13 @@ Encoder_State Encoder_Check_Three(void)
 //			if(last_a == 1) //说明是A产生下降沿
 //			{
 ////				key_value_b = ES3_B;
-////				if(ES3_B == ES3_A) 
+////				if(ES1_B == 1) 
 ////				{
-////					front_flag = 1;
+////					back_flag = 1;
 ////				}
 ////				else
 ////				{
-////					back_flag = 1;
+////					front_flag = 1;
 ////				}
 //			}
 //			else   //说明A是上升沿
@@ -647,9 +662,8 @@ Encoder_State Encoder_Check_Three(void)
 //				{
 //					WM_SendMessageNoPara(hWin_now, MSG_KNOB_CONTROL_LEFT);
 //				}
-//				
+//				back_flag = 0;
 //			}
-//			WM_Exec();
 //			last_a = ES1_A;
 //			return 0;
 //		}

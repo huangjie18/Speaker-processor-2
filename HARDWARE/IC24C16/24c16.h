@@ -1,7 +1,9 @@
 #ifndef __24C16_H
 #define __24C16_H
 #include "sys.h"
+#include "iic.h"
 
+#define FLASH_SRAM  0xAC
 #define AT24C01		127
 #define AT24C02		255
 #define AT24C04		511

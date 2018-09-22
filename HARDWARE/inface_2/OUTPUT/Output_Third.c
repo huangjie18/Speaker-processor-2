@@ -25,7 +25,7 @@
 
 #include "DIALOG.h"
 #include "BUTTON_Private.h"
-
+#include "data.h"
 /*********************************************************************
 *
 *       Defines
@@ -65,6 +65,8 @@
 #define ID_CHECKBOX_3 (GUI_ID_USER + 0x1A)
 #define ID_BUTTON_18 (GUI_ID_USER + 0x1B)
 #define ID_BUTTON_19 (GUI_ID_USER + 0x1C)
+
+#define dec_size  40
 // USER START (Optionally insert additional defines)
 // USER END
 
@@ -74,9 +76,9 @@
 *
 **********************************************************************
 */
-static Output_Third_Data *Out_Third;
+//static Output_Third_Data *Out_Third;
 
-
+static Output_Third_Data* Current_out_third;
 static const GUI_POINT pPoint_left[] = {
 	{ 0, 10 },
 	{ 10, 0 },
@@ -84,15 +86,15 @@ static const GUI_POINT pPoint_left[] = {
 };
 
 static const GUI_POINT pPoint_right[] = {
-	{ 10, 0 },
-	{ 20, 10 },
-	{ 10, 20 },
+	{ 10+20, 0 },
+	{ 20+20, 10 },
+	{ 10+20, 20 },
 };
 
 //页面显示的字符串数据
 static char face_string[][20] = 
 {
-	"NULL",
+//	"NULL",
 	"OUTPUT1 PAGE 2/3",
 	"OUTPUT2 PAGE 2/3",
 	"OUTPUT3 PAGE 2/3",
@@ -125,14 +127,14 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 
 	//LOW PASS
 	/*创建按钮*/
-	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_2, 0, 102, 98, 32, 0, 0x0, 0 },
-	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_0, 0, 136, 98, 32, 0, 0x0, 0 },
-	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_1, 0, 170, 98, 32, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_0, 0, 102, 98, 32, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_1, 0, 136, 98, 32, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_2, 0, 170, 98, 32, 0, 0x0, 0 },
 
 
 	/*创建复选框*/
 	//LOW PASS
-	{ CHECKBOX_CreateIndirect, "Checkbox", ID_CHECKBOX_0, 5, 208, 90, 23, 0, 0x0, 0 },
+//	{ CHECKBOX_CreateIndirect, "Checkbox", ID_CHECKBOX_0, 5, 208, 90, 23, 0, 0x0, 0 },
 	{ CHECKBOX_CreateIndirect, "Checkbox", ID_CHECKBOX_1, 107, 208, 90, 23, 0, 0x0, 0 },
 
 
@@ -140,14 +142,14 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 	/*按钮*/
 	//LOW PASS
 	//left
-	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_3, 104, 102 + 4, 20, 25, 0, 0x0, 0 },
-	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_4, 104, 136 + 4, 20, 25, 0, 0x0, 0 },
-	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_5, 104, 170 + 4, 20, 25, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_3, 104, 102 + 4, dec_size, 25, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_4, 104, 136 + 4, dec_size, 25, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_5, 104, 170 + 4, dec_size, 25, 0, 0x0, 0 },
 
 	//right
-	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_6, 175, 102 + 4, 20, 25, 0, 0x0, 0 },
-	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_7, 175, 136 + 4, 20, 25, 0, 0x0, 0 },
-	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_8, 175, 170 + 4, 20, 25, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_6, 175-20, 102 + 4, dec_size, 25, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_7, 175-20, 136 + 4, dec_size, 25, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_8, 175-20, 170 + 4, dec_size, 25, 0, 0x0, 0 },
 
 	//HIGH PASS
 	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_9, 202, 102, 98, 32, 0, 0x0, 0 },
@@ -155,22 +157,22 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_11, 202, 170, 98, 32, 0, 0x0, 0 },
 
 	//left
-	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_12, 104 + 202, 107, 20, 25, 0, 0x0, 0 },
-	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_13, 104 + 202, 141, 20, 25, 0, 0x0, 0 },
-	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_14, 104 + 202, 174, 20, 25, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_12, 104 + 202, 107, dec_size, 25, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_13, 104 + 202, 141, dec_size, 25, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_14, 104 + 202, 174, dec_size, 25, 0, 0x0, 0 },
 
 	//right
-	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_15, 175 + 200, 107, 20, 25, 0, 0x0, 0 },
-	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_16, 175 + 200, 141, 20, 25, 0, 0x0, 0 },
-	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_17, 175 + 200, 174, 20, 25, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_15, 175 + 180, 107, dec_size, 25, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_16, 175 + 180, 141, dec_size, 25, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_17, 175 + 180, 174, dec_size, 25, 0, 0x0, 0 },
 
 	//HIGH PASS
-	{ CHECKBOX_CreateIndirect, "Checkbox", ID_CHECKBOX_2, 5 + 203, 208, 90, 23, 0, 0x0, 0 },
+//	{ CHECKBOX_CreateIndirect, "Checkbox", ID_CHECKBOX_2, 5 + 203, 208, 90, 23, 0, 0x0, 0 },
 	{ CHECKBOX_CreateIndirect, "Checkbox", ID_CHECKBOX_3, 107 + 203, 208, 90, 23, 0, 0x0, 0 },
 
 	/*页面切换*/
-	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_18, 5, 5, 20, 25, 0, 0x0, 0 },
-	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_19, 375, 5, 20, 25, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_18, 5, 5, dec_size, 25, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_19, 375-20, 5, dec_size, 25, 0, 0x0, 0 },
 };
 
 /*********************************************************************
@@ -216,7 +218,7 @@ static void _cbButton_right(WM_MESSAGE * pMsg) //--------------（3）
 	WM_HWIN hWin;
 	BUTTON_Obj * pObj; //用来提取出按钮的指针结构体，包含了各种信息
 
-	const GUI_PID_STATE* pState = (const GUI_PID_STATE*)pMsg->Data.p;
+//	const GUI_PID_STATE* pState = (const GUI_PID_STATE*)pMsg->Data.p;
 	hWin = pMsg->hWin;
 	pObj = BUTTON_H2P(hWin);
 
@@ -267,13 +269,101 @@ static void _cbButton_right(WM_MESSAGE * pMsg) //--------------（3）
 	}
 }
 
+
+/*
+*******************************************************************************************
+* 函 数 名: 进行数据传输
+* 功能说明: 对此界面中的一些数据传输给DSP
+* 形 参: 无
+* 返 回 值: 无
+*******************************************************************************************
+*/
+static void tranrfer_data(signed char param)
+{
+	if(Current_out_third->overflow != 0)
+	{
+		Current_out_third->overflow = 0;
+		param = -1;
+	}
+	
+	switch(param)
+	{
+		//低通
+		case TYPE_LOW_Item_Out:
+		case FREQ_LOW_Item_Out:
+		case GAIN_LOW_Item_Out:
+		case INVERT_LOW_Item_Out:
+			if(Current_out_third->data.TYPE_DATA_HIGH == 0)
+			{
+				Data_output_pass(OUTPUT_CHANNEL,Current_out_third->data.FREQ_DATA_LOW,
+				Current_out_third->data.GAIN_DATA_LOW,BESSEL_12_TYPE,0,Current_out_third->data.INVERT_LOW_STA,output_flag);
+			}
+			else if(Current_out_third->data.TYPE_DATA_HIGH == 1)
+			{
+				Data_output_pass(OUTPUT_CHANNEL,Current_out_third->data.FREQ_DATA_LOW,
+				Current_out_third->data.GAIN_DATA_LOW,BUTTER_12_TYPE,0,Current_out_third->data.INVERT_LOW_STA,output_flag);
+			}
+			else if(Current_out_third->data.TYPE_DATA_LOW == 2)
+			{
+				Data_output_pass(OUTPUT_CHANNEL,Current_out_third->data.FREQ_DATA_LOW,
+				Current_out_third->data.GAIN_DATA_LOW,BESSEL_24_TYPE,0,Current_out_third->data.INVERT_LOW_STA,output_flag);
+			}
+			else if(Current_out_third->data.TYPE_DATA_LOW == 3)
+			{
+				Data_output_pass(OUTPUT_CHANNEL,Current_out_third->data.FREQ_DATA_LOW,
+				Current_out_third->data.GAIN_DATA_LOW,BUTTER_24_TYPE,0,Current_out_third->data.INVERT_LOW_STA,output_flag);
+			}
+			break;
+			
+		//高通
+		case TYPE_HIGH_Item_Out:
+		case FREQ_HIGH_Item_Out:
+		case GAIN_HIGH_Item_Out:
+		case INVERT_HIGH_Item_Out:
+			if(Current_out_third->data.TYPE_DATA_HIGH == 0)
+			{
+				Data_output_pass(OUTPUT_CHANNEL,Current_out_third->data.FREQ_DATA_HIGH,
+				Current_out_third->data.GAIN_DATA_HIGH,BESSEL_12_TYPE,1,Current_out_third->data.INVERT_HIGH_STA,output_flag);
+			}
+			else if(Current_out_third->data.TYPE_DATA_HIGH == 1)
+			{
+				Data_output_pass(OUTPUT_CHANNEL,Current_out_third->data.FREQ_DATA_HIGH,
+				Current_out_third->data.GAIN_DATA_HIGH,BUTTER_12_TYPE,1,Current_out_third->data.INVERT_HIGH_STA,output_flag);
+			}
+			else if(Current_out_third->data.TYPE_DATA_HIGH == 2)
+			{
+				Data_output_pass(OUTPUT_CHANNEL,Current_out_third->data.FREQ_DATA_HIGH,
+				Current_out_third->data.GAIN_DATA_HIGH,BESSEL_24_TYPE,1,Current_out_third->data.INVERT_HIGH_STA,output_flag);
+			}
+			else if(Current_out_third->data.TYPE_DATA_HIGH == 3)
+			{
+				Data_output_pass(OUTPUT_CHANNEL,Current_out_third->data.FREQ_DATA_HIGH,
+				Current_out_third->data.GAIN_DATA_HIGH,BUTTER_24_TYPE,1,Current_out_third->data.INVERT_HIGH_STA,output_flag);
+			}
+			break;
+			
+		//复选框
+	}
+	
+	Current_out_third->change_item = -1;
+}
 /******************************Show_Value 所需数据*****************************/
 #include "stdio.h"
+#include "string.h"
 
 #define TYPE_LOW_X  150
 #define TYPE_LOW_Y  107
 #define FREQ_LOW_Y	TYPE_LOW_Y+34
 #define GAIN_LOW_Y	FREQ_LOW_Y+34
+
+//最大值和最小值
+#define 	TYPE_MAX	3
+#define		TYPE_MIN	0
+#define		FREQ_MAX	20000
+#define		FREQ_MIN	0
+#define		GAIN_MAX	0
+#define		GAIN_MIN	0
+
 
 //定义无效区域
 static const GUI_RECT InvaliRect_Value[][4] = {
@@ -281,7 +371,7 @@ static const GUI_RECT InvaliRect_Value[][4] = {
 	{ TYPE_LOW_X-50, TYPE_LOW_Y, TYPE_LOW_X+50, TYPE_LOW_Y+20}, 
 	{ TYPE_LOW_X-50, FREQ_LOW_Y, TYPE_LOW_X+50, FREQ_LOW_Y+20},
 	{ TYPE_LOW_X-50, GAIN_LOW_Y, TYPE_LOW_X+50, GAIN_LOW_Y+20},
-	{0},
+//	{0},
 	{0},
 	//HIGH
 	{ TYPE_LOW_X+150, TYPE_LOW_Y, TYPE_LOW_X+250, TYPE_LOW_Y+20}, 
@@ -300,35 +390,96 @@ static const GUI_RECT InvaliRect_Value[][4] = {
 static void Show_Value(void)
 {
 	char str[10];
+	char over;
+	
+	GUI_SetColor(GUI_WHITE);
+	GUI_SetTextMode(GUI_TM_TRANS);
+	GUI_SetFont(GUI_FONT_24_1);
+	//显示字符
+	GUI_DispStringHCenterAt("ENABLE",50,208);
+	GUI_DispStringHCenterAt("ENABLE",250,208);
+	
+	
 	GUI_SetColor(GUI_BLACK);
 	GUI_SetTextMode(GUI_TM_TRANS);
-	GUI_SetFont(&GUI_Font20_1);
+	GUI_SetFont(&GUI_Font16B_1);
+	
 	
 	//TYPE_LOW
-	snprintf(str,sizeof(str) - 1,"%d",Out_Third->data.TYPE_DATA_LOW);  //把数值转为字符串
+	over = Max_Min(&Current_out_third->data.TYPE_DATA_LOW,TYPE_MAX,TYPE_MIN);
+	Current_out_third->overflow |= (over<<TYPE_LOW_Item_Out);
+	if(Current_out_third->data.TYPE_DATA_LOW == 0)
+	{
+		strcpy(str,"Besselx12");
+	}
+	else if(Current_out_third->data.TYPE_DATA_LOW == 1)
+	{
+		strcpy(str,"Butterx12");
+	}
+	else if(Current_out_third->data.TYPE_DATA_LOW == 2)
+	{
+		strcpy(str,"Besselx24");
+	}
+	else if(Current_out_third->data.TYPE_DATA_LOW == 3)
+	{
+		strcpy(str,"Butterx24");
+	}
+//	snprintf(str,sizeof(str) - 1,"%d",Current_out_third->data.TYPE_DATA_LOW);  //把数值转为字符串
 	GUI_DispStringHCenterAt(str,TYPE_LOW_X,TYPE_LOW_Y);          //以当前坐标为中心显示字符串
-
+	
+	
+	//TYPE_HIGH
+//	snprintf(str,sizeof(str) - 1,"%d",Current_out_third->data.TYPE_DATA_HIGH);  //把数值转为字符串
+	over = Max_Min(&Current_out_third->data.TYPE_DATA_HIGH,TYPE_MAX,TYPE_MIN);
+	Current_out_third->overflow |= (over<<TYPE_HIGH_Item_Out);
+	if(Current_out_third->data.TYPE_DATA_HIGH == 0)
+	{
+		strcpy(str,"Besselx12");
+	}
+	else if(Current_out_third->data.TYPE_DATA_HIGH == 1)
+	{
+		strcpy(str,"Butterx12");
+	}
+	else if(Current_out_third->data.TYPE_DATA_HIGH == 2)
+	{
+		strcpy(str,"Besselx24");
+	}
+	else if(Current_out_third->data.TYPE_DATA_HIGH == 3)
+	{
+		strcpy(str,"Butterx24");
+	}
+	GUI_DispStringHCenterAt(str,TYPE_LOW_X+200,TYPE_LOW_Y);          //以当前坐标为中心显示字符串
+	
 	//FREQ_LOW
-	snprintf(str,sizeof(str) - 1,"%d",Out_Third->data.FREQ_DATA_LOW);  //把数值转为字符串
+	GUI_SetFont(&GUI_Font20_1);
+	over = Max_Min(&Current_out_third->data.FREQ_DATA_LOW,FREQ_MAX,FREQ_MIN);
+	Current_out_third->overflow |= (over << FREQ_LOW_Item_Out);
+	snprintf(str,sizeof(str) - 1,"%d",Current_out_third->data.FREQ_DATA_LOW);  //把数值转为字符串
 	GUI_DispStringHCenterAt(str,TYPE_LOW_X,FREQ_LOW_Y);          //以当前坐标为中心显示字符串
 	
 	//GAIN_LOW
-	snprintf(str,sizeof(str) - 1,"%d",Out_Third->data.GAIN_DATA_LOW);  //把数值转为字符串
+	over = Max_Min(&Current_out_third->data.GAIN_DATA_LOW,GAIN_MAX,GAIN_MIN);
+	Current_out_third->overflow |= (over << GAIN_LOW_Item_Out);
+	snprintf(str,sizeof(str) - 1,"%d",Current_out_third->data.GAIN_DATA_LOW);  //把数值转为字符串
 	GUI_DispStringHCenterAt(str,TYPE_LOW_X,GAIN_LOW_Y);          //以当前坐标为中心显示字符串
 	
-	//TYPE_HIGH
-	snprintf(str,sizeof(str) - 1,"%d",Out_Third->data.TYPE_DATA_HIGH);  //把数值转为字符串
-	GUI_DispStringHCenterAt(str,TYPE_LOW_X+200,TYPE_LOW_Y);          //以当前坐标为中心显示字符串
+
 
 	//FREQ_HIGH
-	snprintf(str,sizeof(str) - 1,"%d",Out_Third->data.FREQ_DATA_HIGH);  //把数值转为字符串
+	over = Max_Min(&Current_out_third->data.FREQ_DATA_HIGH,FREQ_MAX,FREQ_MIN);
+	Current_out_third->overflow |= (over << FREQ_HIGH_Item_Out);
+	snprintf(str,sizeof(str) - 1,"%d",Current_out_third->data.FREQ_DATA_HIGH);  //把数值转为字符串
 	GUI_DispStringHCenterAt(str,TYPE_LOW_X+200,FREQ_LOW_Y);          //以当前坐标为中心显示字符串
 	
 	//GAIN_HIGH
-	snprintf(str,sizeof(str) - 1,"%d",Out_Third->data.GAIN_DATA_HIGH);  //把数值转为字符串
+	over = Max_Min(&Current_out_third->data.GAIN_DATA_HIGH,GAIN_MAX,GAIN_MIN);
+	Current_out_third->overflow |= (over << GAIN_HIGH_Item_Out);
+	snprintf(str,sizeof(str) - 1,"%d",Current_out_third->data.GAIN_DATA_HIGH);  //把数值转为字符串
 	GUI_DispStringHCenterAt(str,TYPE_LOW_X+200,GAIN_LOW_Y);          //以当前坐标为中心显示字符串
 	
-	AT24C16_PageWrite((u8 *)(&(Out_Third->data)),IIC_Addr[Out_Third->face_switch+30],sizeof(Out_Third->data));
+	//AT24C16_PageWrite((u8 *)(&(Current_out_third->data)),IIC_Addr[Current_out_third->face_switch+30],sizeof(Current_out_third->data));
+	//判断更改项
+	tranrfer_data(Current_out_third->change_item);
 }
 /*********************************************************************
 *
@@ -347,7 +498,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 	case WM_INIT_DIALOG:
 		//TEXT设置
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_0);
-		TEXT_SetText(hItem, Out_Third->String);
+		TEXT_SetText(hItem, Current_out_third->String);
 		TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
 		TEXT_SetFont(hItem, GUI_FONT_24B_1);
 		TEXT_SetTextColor(hItem, GUI_MAKE_COLOR(0x00FFFFFF));
@@ -376,15 +527,15 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		//按钮设置
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_0);
 		BUTTON_SetFont(hItem, GUI_FONT_16B_1);  //设置字体
-		BUTTON_SetText(hItem, "FREQ(Hz)");          //设置显示的字符串
+		BUTTON_SetText(hItem, "TYPE");          //设置显示的字符串
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_1);
 		BUTTON_SetFont(hItem, GUI_FONT_16B_1);  //设置字体
-		BUTTON_SetText(hItem, "GAIN(dB)");          //设置显示的字符串
+		BUTTON_SetText(hItem, "FREQ(Hz)");          //设置显示的字符串
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_2);
 		BUTTON_SetFont(hItem, GUI_FONT_16B_1);  //设置字体
-		BUTTON_SetText(hItem, "TYPE");          //设置显示的字符串
+		BUTTON_SetText(hItem, "GAIN(dB)");          //设置显示的字符串
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_9);
 		BUTTON_SetFont(hItem, GUI_FONT_16B_1);  //设置字体
@@ -405,12 +556,14 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		CHECKBOX_SetTextColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFocusColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFont(hItem, GUI_FONT_13H_1);
+		CHECKBOX_SetState(hItem,Current_out_third->data.LOW_HIGH_STA);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_1);
-		CHECKBOX_SetText(hItem, "INVERT");
+		CHECKBOX_SetText(hItem, "BYPASS");
 		CHECKBOX_SetTextColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFocusColor(hItem, GUI_WHITE);
-		CHECKBOX_SetFont(hItem, GUI_FONT_13H_1);
+		CHECKBOX_SetFont(hItem, GUI_FONT_13HB_1);
+		CHECKBOX_SetState(hItem,Current_out_third->data.INVERT_LOW_STA);
 
 		//HIGH PASS
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_2);
@@ -418,12 +571,14 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		CHECKBOX_SetTextColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFocusColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFont(hItem, GUI_FONT_13H_1);
+		CHECKBOX_SetState(hItem,Current_out_third->data.MID_HIGH_STA);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_3);
-		CHECKBOX_SetText(hItem, "INVERT");
+		CHECKBOX_SetText(hItem, "BYPASS");
 		CHECKBOX_SetTextColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFocusColor(hItem, GUI_WHITE);
-		CHECKBOX_SetFont(hItem, GUI_FONT_13H_1);
+		CHECKBOX_SetFont(hItem, GUI_FONT_13HB_1);
+		CHECKBOX_SetState(hItem,Current_out_third->data.INVERT_HIGH_STA);
 
 		
 		//LOW PASS
@@ -489,7 +644,590 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		WM_SetCallback(hItem, _cbButton_right);
 		BUTTON_SetFocussable(hItem, 0); //不接受输入焦点
 		break;
+	
+	/***************************************子窗口响应********************************************/
+	case WM_NOTIFY_PARENT:
+		Id = WM_GetId(pMsg->hWinSrc);  //获得是哪个子窗口发生变化
+		NCode = pMsg->Data.v;          //子窗口发生什么变化
+		switch(Id)
+		{
+			//点击主标题  退出
+			case ID_TEXT_0:
+				switch(NCode)
+				{
+					case WM_NOTIFICATION_RELEASED:
+							GUI_EndDialog(pMsg->hWin, 0); //关闭当前窗口
+							hWin_now = Output_First();  //页面
+							break;
+				}
+				break;
+				
+			case ID_BUTTON_0:
+				switch(NCode)
+				{
+					//已点击按钮
+					case WM_NOTIFICATION_CLICKED:
+						WM_SetFocus(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_0)); //改变聚焦
+						Current_out_third->Item = TYPE_LOW_Item_Out;  //子选项改变
+						break;
+				}
+				break;
+				
+			case ID_BUTTON_1:
+				switch(NCode)
+				{
+					//已点击按钮
+					case WM_NOTIFICATION_CLICKED:
+						WM_SetFocus(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_1)); //改变聚焦
+						Current_out_third->Item = FREQ_LOW_Item_Out;  //子选项改变
+						break;
+				}
+				break;
+				
+			case ID_BUTTON_2:
+				switch(NCode)
+				{
+					//已点击按钮
+					case WM_NOTIFICATION_CLICKED:
+						WM_SetFocus(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_2)); //改变聚焦
+						Current_out_third->Item = GAIN_LOW_Item_Out;  //子选项改变
+						break;
+				}
+				break;
+				
+			case ID_BUTTON_9:
+				switch(NCode)
+				{
+					//已点击按钮
+					case WM_NOTIFICATION_CLICKED:
+						WM_SetFocus(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_9)); //改变聚焦
+						Current_out_third->Item = TYPE_HIGH_Item_Out;  //子选项改变
+						break;
+				}
+				break;
+				
+			case ID_BUTTON_10:
+				switch(NCode)
+				{
+					//已点击按钮
+					case WM_NOTIFICATION_CLICKED:
+						WM_SetFocus(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_10)); //改变聚焦
+						Current_out_third->Item = FREQ_HIGH_Item_Out;  //子选项改变
+						break;
+				}
+				break;
+				
+			case ID_BUTTON_11:
+				switch(NCode)
+				{
+					//已点击按钮
+					case WM_NOTIFICATION_CLICKED:
+						WM_SetFocus(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_11)); //改变聚焦
+						Current_out_third->Item = GAIN_HIGH_Item_Out;  //子选项改变
+						break;
+				}
+				break;
+			
+			//LOW_HIGH
+//			case ID_CHECKBOX_0:	
+//				switch(NCode)
+//				{
+//					//复选框已被点击
+//						case WM_NOTIFICATION_CLICKED:
+//							WM_SetFocus(WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_0)); //改变聚焦
+//							Current_out_third->Item = LOW_HIGH_Item_Out;
+//							break;
 
+//						//复选框已被释放
+//						case WM_NOTIFICATION_RELEASED:
+//							break;
+
+//						//复选框的状态已改变
+//						case WM_NOTIFICATION_VALUE_CHANGED:
+//							
+//							if(Current_out_third->checkbox_sta &(0x01<<0))
+//							{
+//								Current_out_third->change_item = LOW_HIGH_Item_Out;
+//								if(Current_out_third->data.LOW_HIGH_STA == 0)
+//								{
+//									Current_out_third->data.LOW_HIGH_STA = 1;
+//								}
+//								else
+//								{
+//									Current_out_third->data.LOW_HIGH_STA = 0;
+//								}
+//							}
+//							else
+//							{
+//								Current_out_third->checkbox_sta |= (0x01<<0);
+//							}
+//							break;
+//				}
+//				break;
+			
+			//INVERT_LOW
+			case ID_CHECKBOX_1:	
+				switch(NCode)
+				{
+					//复选框已被点击
+						case WM_NOTIFICATION_CLICKED:
+							WM_SetFocus(WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_1)); //改变聚焦
+							Current_out_third->Item = INVERT_LOW_Item_Out;
+							break;
+
+						//复选框已被释放
+						case WM_NOTIFICATION_RELEASED:
+							break;
+
+						//复选框的状态已改变
+						case WM_NOTIFICATION_VALUE_CHANGED:
+							
+							if(Current_out_third->checkbox_sta &(0x01<<1))
+							{
+								Current_out_third->change_item = INVERT_LOW_Item_Out;
+								if(Current_out_third->data.INVERT_LOW_STA == 0)
+								{
+									Current_out_third->data.INVERT_LOW_STA = 1;
+								}
+								else
+								{
+									Current_out_third->data.INVERT_LOW_STA = 0;
+								}
+							}
+							else
+							{
+								Current_out_third->checkbox_sta |= (0x01<<1);
+							}
+							break;
+				}
+				break;
+			
+			//MID_HIGH
+//			case ID_CHECKBOX_2:	
+//				switch(NCode)
+//				{
+//					//复选框已被点击
+//						case WM_NOTIFICATION_CLICKED:
+//							WM_SetFocus(WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_2)); //改变聚焦
+//							Current_out_third->Item = MID_HIGH_Item_Out;
+//							break;
+
+//						//复选框已被释放
+//						case WM_NOTIFICATION_RELEASED:
+//							break;
+
+//						//复选框的状态已改变
+//						case WM_NOTIFICATION_VALUE_CHANGED:
+//							
+//							if(Current_out_third->checkbox_sta &(0x01<<2))
+//							{
+//								Current_out_third->change_item = MID_HIGH_Item_Out;
+//								if(Current_out_third->data.MID_HIGH_STA == 0)
+//								{
+//									Current_out_third->data.MID_HIGH_STA = 1;
+//								}
+//								else
+//								{
+//									Current_out_third->data.MID_HIGH_STA = 0;
+//								}
+//							}
+//							else
+//							{
+//								Current_out_third->checkbox_sta |= (0x01<<2);
+//							}
+//							break;
+//				}
+//				break;
+			
+			//INVERT_HIGH
+			case ID_CHECKBOX_3:	
+				switch(NCode)
+				{
+					//复选框已被点击
+						case WM_NOTIFICATION_CLICKED:
+							WM_SetFocus(WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_3)); //改变聚焦
+							Current_out_third->Item = INVERT_HIGH_Item_Out;
+							break;
+
+						//复选框已被释放
+						case WM_NOTIFICATION_RELEASED:
+							break;
+
+						//复选框的状态已改变
+						case WM_NOTIFICATION_VALUE_CHANGED:
+							
+							if(Current_out_third->checkbox_sta &(0x01<<3))
+							{
+								Current_out_third->change_item = INVERT_HIGH_Item_Out;
+								if(Current_out_third->data.INVERT_HIGH_STA == 0)
+								{
+									Current_out_third->data.INVERT_HIGH_STA = 1;
+								}
+								else
+								{
+									Current_out_third->data.INVERT_HIGH_STA = 0;
+								}
+							}
+							else
+							{
+								Current_out_third->checkbox_sta |= (0x01<<3);
+							}
+							break;
+				}
+				break;
+			
+			//页面切换
+			case ID_BUTTON_18:
+				switch (NCode)
+				{
+					//已点击按钮
+					case WM_NOTIFICATION_CLICKED:
+
+						break;
+
+					//已释放按钮
+					case WM_NOTIFICATION_RELEASED:
+						GUI_EndDialog(pMsg->hWin, 0);   //结束当前界面
+						hWin_now = Output_Second();      //切换下一个界面
+						break;
+				}
+				break;
+			
+			case ID_BUTTON_19:
+				switch (NCode)
+				{
+					//已点击按钮
+					case WM_NOTIFICATION_CLICKED:
+
+						break;
+
+					//已释放按钮
+					case WM_NOTIFICATION_RELEASED:
+						GUI_EndDialog(pMsg->hWin, 0);   //结束当前界面
+						hWin_now = Output_Four();      //切换下一个界面
+						break;
+				}
+				break;
+				
+			//增减
+			case ID_BUTTON_3:
+				switch(NCode)
+				{
+					//已点击按钮
+					case WM_NOTIFICATION_CLICKED:
+						// USER START (Optionally insert code for reacting on notification message)
+						Current_out_third->change_item = TYPE_LOW_Item_Out;
+						Time_add_dec(&Current_out_third->data.TYPE_DATA_LOW,InvaliRect_Value[TYPE_LOW_Item_Out],&Current_out_third->hItime,First_Time_left,pMsg);
+	
+					break;
+					
+					//已释放按钮
+					case WM_NOTIFICATION_RELEASED:
+						Time_end(&Current_out_third->Time_count,Current_out_third->hItime);
+					break;
+				}
+				break;
+				
+			case ID_BUTTON_4:
+				switch(NCode)
+				{
+					//已点击按钮
+					case WM_NOTIFICATION_CLICKED:
+						// USER START (Optionally insert code for reacting on notification message)
+						Current_out_third->change_item = FREQ_LOW_Item_Out;
+						Time_add_dec(&Current_out_third->data.FREQ_DATA_LOW,InvaliRect_Value[FREQ_LOW_Item_Out],&Current_out_third->hItime,Second_Time_left,pMsg);
+	
+					break;
+					
+					//已释放按钮
+					case WM_NOTIFICATION_RELEASED:
+						Time_end(&Current_out_third->Time_count,Current_out_third->hItime);
+					break;
+				}
+				break;
+				
+			case ID_BUTTON_5:
+				switch(NCode)
+				{
+					//已点击按钮
+					case WM_NOTIFICATION_CLICKED:
+						// USER START (Optionally insert code for reacting on notification message)
+						Current_out_third->change_item = GAIN_LOW_Item_Out;
+						Time_add_dec(&Current_out_third->data.GAIN_DATA_LOW,InvaliRect_Value[GAIN_LOW_Item_Out],&Current_out_third->hItime,Third_Time_left,pMsg);
+	
+					break;
+					
+					//已释放按钮
+					case WM_NOTIFICATION_RELEASED:
+						Time_end(&Current_out_third->Time_count,Current_out_third->hItime);
+					break;
+				}
+				break;
+				
+			case ID_BUTTON_6:
+				switch(NCode)
+				{
+					//已点击按钮
+					case WM_NOTIFICATION_CLICKED:
+						// USER START (Optionally insert code for reacting on notification message)
+						Current_out_third->change_item = TYPE_LOW_Item_Out;
+						Time_add_dec(&Current_out_third->data.TYPE_DATA_LOW,InvaliRect_Value[TYPE_LOW_Item_Out],&Current_out_third->hItime,First_Time_right,pMsg);
+	
+					break;
+					
+					//已释放按钮
+					case WM_NOTIFICATION_RELEASED:
+						Time_end(&Current_out_third->Time_count,Current_out_third->hItime);
+					break;
+				}
+				break;
+				
+			case ID_BUTTON_7:
+				switch(NCode)
+				{
+					//已点击按钮
+					case WM_NOTIFICATION_CLICKED:
+						// USER START (Optionally insert code for reacting on notification message)
+						Current_out_third->change_item = FREQ_LOW_Item_Out;
+						Time_add_dec(&Current_out_third->data.FREQ_DATA_LOW,InvaliRect_Value[FREQ_LOW_Item_Out],&Current_out_third->hItime,Second_Time_right,pMsg);
+	
+					break;
+					
+					//已释放按钮
+					case WM_NOTIFICATION_RELEASED:
+						Time_end(&Current_out_third->Time_count,Current_out_third->hItime);
+					break;
+				}
+				break;
+				
+			case ID_BUTTON_8:
+				switch(NCode)
+				{
+					//已点击按钮
+					case WM_NOTIFICATION_CLICKED:
+						// USER START (Optionally insert code for reacting on notification message)
+						Current_out_third->change_item = GAIN_LOW_Item_Out;
+						Time_add_dec(&Current_out_third->data.GAIN_DATA_LOW,InvaliRect_Value[GAIN_LOW_Item_Out],&Current_out_third->hItime,Third_Time_right,pMsg);
+	
+					break;
+					
+					//已释放按钮
+					case WM_NOTIFICATION_RELEASED:
+						Time_end(&Current_out_third->Time_count,Current_out_third->hItime);
+					break;
+				}
+				break;
+				
+			case ID_BUTTON_12:
+				switch(NCode)
+				{
+					case WM_NOTIFICATION_CLICKED:
+						// USER START (Optionally insert code for reacting on notification message)
+						Current_out_third->change_item = TYPE_HIGH_Item_Out;
+						Time_add_dec(&Current_out_third->data.TYPE_DATA_HIGH,InvaliRect_Value[TYPE_HIGH_Item_Out],&Current_out_third->hItime,Four_Time_left,pMsg);
+	
+					break;
+					
+					//已释放按钮
+					case WM_NOTIFICATION_RELEASED:
+						Time_end(&Current_out_third->Time_count,Current_out_third->hItime);
+					break;
+				}
+				break;
+				
+			case ID_BUTTON_13:
+				switch(NCode)
+				{
+					case WM_NOTIFICATION_CLICKED:
+						// USER START (Optionally insert code for reacting on notification message)
+						Current_out_third->change_item = FREQ_HIGH_Item_Out;
+						Time_add_dec(&Current_out_third->data.FREQ_DATA_HIGH,InvaliRect_Value[FREQ_HIGH_Item_Out],&Current_out_third->hItime,Five_Time_left,pMsg);
+	
+					break;
+					
+					//已释放按钮
+					case WM_NOTIFICATION_RELEASED:
+						Time_end(&Current_out_third->Time_count,Current_out_third->hItime);
+					break;
+				}
+				break;
+				
+			case ID_BUTTON_14:
+				switch(NCode)
+				{
+					case WM_NOTIFICATION_CLICKED:
+						// USER START (Optionally insert code for reacting on notification message)
+						Current_out_third->change_item = GAIN_HIGH_Item_Out;
+						Time_add_dec(&Current_out_third->data.GAIN_DATA_HIGH,InvaliRect_Value[GAIN_HIGH_Item_Out],&Current_out_third->hItime,Six_Time_left,pMsg);
+	
+					break;
+					
+					//已释放按钮
+					case WM_NOTIFICATION_RELEASED:
+						Time_end(&Current_out_third->Time_count,Current_out_third->hItime);
+					break;
+				}
+				break;
+				
+			case ID_BUTTON_15:
+				switch(NCode)
+				{
+					case WM_NOTIFICATION_CLICKED:
+						// USER START (Optionally insert code for reacting on notification message)
+						Current_out_third->change_item = TYPE_HIGH_Item_Out;
+						Time_add_dec(&Current_out_third->data.TYPE_DATA_HIGH,InvaliRect_Value[TYPE_HIGH_Item_Out],&Current_out_third->hItime,Four_Time_right,pMsg);
+	
+					break;
+					
+					//已释放按钮
+					case WM_NOTIFICATION_RELEASED:
+						Time_end(&Current_out_third->Time_count,Current_out_third->hItime);
+					break;
+				}
+				break;
+				
+			case ID_BUTTON_16:
+				switch(NCode)
+				{
+					case WM_NOTIFICATION_CLICKED:
+						// USER START (Optionally insert code for reacting on notification message)
+						Current_out_third->change_item = FREQ_HIGH_Item_Out;
+						Time_add_dec(&Current_out_third->data.FREQ_DATA_HIGH,InvaliRect_Value[FREQ_HIGH_Item_Out],&Current_out_third->hItime,Five_Time_right,pMsg);
+	
+					break;
+					
+					//已释放按钮
+					case WM_NOTIFICATION_RELEASED:
+						Time_end(&Current_out_third->Time_count,Current_out_third->hItime);
+					break;
+				}
+				break;
+				
+			case ID_BUTTON_17:
+				switch(NCode)
+				{
+					case WM_NOTIFICATION_CLICKED:
+						// USER START (Optionally insert code for reacting on notification message)
+						Current_out_third->change_item = GAIN_HIGH_Item_Out;
+						Time_add_dec(&Current_out_third->data.GAIN_DATA_HIGH,InvaliRect_Value[GAIN_HIGH_Item_Out],&Current_out_third->hItime,Six_Time_right,pMsg);
+	
+					break;
+					
+					//已释放按钮
+					case WM_NOTIFICATION_RELEASED:
+						Time_end(&Current_out_third->Time_count,Current_out_third->hItime);
+					break;
+				}
+				break;
+			
+			
+		}
+		break;
+	/********************************************END*********************************************/
+	/********************************定时器**********************************/
+	case WM_TIMER:	
+		switch(WM_GetTimerId(pMsg->Data.v))  //根据不同定时器的ID号来处理不同的信息
+		{
+			case First_Time_left:
+				if(BUTTON_IsPressed(WM_GetDialogItem(pMsg->hWin,ID_BUTTON_3)))
+				{
+					Current_out_third->change_item = TYPE_LOW_Item_Out;
+					Time_long_press(pMsg,&Current_out_third->data.TYPE_DATA_LOW,&Current_out_third->Time_count,InvaliRect_Value[TYPE_LOW_Item_Out],First_Time_left);
+				}
+				break;
+				
+			case Second_Time_left:
+				if(BUTTON_IsPressed(WM_GetDialogItem(pMsg->hWin,ID_BUTTON_4)))
+				{
+					Current_out_third->change_item = FREQ_LOW_Item_Out;
+					Time_long_press(pMsg,&Current_out_third->data.FREQ_DATA_LOW,&Current_out_third->Time_count,InvaliRect_Value[FREQ_LOW_Item_Out],Second_Time_left);
+				}
+				break;
+				
+			case Third_Time_left:
+				if(BUTTON_IsPressed(WM_GetDialogItem(pMsg->hWin,ID_BUTTON_5)))
+				{
+					Current_out_third->change_item = GAIN_LOW_Item_Out;
+					Time_long_press(pMsg,&Current_out_third->data.GAIN_DATA_LOW,&Current_out_third->Time_count,InvaliRect_Value[GAIN_LOW_Item_Out],Third_Time_left);
+				}
+				break;
+				
+			case First_Time_right:
+				if(BUTTON_IsPressed(WM_GetDialogItem(pMsg->hWin,ID_BUTTON_6)))
+				{
+					Current_out_third->change_item = TYPE_LOW_Item_Out;
+					Time_long_press(pMsg,&Current_out_third->data.TYPE_DATA_LOW,&Current_out_third->Time_count,InvaliRect_Value[TYPE_LOW_Item_Out],First_Time_right);
+				}
+				break;
+				
+			case Second_Time_right:
+				if(BUTTON_IsPressed(WM_GetDialogItem(pMsg->hWin,ID_BUTTON_7)))
+				{
+					Current_out_third->change_item = FREQ_LOW_Item_Out;
+					Time_long_press(pMsg,&Current_out_third->data.FREQ_DATA_LOW,&Current_out_third->Time_count,InvaliRect_Value[FREQ_LOW_Item_Out],Second_Time_right);
+				}
+				break;
+				
+			case Third_Time_right:
+				if(BUTTON_IsPressed(WM_GetDialogItem(pMsg->hWin,ID_BUTTON_8)))
+				{
+					Current_out_third->change_item = GAIN_LOW_Item_Out;
+					Time_long_press(pMsg,&Current_out_third->data.GAIN_DATA_LOW,&Current_out_third->Time_count,InvaliRect_Value[GAIN_LOW_Item_Out],Third_Time_right);
+				}
+				break;
+				
+			case Four_Time_left:
+				if(BUTTON_IsPressed(WM_GetDialogItem(pMsg->hWin,ID_BUTTON_12)))
+				{
+					Current_out_third->change_item = TYPE_HIGH_Item_Out;
+					Time_long_press(pMsg,&Current_out_third->data.TYPE_DATA_HIGH,&Current_out_third->Time_count,InvaliRect_Value[TYPE_HIGH_Item_Out],Four_Time_left);
+				}
+				break;
+				
+			case Five_Time_left:
+				if(BUTTON_IsPressed(WM_GetDialogItem(pMsg->hWin,ID_BUTTON_13)))
+				{
+					Current_out_third->change_item = FREQ_HIGH_Item_Out;
+					Time_long_press(pMsg,&Current_out_third->data.FREQ_DATA_HIGH,&Current_out_third->Time_count,InvaliRect_Value[FREQ_HIGH_Item_Out],Five_Time_left);
+				}
+				break;
+				
+			case Six_Time_left:
+				if(BUTTON_IsPressed(WM_GetDialogItem(pMsg->hWin,ID_BUTTON_14)))
+				{
+					Current_out_third->change_item = GAIN_HIGH_Item_Out;
+					Time_long_press(pMsg,&Current_out_third->data.GAIN_DATA_HIGH,&Current_out_third->Time_count,InvaliRect_Value[GAIN_HIGH_Item_Out],Six_Time_left);
+				}
+				break;
+				
+			case Four_Time_right:
+				if(BUTTON_IsPressed(WM_GetDialogItem(pMsg->hWin,ID_BUTTON_15)))
+				{
+					Current_out_third->change_item = TYPE_HIGH_Item_Out;
+					Time_long_press(pMsg,&Current_out_third->data.TYPE_DATA_HIGH,&Current_out_third->Time_count,InvaliRect_Value[TYPE_HIGH_Item_Out],Four_Time_right);
+				}
+				break;
+				
+			case Five_Time_right:
+				if(BUTTON_IsPressed(WM_GetDialogItem(pMsg->hWin,ID_BUTTON_16)))
+				{
+					Current_out_third->change_item = FREQ_HIGH_Item_Out;
+					Time_long_press(pMsg,&Current_out_third->data.FREQ_DATA_HIGH,&Current_out_third->Time_count,InvaliRect_Value[FREQ_HIGH_Item_Out],Five_Time_right);
+				}
+				break;
+				
+			case Six_Time_right:
+				if(BUTTON_IsPressed(WM_GetDialogItem(pMsg->hWin,ID_BUTTON_17)))
+				{
+					Current_out_third->change_item = GAIN_HIGH_Item_Out;
+					Time_long_press(pMsg,&Current_out_third->data.GAIN_DATA_HIGH,&Current_out_third->Time_count,InvaliRect_Value[GAIN_HIGH_Item_Out],Six_Time_right);
+				}
+				break;
+				
+			
+		}
+		break;
+		
 	case WM_PAINT:
 		GUI_SetBkColor(GUI_BLACK);
 		GUI_Clear();
@@ -533,34 +1271,36 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 	//旋钮左转
 	case MSG_KNOB_CONTROL_LEFT:
 		//子选项指示
-		if(Out_Third->Item == INVERT_HIGH_Item_Out)
-		{
-			Out_Third->Item = TYPE_LOW_Item_Out;
-		}
-		else
-		{
-			Out_Third->Item++;
-		}
+//		if(Current_out_third->Item == INVERT_HIGH_Item_Out)
+//		{
+//			Current_out_third->Item = TYPE_LOW_Item_Out;
+//		}
+//		else
+//		{
+//			Current_out_third->Item++;
+//		}
+		Item_change(&(Current_out_third->Item),TYPE_LOW_Item_Out,INVERT_HIGH_Item_Out,Next_dir);
 		GUI_SendKeyMsg(GUI_KEY_TAB, 1);     //下一个聚焦点
 		break;
 	
 	//旋钮右转
 	case MSG_KNOB_CONTROL_RIGHT:
-		if(Out_Third->Item == TYPE_LOW_Item_Out)
-		{
-			Out_Third->Item = INVERT_HIGH_Item_Out;
-		}
-		else
-		{
-			Out_Third->Item--;
-		}
+//		if(Current_out_third->Item == TYPE_LOW_Item_Out)
+//		{
+//			Current_out_third->Item = INVERT_HIGH_Item_Out;
+//		}
+//		else
+//		{
+//			Current_out_third->Item--;
+//		}
+		Item_change(&(Current_out_third->Item),TYPE_LOW_Item_Out,INVERT_HIGH_Item_Out,Last_dir);
 		GUI_SendKeyMsg(GUI_KEY_BACKTAB, 1); //上一个聚焦
 		break;
 		
 	//CONTROL按下
 	case MSG_KEY_CONTROL:
-		if((Out_Third->Item == LOW_HIGH_Item_Out)||(Out_Third->Item == INVERT_LOW_Item_Out)
-			||(Out_Third->Item == MID_HIGH_Item_Out)||(Out_Third->Item == INVERT_HIGH_Item_Out)) //IN_MUTE_Item和IN_INVERT_Item项
+		if((Current_out_third->Item == INVERT_LOW_Item_Out)||
+			(Current_out_third->Item == INVERT_HIGH_Item_Out)) //IN_MUTE_Item和IN_INVERT_Item项
 		{
 			GUI_SendKeyMsg(GUI_KEY_SPACE,1);
 		}
@@ -572,13 +1312,15 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		
 	//没有旋钮动作
 	case MSG_KNOB_NULL:
-		Out_Third->Key_count = 0;
+		Current_out_third->Key_count = 0;
+		Current_out_third->dir	=	0;
 		break;
 	
 	//ESC
 	case MSG_KEY_ESC:
 		GUI_EndDialog(pMsg->hWin, 0); //关闭当前窗口
         hWin_now = Output_First();  //显示Input_First页面
+//		OUTPUT_CHANNEL = 1;
 		break;
 	
 	//页面切换
@@ -594,37 +1336,48 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 	
 	//INPUT右转
 	case MSG_KNOB_INPUT_RIGHT:  
-		switch(Out_Third->Item)
+		if(Current_out_third->dir == 2)
+		{
+			Current_out_third->Key_count = 0;
+		}
+		Current_out_third->dir = 1;
+		switch(Current_out_third->Item)
 		{
 			//值减少
 			case TYPE_LOW_Item_Out:
-				Value_Change_dec(&Out_Third->data.TYPE_DATA_LOW,&Out_Third->Key_count);
+				Current_out_third->change_item = Current_out_third->Item;
+				Value_Change_dec(&Current_out_third->data.TYPE_DATA_LOW,&Current_out_third->Key_count);
 				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[TYPE_LOW_Item_Out]); //无效化该区域重新刷新
 				break;
 			
 			case FREQ_LOW_Item_Out:
-				Value_Change_dec(&Out_Third->data.FREQ_DATA_LOW,&Out_Third->Key_count);
+				Current_out_third->change_item = Current_out_third->Item;
+				Value_Change_dec(&Current_out_third->data.FREQ_DATA_LOW,&Current_out_third->Key_count);
 				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[FREQ_LOW_Item_Out]); //无效化该区域重新刷新
 				break;
 			
 			case GAIN_LOW_Item_Out:
-				Value_Change_dec(&Out_Third->data.GAIN_DATA_LOW,&Out_Third->Key_count);
+				Current_out_third->change_item = Current_out_third->Item;
+				Value_Change_dec(&Current_out_third->data.GAIN_DATA_LOW,&Current_out_third->Key_count);
 				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[GAIN_LOW_Item_Out]); //无效化该区域重新刷新
 				break;
 			
 			//值减少
 			case TYPE_HIGH_Item_Out:
-				Value_Change_dec(&Out_Third->data.TYPE_DATA_HIGH,&Out_Third->Key_count);
+				Current_out_third->change_item = Current_out_third->Item;
+				Value_Change_dec(&Current_out_third->data.TYPE_DATA_HIGH,&Current_out_third->Key_count);
 				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[TYPE_HIGH_Item_Out]); //无效化该区域重新刷新
 				break;
 			
 			case FREQ_HIGH_Item_Out:
-				Value_Change_dec(&Out_Third->data.FREQ_DATA_HIGH,&Out_Third->Key_count);
+				Current_out_third->change_item = Current_out_third->Item;
+				Value_Change_dec(&Current_out_third->data.FREQ_DATA_HIGH,&Current_out_third->Key_count);
 				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[FREQ_HIGH_Item_Out]); //无效化该区域重新刷新
 				break;
 			
 			case GAIN_HIGH_Item_Out:
-				Value_Change_dec(&Out_Third->data.GAIN_DATA_HIGH,&Out_Third->Key_count);
+				Current_out_third->change_item = Current_out_third->Item;
+				Value_Change_dec(&Current_out_third->data.GAIN_DATA_HIGH,&Current_out_third->Key_count);
 				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[GAIN_HIGH_Item_Out]); //无效化该区域重新刷新
 				break;
 			
@@ -633,37 +1386,48 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		break;
 		
 	case MSG_KNOB_INPUT_LEFT:  
-		switch(Out_Third->Item)
+		if(Current_out_third->dir == 1)
+		{
+			Current_out_third->Key_count = 0;
+		}
+		Current_out_third->dir = 2;
+		switch(Current_out_third->Item)
 		{
 			//值增加
 			case TYPE_LOW_Item_Out:
-				Value_Change_add(&Out_Third->data.TYPE_DATA_LOW,&Out_Third->Key_count);
+				Current_out_third->change_item = Current_out_third->Item;
+				Value_Change_add(&Current_out_third->data.TYPE_DATA_LOW,&Current_out_third->Key_count);
 				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[TYPE_LOW_Item_Out]); //无效化该区域重新刷新
 				break;
 			
 			case FREQ_LOW_Item_Out:
-				Value_Change_add(&Out_Third->data.FREQ_DATA_LOW,&Out_Third->Key_count);
+				Current_out_third->change_item = Current_out_third->Item;
+				Value_Change_add(&Current_out_third->data.FREQ_DATA_LOW,&Current_out_third->Key_count);
 				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[FREQ_LOW_Item_Out]); //无效化该区域重新刷新
 				break;
 			
 			case GAIN_LOW_Item_Out:
-				Value_Change_add(&Out_Third->data.GAIN_DATA_LOW,&Out_Third->Key_count);
+				Current_out_third->change_item = Current_out_third->Item;
+				Value_Change_add(&Current_out_third->data.GAIN_DATA_LOW,&Current_out_third->Key_count);
 				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[GAIN_LOW_Item_Out]); //无效化该区域重新刷新
 				break;
 			
 			//值增加
 			case TYPE_HIGH_Item_Out:
-				Value_Change_add(&Out_Third->data.TYPE_DATA_HIGH,&Out_Third->Key_count);
+				Current_out_third->change_item = Current_out_third->Item;
+				Value_Change_add(&Current_out_third->data.TYPE_DATA_HIGH,&Current_out_third->Key_count);
 				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[TYPE_HIGH_Item_Out]); //无效化该区域重新刷新
 				break;
 			
 			case FREQ_HIGH_Item_Out:
-				Value_Change_add(&Out_Third->data.FREQ_DATA_HIGH,&Out_Third->Key_count);
+				Current_out_third->change_item = Current_out_third->Item;
+				Value_Change_add(&Current_out_third->data.FREQ_DATA_HIGH,&Current_out_third->Key_count);
 				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[FREQ_HIGH_Item_Out]); //无效化该区域重新刷新
 				break;
 			
 			case GAIN_HIGH_Item_Out:
-				Value_Change_add(&Out_Third->data.GAIN_DATA_HIGH,&Out_Third->Key_count);
+				Current_out_third->change_item = Current_out_third->Item;
+				Value_Change_add(&Current_out_third->data.GAIN_DATA_HIGH,&Current_out_third->Key_count);
 				WM_InvalidateRect(pMsg->hWin, InvaliRect_Value[GAIN_HIGH_Item_Out]); //无效化该区域重新刷新
 				break;
 			
@@ -673,7 +1437,9 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 	/*********************************END***************************************/
 	//释放内存
 	case WM_DELETE:
+//		myfree(0,Current_out_third);
 		break;
+	
 	default:
 		WM_DefaultProc(pMsg);
 		break;
@@ -699,6 +1465,8 @@ static void Init_data(Output_Third_Data *L)
 	L->hItime			=		0;
 	L->Key_count		=		0;
 	L->checkbox_sta		=		0;
+	L->change_item		=		-1;
+	L->overflow			=		0;
 	
 	//数据初始化
 //	L->data.RMSTC_DATA  =		0;
@@ -707,24 +1475,34 @@ static void Init_data(Output_Third_Data *L)
 //	L->data.OUT_INVERT_STA 	=	0;
 //	L->data.OUT_MUTE_STA	=	0;
 //	L->data.DELAY_DATA	=		0;
-	AT24C16_PageRead((u8 *)(&(L->data)),IIC_Addr[L->face_switch+30],sizeof(L->data));
+//	AT24C16_PageRead((u8 *)(&(L->data)),IIC_Addr[L->face_switch+30],sizeof(L->data));
+	
+	//当复选框状态大于1时要初始化
+	Checkbox_Init(&(L->data.LOW_HIGH_STA));
+	Checkbox_Init(&(L->data.INVERT_LOW_STA));
+	Checkbox_Init(&(L->data.MID_HIGH_STA));
+	Checkbox_Init(&(L->data.INVERT_HIGH_STA));
+	
 }
 
 WM_HWIN Output_Third(void) {
 	WM_HWIN hWin;
 	
 	//申请动态内存
-	Out_Third = (Output_Third_Data *)mymalloc(0,sizeof(Output_Third_Data));
-	
-	if(Out_Third == NULL)
-	{
-		return 0;
-	}
-	else
-	{
-		Init_data(Out_Third);
-	}
-	
+//	Out_Third = (Output_Third_Data *)mymalloc(0,sizeof(Output_Third_Data));
+//	
+//	if(Out_Third == NULL)
+//	{
+//		return 0;
+//	}
+//	else
+//	{
+
+//		Init_data(Out_Third);
+//	}
+//	
+	Init_data(Out_Third[OUTPUT_CHANNEL]);
+	Current_out_third = Out_Third[OUTPUT_CHANNEL];
 	hWin = GUI_CreateDialogBox(_aDialogCreate, GUI_COUNTOF(_aDialogCreate), _cbDialog, WM_HBKWIN, 0, 0);
 	return hWin;
 }

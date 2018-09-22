@@ -45,6 +45,7 @@
 ..\obj\output_second.o: ..\STemWin\inc\TEXT.h
 ..\obj\output_second.o: ..\STemWin\inc\TREEVIEW.h
 ..\obj\output_second.o: ..\STemWin\inc\KNOB.h
+..\obj\output_second.o: ..\STemWin\inc\MESSAGEBOX.h
 ..\obj\output_second.o: ..\HARDWARE\InterFace\interface.h
 ..\obj\output_second.o: ..\HARDWARE\Test\example.h
 ..\obj\output_second.o: ..\HARDWARE\InterFace\interface.h
@@ -80,6 +81,12 @@
 ..\obj\output_second.o: ..\STM32F10x_StdPeriph_Driver\inc\misc.h
 ..\obj\output_second.o: ..\HARDWARE\IC24C16\24c16.h
 ..\obj\output_second.o: ..\HARDWARE\IIC\iic.h
+..\obj\output_second.o: ..\adau1452\inc\ak4612.h
+..\obj\output_second.o: ..\adau1452\inc\spi.h
+..\obj\output_second.o: ..\SYSTEM\delay\delay.h
+..\obj\output_second.o: ..\SYSTEM\usart\usart.h
+..\obj\output_second.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 ..\obj\output_second.o: ..\MALLOC\malloc.h
 ..\obj\output_second.o: ..\STemWin\inc\BUTTON_Private.h
-..\obj\output_second.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+..\obj\output_second.o: ..\HARDWARE\inface_2\DATA\data.h
+..\obj\output_second.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h

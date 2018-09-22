@@ -22,7 +22,8 @@
 // USER END
 
 #include "DIALOG.h"
-
+#include "rtc.h"
+static u8 jump_flag = 0;
 /*********************************************************************
 *
 *       Defines
@@ -55,6 +56,74 @@ extern GUI_CONST_STORAGE GUI_BITMAP bmlannge_white;   //白色logo
 static char Main_channel=0;
 // USER START (Optionally insert additional static data)
 // USER END
+//key_lock变量
+u8 key_lock_sta = 0;
+u8 key_lock_flag = 0; //键盘锁标记
+void check_key_lock(u8 clr)
+{
+	//清零
+	if(clr == 0)
+	{
+		key_lock_sta = 0;
+	}
+	else
+	{
+		key_lock_sta++;
+		if(key_lock_sta > 3)
+		{
+			key_lock_sta = 0;
+			key_lock_flag = (key_lock_flag == 0) ? 1 : 0;
+		}
+	}
+}
+/*
+*******************************************************************************************
+* 函 数 名: 滑动函数测试
+* 功能说明: 
+* 形 参: 无
+* 返 回 值: 无
+*******************************************************************************************
+*/
+#define slider_direct 50
+static char touch_hua = 0;
+int touch_hua_x_last; 
+int touch_hua_y_last;
+int touch_hua_x_curr;
+int touch_hua_y_curr;
+//char huadong_flag = 0;
+static void huadong(WM_MESSAGE* pMsg)
+{
+	const GUI_PID_STATE* pState = (const GUI_PID_STATE*)pMsg->Data.p; //获得PID输入设备的数据
+	int direct;
+    if (pMsg->Data.p)    /* Something happened in our area (pressed or released) */
+    {
+        if (pState->Pressed)  //按下
+        {
+			if(touch_hua == 0)
+			{
+				touch_hua = 1;
+				touch_hua_x_last 	= pState->x;
+				touch_hua_y_last	= pState->y;
+			}
+		}
+		else  //释放
+		{
+			touch_hua = 0;
+			touch_hua_x_curr 	= pState->x;
+			touch_hua_y_curr	= pState->y;
+			direct = touch_hua_x_curr - touch_hua_x_last;
+			if(direct > slider_direct ) //滑动距离超过100个像素点
+			{
+				WM_SendMessageNoPara(hWin_now, MSG_SLIDER_R);
+			}
+			else if(direct<-slider_direct)
+			{
+				WM_SendMessageNoPara(hWin_now, MSG_SLIDER_L);
+			}
+
+		}
+	}
+}
 
 /*********************************************************************
 *
@@ -68,8 +137,8 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_3, 17, 155, 103, 71, 0, 0x0, 0 },
 	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_4, 150, 155, 103, 71, 0, 0x0, 0 },
 	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_5, 280, 155, 103, 71, 0, 0x0, 0 },
-//	{ TEXT_CreateIndirect, "Text", ID_TEXT_1, 317, 16, 63, 20, 0, 0x64, 0 },
-
+	{ TEXT_CreateIndirect, "Text", ID_TEXT_1, 330, 16, 63, 20, 0, 0x64, 0 },
+//	{ TEXT_CreateIndirect, "Text", ID_TEXT_0, 59, 3, 294, 48, 0, 0x64, 0 },
 };
 
 /*********************************************************************
@@ -94,18 +163,27 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 	WM_HWIN hItem, hItem1;
 	int     NCode;
 	int     Id;
-
+	char 	str[10];
+//	GUI_PID_STATE p;
 
 	switch (pMsg->MsgId) {
 	case WM_INIT_DIALOG:
 		//
 		// Initialization of 'Text'
 		//
-//		hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_0);
-//		TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
-//		TEXT_SetText(hItem, "Lannge");
-//		TEXT_SetFont(hItem, GUI_FONT_32B_ASCII);
-//		TEXT_SetTextColor(hItem, GUI_MAKE_COLOR(0xffffffff));
+		if(jump_flag == 0)
+		{
+			snprintf(str,sizeof(str) - 1,"%d:%02d",calendar.hour,calendar.min);
+		}
+		else 
+		{
+			snprintf(str,sizeof(str) - 1,"%d %02d",calendar.hour,calendar.min);
+		}
+		hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_1);
+		TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
+		TEXT_SetText(hItem, str);
+		TEXT_SetFont(hItem, GUI_FONT_32B_ASCII);
+		TEXT_SetTextColor(hItem, GUI_MAKE_COLOR(0xffffffff));
 
 		//
 		// 初始按钮控件 INPUT
@@ -118,7 +196,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		// 初始按钮控件 COAX_IN
 		//
 		hItem1 = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_1);
-		BUTTON_SetText(hItem1, "COAX_IN");
+		BUTTON_SetText(hItem1, "GEN_OUT");
 		BUTTON_SetFont(hItem1, Font_Text);
 
 		//
@@ -126,7 +204,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		//
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_2);
 		BUTTON_SetFont(hItem, Font_Text);
-		BUTTON_SetText(hItem, "Gen_Out");
+		BUTTON_SetText(hItem, "TIME");
 
 		//
 		// 初始按钮控件 OUTPUT
@@ -215,24 +293,28 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			}
 			break;
-		case ID_BUTTON_1: // COAX_IN
+		case ID_BUTTON_1: // Gen_out
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
-				Main_channel = 1;
-                GUI_EndDialog(pMsg->hWin, 0); //结束本界面
+				
 				break;
 			case WM_NOTIFICATION_RELEASED:
-
+				Main_channel = 1;
+                GUI_EndDialog(pMsg->hWin, 0); //结束本界面
+				hWin_now = Gen_First(); //显示INPUT第一个界面
 				break;
 
 			}
 			break;
-		case ID_BUTTON_2: //Gen_Out
+		case ID_BUTTON_2: //TIME
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
-                GUI_EndDialog(pMsg->hWin,0);   //结束本界面
+				
 				break;
 			case WM_NOTIFICATION_RELEASED:
+				Main_channel = 2;
+                GUI_EndDialog(pMsg->hWin,0);   //结束本界面
+				hWin_now = Time_First();
 
 				break;
 
@@ -259,6 +341,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_RELEASED:
 				Main_channel = 4;
 				GUI_EndDialog(pMsg->hWin,0);
+				hWin_now = System_First(); //显示SYS第一个界面
 				break;
 
 			}
@@ -271,6 +354,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_RELEASED:
 				Main_channel = 5;
 				GUI_EndDialog(pMsg->hWin,0);
+				hWin_now = Mode_First(); //显示MODE第一个界面
 				break;
 
 			}
@@ -319,19 +403,79 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		hWin_now = Input_First(); //显示INPUT第一个界面
 		break;
 //	
-//	//OUT
-//	case MSG_KEY_OUTPUT:
-//        GUI_EndDialog(pMsg->hWin,0);     //结束当前页面
+	//OUTPUT
+	case MSG_KEY_OUTPUT:
+        GUI_EndDialog(pMsg->hWin, 0); //结束本界面
+		hWin_now = Output_First(); //显示INPUT第一个界面
+		break;
+	
+//	//OUT_VOL
+//	case MSG_KEY_VOL_OUTPUT:
+//        check_key_lock(1);
 //		break;
 //	
+//	//没有按键动作
+//	case MSG_KEY_NULL:
+//		check_key_lock(0);
+//		break;
 //	
 //	//SYS
 //	case MSG_KEY_SYSTEM:
 //		GUI_EndDialog(pMsg->hWin,0);
 //		break;
 	
+	case MSG_SLIDER_R:
+		GUI_EndDialog(pMsg->hWin, 0); //结束本界面
+		hWin_now = Meter_Show(); //显示INPUT第一个界面
+		break;
+	
+	case MSG_SLIDER_L:
+		GUI_EndDialog(pMsg->hWin, 0);   //结束当前界面
+		hWin_now = RTA_Show();      //切换下一个界面
+		break;
+	
+	//页面切换
+	case MSG_KNOB_OUT_LEFT:	
+		GUI_EndDialog(pMsg->hWin, 0);   //结束当前界面
+		hWin_now = Meter_Show();      //切换下一个界面
+		break;
+	
+	case MSG_KNOB_OUT_RIGHT:
+		GUI_EndDialog(pMsg->hWin, 0);   //结束当前界面
+		hWin_now = RTA_Show();      //切换下一个界面
+		break;
+	
+	//input按钮
+	
+	
 	default:
 		WM_DefaultProc(pMsg);
+		break;
+	
+	//触摸测试
+	case WM_TOUCH:
+		huadong(pMsg);
+		break;
+	
+	//切换页面时
+	case WM_DELETE:
+		main_face = 0;
+		break;
+	
+	//更新时间
+	case MSG_TIME_UPDATE:
+		jump_flag = !jump_flag;
+		RTC_Get();//更新时间
+		if(jump_flag == 0)
+		{
+			snprintf(str,sizeof(str) - 1,"%d:%02d",calendar.hour,calendar.min);
+		}
+		else 
+		{
+			snprintf(str,sizeof(str) - 1,"%d %02d",calendar.hour,calendar.min);
+		}
+		hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_1);
+		TEXT_SetText(hItem, str);
 		break;
 	}
 }
@@ -351,8 +495,9 @@ WM_HWIN CreateMainface(void) {
 	WM_HWIN hWin;
 	
 	//设置皮肤
-	
+	main_face = 1;   //当前页面为主界面
 	Button_flex();   //按钮皮肤设置
+	RTC_Get();//更新时间
 	/////////////
 	hWin = GUI_CreateDialogBox(_aDialogCreate, GUI_COUNTOF(_aDialogCreate), _cbDialog, WM_HBKWIN, 0, 0);
 

@@ -46,7 +46,7 @@ void Button_flex_2(void)
 //	BUTTON_SetSkinFlexProps(&Props, BUTTON_SKINFLEX_PI_PRESSED);   //按下颜色
 
 	
-	BUTTON_GetSkinFlexProps(&Props, BUTTON_SKINFLEX_PI_ENABLED); //聚焦的状态
+	BUTTON_GetSkinFlexProps(&Props, BUTTON_SKINFLEX_PI_ENABLED); //初始状态
 	Props.aColorFrame[0] = GUI_GREEN; //圆角边框的外部颜色
 	Props.aColorFrame[1] = GUI_BLACK; //圆角边框的内部颜色
 	Props.aColorFrame[2] = GUI_BLUE;   //框架与内部区域的颜色
@@ -65,26 +65,33 @@ void Framewin_flex(void)
 	  //设置按钮皮肤
   	FRAMEWIN_SKINFLEX_PROPS Props;
 	FRAMEWIN_GetSkinFlexProps(&Props,FRAMEWIN_SKINFLEX_PI_ACTIVE); //获得活动状态的皮肤
-	Props.aColorFrame[0] = GUI_BLACK;
-	Props.aColorFrame[1] = GUI_BLACK;
-	Props.aColorFrame[2] = GUI_BLACK;
-	Props.aColorTitle[0] = 0xC0CEDC;
-	Props.aColorTitle[1] = GUI_BLACK;
-	Props.BorderSizeL = 0;
-	Props.BorderSizeR = 0;
-	Props.BorderSizeB = 0;
+//	Props.aColorFrame[0] = GUI_BLACK;
+//	Props.aColorFrame[1] = GUI_BLACK;
+//	Props.aColorFrame[2] = GUI_BLACK;
+//	Props.aColorTitle[0] = 0xC0CEDC;
+//	Props.aColorTitle[1] = GUI_BLACK;
+//	Props.BorderSizeL = 0;
+//	Props.BorderSizeR = 0;
+//	Props.BorderSizeB = 0;
 	Props.Radius = 0;
 	FRAMEWIN_SetSkinFlexProps(&Props,FRAMEWIN_SKINFLEX_PI_ACTIVE);//设置活动状态的皮肤
 }
 
+#define SLIDER_H2P(h) (WIDGET*) GUI_ALLOC_h2p(h)
 //SLIDER皮肤设置
 int _DrawSkin_SLIDER1(const WIDGET_ITEM_DRAW_INFO * pDrawItemInfo)
 {
+	WIDGET * pObj;
+	GUI_RECT rFocus;  //聚焦
     static GUI_RECT rSlot; //轴的坐标
     static GUI_RECT rSlider = {0, 0, 0, 0};
-	static char a=0;
 //    int x, y;
 	SLIDER_SetWidth(pDrawItemInfo->hWin, 22);
+	
+	//聚焦
+	pObj = SLIDER_H2P(pDrawItemInfo->hWin); //得到关于窗口的指针
+	WIDGET__GetClientRect(pObj, &rFocus); //获得客户区的区域
+	
     switch (pDrawItemInfo->Cmd)
     {
     case WIDGET_ITEM_DRAW_TICKS: //如果下面不操作则不绘制刻度线
@@ -129,7 +136,14 @@ int _DrawSkin_SLIDER1(const WIDGET_ITEM_DRAW_INFO * pDrawItemInfo)
         GUI_FillCircle((rSlider.x0 + rSlider.x1) / 2, (rSlider.y0 + rSlider.y1) / 2, 6);
 	
         break;
-
+	
+//	//绘制聚焦框
+	case WIDGET_ITEM_DRAW_FOCUS:
+		GUI_SetColor(GUI_WHITE);
+		WIDGET__DrawFocusRect(pObj, &rFocus, 0); //绘制聚焦框
+//		GUI_DrawRect(pDrawItemInfo->x0,pDrawItemInfo->y0,pDrawItemInfo->x1,pDrawItemInfo->y1);
+		break;
+	
     default:
         return SLIDER_DrawSkinFlex(pDrawItemInfo);
     }

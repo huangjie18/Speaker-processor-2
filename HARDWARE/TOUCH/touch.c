@@ -5,6 +5,7 @@
 #include "GUI.h"
 #include "stdlib.h"
 #include "math.h"
+#include "touch.h"
 
 //variable
 struct tp_pix_  tp_pixad, tp_pixlcd; //当前触控坐标的AD值,前触控坐标的像素值
@@ -54,7 +55,7 @@ u8 TP_Init(void)
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1;  //触摸触发信号
     GPIO_Init(GPIOB, &GPIO_InitStructure);
 
-
+	return 0;
 }
 
 //判断是否触摸
@@ -271,13 +272,13 @@ u8 TP_Read_XY2(u16 *x, u16 *y)
 void Touch_Adjust(void)
 {
     u16 x1, y1;
-    u16 pos_temp[4][2];//坐标缓存值
-    u8  cnt = 0;
-    u16 d1, d2;
-    u32 tem1, tem2;
-    double fac;
-    u16 outtime = 0;
-    cnt = 0;
+//    u16 pos_temp[4][2];//坐标缓存值
+//    u8  cnt = 0;
+//    u16 d1, d2;
+//    u32 tem1, tem2;
+//    double fac;
+//    u16 outtime = 0;
+
     Drow_Touch_Point(tp_pianyi, tp_pianyi); //画点1
     while(1)
     {
@@ -323,6 +324,7 @@ static int lcd_x[5] = {20, 380, 20, 380, 200};
 static int lcd_y[5] = {20, 220, 220, 20, 120};
 static int Adc_x[5] = {3613, 320, 3674, 316, 1980};
 static int Adc_y[5] = {3546, 600, 650, 3600, 2100};
+static int Save_touch[10] = {0};
 /*********************************************************************
 *
 *       _WaitForPressedState
@@ -381,7 +383,7 @@ static u8 _Explain(void) {
   _DispStringCentered("The touch screen is calibrated at four points,\n"
                       "and the uncalibrated touch screen will\n"
                       "return to the main interface automatically\n"
-                      "within ten seconds.\n"
+                      "within a few seconds.\n"
 					  "Please press the touch screen to continue...");
   GUI_DispStringHCenterAt("TOUCH_Calibrate", LCD_GetXSize() / 2, 5);
   while(Penirq)
@@ -480,7 +482,8 @@ static void TOUCH_DispPoint(uint8_t _ucIndex)
 	
 }
 
-
+#define  SAVE_TOUCH_ADDR_BASE   1500
+#define  touch_flag  0xC0
 //多点触摸校准
 void Touch_adjust(void)
 {
@@ -489,8 +492,8 @@ void Touch_adjust(void)
 	u32 tem1,tem2;
 	u16 d1,d2;
 	double fac;
-	flat = _Explain();
-	//圆点的坐标
+	
+	//圆点的LCD屏幕坐标
 	lcd_x[0] = TP_X1;
 	lcd_y[0] = TP_Y1;
 	lcd_x[1] = TP_X2;
@@ -501,9 +504,38 @@ void Touch_adjust(void)
 	lcd_y[3] = TP_Y4;
 	lcd_x[4] = TP_X5;
 	lcd_y[4] = TP_Y5;
+	//先判断是否已经校准过
+	flat = AT24CXX_ReadOneByte(SAVE_TOUCH_ADDR_BASE);
+	if(flat == touch_flag)  //触摸已经校准过了
+	{
+		AT24C16_PageRead((u8 *)Save_touch,SAVE_TOUCH_ADDR_BASE+1,sizeof(Save_touch));
+		Adc_x[0] = Save_touch[0] ;
+		Adc_x[1] = Save_touch[1] ;
+		Adc_x[2] = Save_touch[2] ;
+		Adc_x[3] = Save_touch[3] ;
+		Adc_x[4] = Save_touch[4] ;
+		
+		Adc_y[0] = Save_touch[5] ;
+		Adc_y[1] = Save_touch[6] ;
+		Adc_y[2] = Save_touch[7] ;
+		Adc_y[3] = Save_touch[8] ;
+		Adc_y[4] = Save_touch[9] ;
+		
+		return ;
+	}
+	else
+	{
+		flat = 1;
+		GUI_SetColor(GUI_BLACK);
+		GUI_SetFont(&GUI_Font13B_ASCII);
+	}
+	
+//	flat = _Explain();
+	
 	////////////////////////////////////////////
 	while(flat)
 	{
+		//定义多少个校准点
 		for(i = 0;i < CALIB_POINT_COUT; i++)
 		{
 			TOUCH_DispPoint(i);		/* 显示校准点 */
@@ -589,7 +621,23 @@ void Touch_adjust(void)
 		flat = 0;
 		
 		//到时候添加把数据存起来的代码
+		Save_touch[0] = Adc_x[0];
+		Save_touch[1] = Adc_x[1];
+		Save_touch[2] = Adc_x[2];
+		Save_touch[3] = Adc_x[3];
+		Save_touch[4] = Adc_x[4];
+		
+		Save_touch[5] = Adc_y[0];
+		Save_touch[6] = Adc_y[1];
+		Save_touch[7] = Adc_y[2];
+		Save_touch[8] = Adc_y[3];
+		Save_touch[9] = Adc_y[4];
+		
+		AT24C16_PageWrite((u8 *)Save_touch,SAVE_TOUCH_ADDR_BASE+1,sizeof(Save_touch));
+		delay_ms(10); //连续写之间要有个延时
+		AT24CXX_WriteOneByte(SAVE_TOUCH_ADDR_BASE,touch_flag);  //已经校验过了
 	}
+	
 
 }
 

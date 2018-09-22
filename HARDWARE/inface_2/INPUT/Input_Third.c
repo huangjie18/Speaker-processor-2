@@ -23,6 +23,7 @@
 
 #include "DIALOG.h"
 #include "BUTTON_Private.h"
+#include "data.h"
 /*********************************************************************
 *
 *       Defines
@@ -57,6 +58,8 @@
 #define ID_TEXT_8 (GUI_ID_USER + 0x19)
 #define ID_BUTTON_0		(GUI_ID_USER + 0x1A)
 #define ID_BUTTON_1		(GUI_ID_USER + 0x1B)
+
+#define		dec_size	40
 // USER START (Optionally insert additional defines)
 // USER END
 
@@ -67,10 +70,14 @@
 **********************************************************************
 */
 #define Text_y  195
+#define Text_x  8
 #define text_color GUI_BLACK
-static char value[8]; //用来显示的值
+#define aux_slider_max  2000   //滑块的最大值
+#define aux_step        0.04   //滑块的步进
 
-static Input_Third_data * In_Third;
+
+static char input_channel_third;
+//static Input_Third_data * In_Third;
 static const GUI_POINT pPoint_left[] = {
 	{ 0, 10 },
 	{ 10, 0 },
@@ -78,22 +85,23 @@ static const GUI_POINT pPoint_left[] = {
 };
 
 static const GUI_POINT pPoint_right[] = {
-	{ 10, 0 },
-	{ 20, 10 },
-	{ 10, 20 },
+	{ 10+20, 0 },
+	{ 20+20, 10 },
+	{ 10+20, 20 },
 };
 
 //页面显示的字符串数据
 static char face_string[][20] = 
 {
-	"NULL",
-	"INPUT1 PAGE 3/3",
-	"INPUT2 PAGE 3/3",
-	"INPUT3 PAGE 3/3",
-	"INPUT4 PAGE 3/3",
-	"INPUT5 PAGE 3/3",
-	"INPUT6 PAGE 3/3",
-	"COAX PAGE 3/3",
+//	"NULL",
+	"INPUT1 PAGE 3/4",
+	"INPUT2 PAGE 3/4",
+	"INPUT3 PAGE 3/4",
+	"INPUT4 PAGE 3/4",
+	"INPUT5 PAGE 3/4",
+	"INPUT6 PAGE 3/4",
+	"COAL PAGE 3/4",
+	"COAR PAGE 3/4",
 
 };
 //无效区域设置
@@ -108,13 +116,160 @@ static GUI_RECT Rect[] =
 	{ 250, Text_y, 280, Text_y+20 },
 	{ 290, Text_y, 320, Text_y+20 },
 };
-
+/*
+*******************************************************************************************
+* 函 数 名: tranrfer_data
+* 功能说明: 对此界面中的一些数据传输给DSP
+* 形 参: 无
+* 返 回 值: 无
+*******************************************************************************************
+*/
+static void tranrfer_data(signed char param)
+{
+	float gain_temp;
+	
+	switch(param)
+	{
+		case aux1_slider:
+			gain_temp = In_Third[input_channel_third]->data.Aux1_SLIDER_DATA * aux_step;
+			Data_input_mixer_gain(input_channel_third,param,gain_temp);
+			break;
+		
+		case aux2_slider:
+			gain_temp = In_Third[input_channel_third]->data.Aux2_SLIDER_DATA * aux_step;
+			Data_input_mixer_gain(input_channel_third,param,gain_temp);
+			break;
+		
+		case aux3_slider:
+			gain_temp = In_Third[input_channel_third]->data.Aux3_SLIDER_DATA * aux_step;
+			Data_input_mixer_gain(input_channel_third,param,gain_temp);
+			break;
+		
+		case aux4_slider:
+			gain_temp = In_Third[input_channel_third]->data.Aux4_SLIDER_DATA * aux_step;
+			Data_input_mixer_gain(input_channel_third,param,gain_temp);
+			break;
+		
+		case aux5_slider:
+			gain_temp = In_Third[input_channel_third]->data.Aux5_SLIDER_DATA * aux_step;
+			Data_input_mixer_gain(input_channel_third,param,gain_temp);
+			break;
+		
+		case aux6_slider:
+			gain_temp = In_Third[input_channel_third]->data.Aux6_SLIDER_DATA * aux_step;
+			Data_input_mixer_gain(input_channel_third,param,gain_temp);
+			break;
+		
+		case aux7_slider:
+			gain_temp = In_Third[input_channel_third]->data.Aux7_SLIDER_DATA * aux_step;
+			Data_input_mixer_gain(input_channel_third,param,gain_temp);
+			break;
+		
+		case aux8_slider:
+			gain_temp = In_Third[input_channel_third]->data.Aux8_SLIDER_DATA * aux_step;
+			Data_input_mixer_gain(input_channel_third,param,gain_temp);
+			break;
+		
+		//复选框
+		case aux1_checkbox:
+			if(In_Third[input_channel_third]->data.Aux1_CHECKBOX_STA == 1)
+			{
+				Data_input_mixer_sw(input_channel_third,param,g_mute);  //静音
+			}
+			else
+			{
+				Data_input_mixer_sw(input_channel_third,param,g_umute);  //不静音
+			}
+			break;
+		
+		case aux2_checkbox:
+			if(In_Third[input_channel_third]->data.Aux2_CHECKBOX_STA == 1)
+			{
+				Data_input_mixer_sw(input_channel_third,param,g_mute);  //静音
+			}
+			else
+			{
+				Data_input_mixer_sw(input_channel_third,param,g_umute);  //不静音
+			}
+			break;
+		
+		case aux3_checkbox:
+			if(In_Third[input_channel_third]->data.Aux3_CHECKBOX_STA == 1)
+			{
+				Data_input_mixer_sw(input_channel_third,param,g_mute);  //静音
+			}
+			else
+			{
+				Data_input_mixer_sw(input_channel_third,param,g_umute);  //不静音
+			}
+			break;
+		
+		case aux4_checkbox:
+			if(In_Third[input_channel_third]->data.Aux4_CHECKBOX_STA == 1)
+			{
+				Data_input_mixer_sw(input_channel_third,param,g_mute);  //静音
+			}
+			else
+			{
+				Data_input_mixer_sw(input_channel_third,param,g_umute);  //不静音
+			}
+			break;
+		
+		case aux5_checkbox:
+			if(In_Third[input_channel_third]->data.Aux5_CHECKBOX_STA == 1)
+			{
+				Data_input_mixer_sw(input_channel_third,param,g_mute);  //静音
+			}
+			else
+			{
+				Data_input_mixer_sw(input_channel_third,param,g_umute);  //不静音
+			}
+			break;
+		
+		case aux6_checkbox:
+			if(In_Third[input_channel_third]->data.Aux6_CHECKBOX_STA == 1)
+			{
+				Data_input_mixer_sw(input_channel_third,param,g_mute);  //静音
+			}
+			else
+			{
+				Data_input_mixer_sw(input_channel_third,param,g_umute);  //不静音
+			}
+			break;
+		
+		case aux7_checkbox:
+			if(In_Third[input_channel_third]->data.Aux7_CHECKBOX_STA == 1)
+			{
+				Data_input_mixer_sw(input_channel_third,param,g_mute);  //静音
+			}
+			else
+			{
+				Data_input_mixer_sw(input_channel_third,param,g_umute);  //不静音
+			}
+			break;
+		
+		case aux8_checkbox:
+			if(In_Third[input_channel_third]->data.Aux8_CHECKBOX_STA == 1)
+			{
+				Data_input_mixer_sw(input_channel_third,param,g_mute);  //静音
+			}
+			else
+			{
+				Data_input_mixer_sw(input_channel_third,param,g_umute);  //不静音
+			}
+			break;
+		
+		
+	}
+	
+	In_Third[input_channel_third]->change_item = -1;  //重新识别
+}
 //显示滑块值
 static void _ShowSlidervalue(void)
 {
 	GUI_SetColor(GUI_BLACK); //设置颜色
 	GUI_SetTextMode(GUI_TM_TRANS); //设置透明模式
-	GUI_SetFont(&GUI_Font20_1); //设置字体
+	GUI_SetFont(&GUI_Font13_1); //设置字体
 
 //	GUI_GotoXY(10, Text_y);  //设置1位置
 //	GUI_DispDecMin(-value[0]); //显示值
@@ -133,24 +288,35 @@ static void _ShowSlidervalue(void)
 //	GUI_GotoXY(290, Text_y);  //设置8位置
 //	GUI_DispDecMin(-value[7]); //显示值
 	
-	GUI_GotoXY(10, Text_y);  //设置1位置
-	GUI_DispDecMin(-In_Third->data.Aux1_SLIDER_DATA); //显示值
-	GUI_GotoXY(50, Text_y);  //设置2位置
-	GUI_DispDecMin(-In_Third->data.Aux2_SLIDER_DATA); //显示值
-	GUI_GotoXY(90, Text_y);  //设置3位置
-	GUI_DispDecMin(-In_Third->data.Aux3_SLIDER_DATA); //显示值
-	GUI_GotoXY(130, Text_y);  //设置4位置
-	GUI_DispDecMin(-In_Third->data.Aux4_SLIDER_DATA); //显示值
-	GUI_GotoXY(170, Text_y);  //设置5位置
-	GUI_DispDecMin(-In_Third->data.Aux5_SLIDER_DATA); //显示值
-	GUI_GotoXY(210, Text_y);  //设置6位置
-	GUI_DispDecMin(-In_Third->data.Aux6_SLIDER_DATA); //显示值
-	GUI_GotoXY(250, Text_y);  //设置7位置
-	GUI_DispDecMin(-In_Third->data.Aux7_SLIDER_DATA); //显示值
-	GUI_GotoXY(290, Text_y);  //设置8位置
-	GUI_DispDecMin(-In_Third->data.Aux8_SLIDER_DATA); //显示值
+	GUI_GotoXY(Text_x, Text_y);  //设置1位置
+//	GUI_DispDecMin(-In_Third[input_channel_third]->data.Aux1_SLIDER_DATA); //显示值
+	GUI_DispFloatMin(-(In_Third[input_channel_third]->data.Aux1_SLIDER_DATA * aux_step),2);
 	
-	AT24C16_PageWrite((u8 *)In_Third,IIC_Addr[(In_Third->face_switch)+7],sizeof(Input_Data3));  //保存数据
+	GUI_GotoXY(Text_x+40, Text_y);  //设置2位置
+	GUI_DispFloatMin(-(In_Third[input_channel_third]->data.Aux2_SLIDER_DATA * aux_step),2);
+	
+	GUI_GotoXY(Text_x+80, Text_y);  //设置3位置
+	GUI_DispFloatMin(-(In_Third[input_channel_third]->data.Aux3_SLIDER_DATA * aux_step),2);
+	
+	GUI_GotoXY(Text_x+120, Text_y);  //设置4位置
+	GUI_DispFloatMin(-(In_Third[input_channel_third]->data.Aux4_SLIDER_DATA * aux_step),2);
+	
+	GUI_GotoXY(Text_x+160, Text_y);  //设置5位置
+	GUI_DispFloatMin(-(In_Third[input_channel_third]->data.Aux5_SLIDER_DATA * aux_step),2);
+	
+	GUI_GotoXY(Text_x+200, Text_y);  //设置6位置
+	GUI_DispFloatMin(-(In_Third[input_channel_third]->data.Aux6_SLIDER_DATA * aux_step),2);
+	
+	GUI_GotoXY(Text_x+240, Text_y);  //设置7位置
+	GUI_DispFloatMin(-(In_Third[input_channel_third]->data.Aux7_SLIDER_DATA * aux_step),2);
+	
+	GUI_GotoXY(Text_x+278, Text_y);  //设置8位置
+	GUI_DispFloatMin(-(In_Third[input_channel_third]->data.Aux8_SLIDER_DATA * aux_step),2);
+	
+	//AT24C16_PageWrite((u8 *)In_Third[input_channel_third],IIC_Addr[(In_Third[input_channel_third]->face_switch)+7],sizeof(Input_Data3));  //保存数据
+	
+	//判断更改项，然后进行数据传输
+	tranrfer_data(In_Third[input_channel_third]->change_item);
 }
 // USER START (Optionally insert additional static data)
 // USER END
@@ -188,8 +354,8 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 	{ TEXT_CreateIndirect, "Text", ID_TEXT_8, 288, 212, 30, 240 - 212, 0, 0, 0 },
 	
 	/*页面切换*/
-	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_0, 5, 5, 20, 25, 0, 0x0, 0 },
-	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_1, 375, 5, 20, 25, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_0, 5, 5, dec_size, 25, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Button", ID_BUTTON_1, 375-20, 5, dec_size, 25, 0, 0x0, 0 },
 	// USER START (Optionally insert additional widgets)
 	// USER END
 };
@@ -239,7 +405,7 @@ static void _cbButton_right(WM_MESSAGE * pMsg) //--------------（3）
 	WM_HWIN hWin;
 	BUTTON_Obj * pObj; //用来提取出按钮的指针结构体，包含了各种信息
 
-	const GUI_PID_STATE* pState = (const GUI_PID_STATE*)pMsg->Data.p;
+//	const GUI_PID_STATE* pState = (const GUI_PID_STATE*)pMsg->Data.p;
 	hWin = pMsg->hWin;
 	pObj = BUTTON_H2P(hWin);
 
@@ -291,6 +457,68 @@ static void _cbButton_right(WM_MESSAGE * pMsg) //--------------（3）
 }
 // USER START (Optionally insert additional static code)
 // USER END
+/*
+*******************************************************************************************
+* 函 数 名: _slider_add_dec
+* 功能说明: 实现滑块的增减
+* 形 参: 
+* 返 回 值: 无
+*******************************************************************************************
+*/
+static void _slider_add_dec(WM_MESSAGE * pMsg,void (*p)())
+{
+	p = p;
+	switch(In_Third[input_channel_third]->Item)
+	{
+		case aux1_slider:
+				p(&In_Third[input_channel_third]->data.Aux1_SLIDER_DATA,&In_Third[input_channel_third]->Key_count);
+				Max_Min(&(In_Third[input_channel_third]->data.Aux1_SLIDER_DATA),aux_slider_max,0);
+				SLIDER_SetValue(WM_GetDialogItem(pMsg->hWin, ID_SLIDER_0),In_Third[input_channel_third]->data.Aux1_SLIDER_DATA);
+				break;
+			
+			case aux2_slider:
+				p(&In_Third[input_channel_third]->data.Aux2_SLIDER_DATA,&In_Third[input_channel_third]->Key_count);
+				Max_Min(&(In_Third[input_channel_third]->data.Aux2_SLIDER_DATA),aux_slider_max,0);
+				SLIDER_SetValue(WM_GetDialogItem(pMsg->hWin, ID_SLIDER_1),In_Third[input_channel_third]->data.Aux2_SLIDER_DATA);
+				break;
+			
+			case aux3_slider:
+				p(&In_Third[input_channel_third]->data.Aux3_SLIDER_DATA,&In_Third[input_channel_third]->Key_count);
+				Max_Min(&(In_Third[input_channel_third]->data.Aux3_SLIDER_DATA),aux_slider_max,0);
+				SLIDER_SetValue(WM_GetDialogItem(pMsg->hWin, ID_SLIDER_2),In_Third[input_channel_third]->data.Aux3_SLIDER_DATA);
+				break;
+			
+			case aux4_slider:
+				p(&In_Third[input_channel_third]->data.Aux4_SLIDER_DATA,&In_Third[input_channel_third]->Key_count);
+				Max_Min(&(In_Third[input_channel_third]->data.Aux4_SLIDER_DATA),aux_slider_max,0);
+				SLIDER_SetValue(WM_GetDialogItem(pMsg->hWin, ID_SLIDER_3),In_Third[input_channel_third]->data.Aux4_SLIDER_DATA);
+				break;
+			
+			case aux5_slider:
+				p(&In_Third[input_channel_third]->data.Aux5_SLIDER_DATA,&In_Third[input_channel_third]->Key_count);
+				Max_Min(&(In_Third[input_channel_third]->data.Aux5_SLIDER_DATA),aux_slider_max,0);
+				SLIDER_SetValue(WM_GetDialogItem(pMsg->hWin, ID_SLIDER_4),In_Third[input_channel_third]->data.Aux5_SLIDER_DATA);
+				break;
+			
+			case aux6_slider:
+				p(&In_Third[input_channel_third]->data.Aux6_SLIDER_DATA,&In_Third[input_channel_third]->Key_count);
+				Max_Min(&(In_Third[input_channel_third]->data.Aux6_SLIDER_DATA),aux_slider_max,0);
+				SLIDER_SetValue(WM_GetDialogItem(pMsg->hWin, ID_SLIDER_5),In_Third[input_channel_third]->data.Aux6_SLIDER_DATA);
+				break;
+			
+			case aux7_slider:
+				p(&In_Third[input_channel_third]->data.Aux7_SLIDER_DATA,&In_Third[input_channel_third]->Key_count);
+				Max_Min(&(In_Third[input_channel_third]->data.Aux7_SLIDER_DATA),aux_slider_max,0);
+				SLIDER_SetValue(WM_GetDialogItem(pMsg->hWin, ID_SLIDER_6),In_Third[input_channel_third]->data.Aux7_SLIDER_DATA);
+				break;
+			
+			case aux8_slider:
+				p(&In_Third[input_channel_third]->data.Aux8_SLIDER_DATA,&In_Third[input_channel_third]->Key_count);
+				Max_Min(&(In_Third[input_channel_third]->data.Aux8_SLIDER_DATA),aux_slider_max,0);
+				SLIDER_SetValue(WM_GetDialogItem(pMsg->hWin, ID_SLIDER_7),In_Third[input_channel_third]->data.Aux8_SLIDER_DATA);
+				break;
+	}
+}
 
 /*********************************************************************
 *
@@ -311,7 +539,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		// Initialization of 'Text'
 		//
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_0);
-		TEXT_SetText(hItem, In_Third->String);
+		TEXT_SetText(hItem, In_Third[input_channel_third]->String);
 		TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
 		TEXT_SetFont(hItem, GUI_FONT_24B_1);
 		TEXT_SetTextColor(hItem, GUI_WHITE);
@@ -371,91 +599,91 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		CHECKBOX_SetTextColor(hItem,GUI_WHITE);
 		CHECKBOX_SetFocusColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFont(hItem, GUI_FONT_16B_1);
-		CHECKBOX_SetState(hItem,In_Third->data.Aux1_CHECKBOX_STA);
+		CHECKBOX_SetState(hItem,In_Third[input_channel_third]->data.Aux1_CHECKBOX_STA);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_1);
 		CHECKBOX_SetText(hItem, "AUX2");
 		CHECKBOX_SetTextColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFocusColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFont(hItem, GUI_FONT_16B_1);
-		CHECKBOX_SetState(hItem,In_Third->data.Aux2_CHECKBOX_STA);
+		CHECKBOX_SetState(hItem,In_Third[input_channel_third]->data.Aux2_CHECKBOX_STA);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_2);
 		CHECKBOX_SetText(hItem, "AUX3");
 		CHECKBOX_SetTextColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFocusColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFont(hItem, GUI_FONT_16B_1);
-		CHECKBOX_SetState(hItem,In_Third->data.Aux3_CHECKBOX_STA);
+		CHECKBOX_SetState(hItem,In_Third[input_channel_third]->data.Aux3_CHECKBOX_STA);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_3);
 		CHECKBOX_SetText(hItem, "AUX4");
 		CHECKBOX_SetTextColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFocusColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFont(hItem, GUI_FONT_16B_1);
-		CHECKBOX_SetState(hItem,In_Third->data.Aux4_CHECKBOX_STA);
+		CHECKBOX_SetState(hItem,In_Third[input_channel_third]->data.Aux4_CHECKBOX_STA);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_4);
 		CHECKBOX_SetText(hItem, "AUX5");
 		CHECKBOX_SetTextColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFocusColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFont(hItem, GUI_FONT_16B_1);
-		CHECKBOX_SetState(hItem,In_Third->data.Aux5_CHECKBOX_STA);
+		CHECKBOX_SetState(hItem,In_Third[input_channel_third]->data.Aux5_CHECKBOX_STA);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_5);
 		CHECKBOX_SetText(hItem, "AUX6");
 		CHECKBOX_SetTextColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFocusColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFont(hItem, GUI_FONT_16B_1);
-		CHECKBOX_SetState(hItem,In_Third->data.Aux6_CHECKBOX_STA);
+		CHECKBOX_SetState(hItem,In_Third[input_channel_third]->data.Aux6_CHECKBOX_STA);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_6);
 		CHECKBOX_SetText(hItem, "AUX7");
 		CHECKBOX_SetTextColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFocusColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFont(hItem, GUI_FONT_16B_1);
-		CHECKBOX_SetState(hItem,In_Third->data.Aux7_CHECKBOX_STA);
+		CHECKBOX_SetState(hItem,In_Third[input_channel_third]->data.Aux7_CHECKBOX_STA);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_7);
 		CHECKBOX_SetText(hItem, "AUX8");
 		CHECKBOX_SetTextColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFocusColor(hItem, GUI_WHITE);
 		CHECKBOX_SetFont(hItem, GUI_FONT_16B_1);
-		CHECKBOX_SetState(hItem,In_Third->data.Aux8_CHECKBOX_STA);
+		CHECKBOX_SetState(hItem,In_Third[input_channel_third]->data.Aux8_CHECKBOX_STA);
 
 		//滑块
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_0);
-		SLIDER_SetRange(hItem, 0, 80);  //要取绝对值
-		SLIDER_SetValue(hItem, In_Third->data.Aux1_SLIDER_DATA);
+		SLIDER_SetRange(hItem, 0, aux_slider_max);  //要取绝对值
+		SLIDER_SetValue(hItem, In_Third[input_channel_third]->data.Aux1_SLIDER_DATA);
 		//SLIDER_SetSkin(hItem, SLIDER_DrawSkinFlex); //可以用回之前的皮肤
 
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_1);
-		SLIDER_SetRange(hItem, 0, 80);  //要取绝对值
-		SLIDER_SetValue(hItem, In_Third->data.Aux2_SLIDER_DATA);
+		SLIDER_SetRange(hItem, 0, aux_slider_max);  //要取绝对值
+		SLIDER_SetValue(hItem, In_Third[input_channel_third]->data.Aux2_SLIDER_DATA);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_2);
-		SLIDER_SetRange(hItem, 0, 80);  //要取绝对值
-		SLIDER_SetValue(hItem, In_Third->data.Aux3_SLIDER_DATA);
+		SLIDER_SetRange(hItem, 0, aux_slider_max);  //要取绝对值
+		SLIDER_SetValue(hItem, In_Third[input_channel_third]->data.Aux3_SLIDER_DATA);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_3);
-		SLIDER_SetRange(hItem, 0, 80);  //要取绝对值
-		SLIDER_SetValue(hItem, In_Third->data.Aux4_SLIDER_DATA);
+		SLIDER_SetRange(hItem, 0, aux_slider_max);  //要取绝对值
+		SLIDER_SetValue(hItem, In_Third[input_channel_third]->data.Aux4_SLIDER_DATA);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_4);
-		SLIDER_SetRange(hItem, 0, 80);  //要取绝对值
-		SLIDER_SetValue(hItem, In_Third->data.Aux5_SLIDER_DATA);
+		SLIDER_SetRange(hItem, 0, aux_slider_max);  //要取绝对值
+		SLIDER_SetValue(hItem, In_Third[input_channel_third]->data.Aux5_SLIDER_DATA);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_5);
-		SLIDER_SetRange(hItem, 0, 80);  //要取绝对值
-		SLIDER_SetValue(hItem, In_Third->data.Aux6_SLIDER_DATA);
+		SLIDER_SetRange(hItem, 0, aux_slider_max);  //要取绝对值
+		SLIDER_SetValue(hItem, In_Third[input_channel_third]->data.Aux6_SLIDER_DATA);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_6);
-		SLIDER_SetRange(hItem, 0, 80);  //要取绝对值
-		SLIDER_SetValue(hItem, In_Third->data.Aux7_SLIDER_DATA);
+		SLIDER_SetRange(hItem, 0, aux_slider_max);  //要取绝对值
+		SLIDER_SetValue(hItem, In_Third[input_channel_third]->data.Aux7_SLIDER_DATA);
 
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_7);
-		SLIDER_SetRange(hItem, 0, 80);  //要取绝对值
-		SLIDER_SetValue(hItem, In_Third->data.Aux8_SLIDER_DATA);
+		SLIDER_SetRange(hItem, 0, aux_slider_max);  //要取绝对值
+		SLIDER_SetValue(hItem, In_Third[input_channel_third]->data.Aux8_SLIDER_DATA);
 
 		/*重新设计按钮的外观*/
 		
@@ -476,9 +704,22 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		Id = WM_GetId(pMsg->hWinSrc);
 		NCode = pMsg->Data.v;
 		switch (Id) {
+			
+		//点击主标题  退出
+		case ID_TEXT_0:
+			switch(NCode)
+			{
+				case WM_NOTIFICATION_RELEASED:
+						GUI_EndDialog(pMsg->hWin, 0); //关闭当前窗口
+						hWin_now = Input_First();  //显示Input_First页面
+						break;
+			}
+			break;
+			
 		case ID_SLIDER_0: // Notifications sent by 'Slider'
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
+				In_Third[input_channel_third]->Item = aux1_slider;
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
 				break;
@@ -488,8 +729,9 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_VALUE_CHANGED:
 				// USER START (Optionally insert code for reacting on notification message)
+				In_Third[input_channel_third]->change_item = aux1_slider;
 				hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_0); //获得滑块句柄
-				In_Third->data.Aux1_SLIDER_DATA = SLIDER_GetValue(hItem); //保存滑块值
+				In_Third[input_channel_third]->data.Aux1_SLIDER_DATA = SLIDER_GetValue(hItem); //保存滑块值
 				WM_InvalidateRect(pMsg->hWin, &Rect[0]); //无效化该值重新刷新显示值
 				// USER END
 				break;
@@ -500,6 +742,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		case ID_SLIDER_1: // Notifications sent by 'Slider'
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
+				In_Third[input_channel_third]->Item = aux2_slider;
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
 				break;
@@ -509,8 +752,9 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_VALUE_CHANGED:
 				// USER START (Optionally insert code for reacting on notification message)
+				In_Third[input_channel_third]->change_item = aux2_slider;
 				hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_1); //获得滑块句柄
-				In_Third->data.Aux2_SLIDER_DATA = SLIDER_GetValue(hItem); //保存滑块值
+				In_Third[input_channel_third]->data.Aux2_SLIDER_DATA = SLIDER_GetValue(hItem); //保存滑块值
 				WM_InvalidateRect(pMsg->hWin, &Rect[1]); //无效化该值重新刷新显示值
 				// USER END
 				break;
@@ -521,6 +765,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		case ID_SLIDER_2: // Notifications sent by 'Slider'
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
+				In_Third[input_channel_third]->Item = aux3_slider;
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
 				break;
@@ -530,8 +775,9 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_VALUE_CHANGED:
 				// USER START (Optionally insert code for reacting on notification message)
+				In_Third[input_channel_third]->change_item = aux3_slider;
 				hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_2); //获得滑块句柄
-				In_Third->data.Aux3_SLIDER_DATA = SLIDER_GetValue(hItem); //保存滑块值
+				In_Third[input_channel_third]->data.Aux3_SLIDER_DATA = SLIDER_GetValue(hItem); //保存滑块值
 				WM_InvalidateRect(pMsg->hWin, &Rect[2]); //无效化该值重新刷新显示值
 				// USER END
 				break;
@@ -542,6 +788,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		case ID_SLIDER_3: // Notifications sent by 'Slider'
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
+				In_Third[input_channel_third]->Item = aux4_slider;
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
 				break;
@@ -551,8 +798,9 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_VALUE_CHANGED:
 				// USER START (Optionally insert code for reacting on notification message)
+				In_Third[input_channel_third]->change_item = aux4_slider;
 				hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_3); //获得滑块句柄
-				In_Third->data.Aux4_SLIDER_DATA = SLIDER_GetValue(hItem); //保存滑块值
+				In_Third[input_channel_third]->data.Aux4_SLIDER_DATA = SLIDER_GetValue(hItem); //保存滑块值
 				WM_InvalidateRect(pMsg->hWin, &Rect[3]); //无效化该值重新刷新显示值
 				// USER END
 				break;
@@ -563,6 +811,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		case ID_SLIDER_4: // Notifications sent by 'Slider'
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
+				In_Third[input_channel_third]->Item = aux5_slider;
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
 				break;
@@ -572,8 +821,9 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_VALUE_CHANGED:
 				// USER START (Optionally insert code for reacting on notification message)
+				In_Third[input_channel_third]->change_item = aux5_slider;
 				hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_4); //获得滑块句柄
-				In_Third->data.Aux5_SLIDER_DATA = SLIDER_GetValue(hItem); //保存滑块值
+				In_Third[input_channel_third]->data.Aux5_SLIDER_DATA = SLIDER_GetValue(hItem); //保存滑块值
 				WM_InvalidateRect(pMsg->hWin, &Rect[4]); //无效化该值重新刷新显示值
 				// USER END
 				break;
@@ -584,6 +834,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		case ID_SLIDER_5: // Notifications sent by 'Slider'
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
+				In_Third[input_channel_third]->Item = aux6_slider;
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
 				break;
@@ -593,8 +844,9 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_VALUE_CHANGED:
 				// USER START (Optionally insert code for reacting on notification message)
+				In_Third[input_channel_third]->change_item = aux6_slider;
 				hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_5); //获得滑块句柄
-				In_Third->data.Aux6_SLIDER_DATA = SLIDER_GetValue(hItem); //保存滑块值
+				In_Third[input_channel_third]->data.Aux6_SLIDER_DATA = SLIDER_GetValue(hItem); //保存滑块值
 				WM_InvalidateRect(pMsg->hWin, &Rect[5]); //无效化该值重新刷新显示值
 				// USER END
 				break;
@@ -605,6 +857,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		case ID_SLIDER_6: // Notifications sent by 'Slider'
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
+				In_Third[input_channel_third]->Item = aux7_slider;
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
 				break;
@@ -614,8 +867,9 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_VALUE_CHANGED:
 				// USER START (Optionally insert code for reacting on notification message)
+				In_Third[input_channel_third]->change_item = aux7_slider;
 				hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_6); //获得滑块句柄
-				In_Third->data.Aux7_SLIDER_DATA = SLIDER_GetValue(hItem); //保存滑块值
+				In_Third[input_channel_third]->data.Aux7_SLIDER_DATA = SLIDER_GetValue(hItem); //保存滑块值
 				WM_InvalidateRect(pMsg->hWin, &Rect[6]); //无效化该值重新刷新显示值
 
 				//SLIDER_SetValue(WM_GetDialogItem(pMsg->hWin, ID_SLIDER_7), value[6]);
@@ -629,6 +883,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		case ID_SLIDER_7: // Notifications sent by 'Slider'
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
+				In_Third[input_channel_third]->Item = aux8_slider;
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
 				break;
@@ -638,8 +893,9 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_VALUE_CHANGED:
 				// USER START (Optionally insert code for reacting on notification message)
+				In_Third[input_channel_third]->change_item = aux8_slider;
 				hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_7); //获得滑块句柄
-				In_Third->data.Aux8_SLIDER_DATA = SLIDER_GetValue(hItem); //保存滑块值
+				In_Third[input_channel_third]->data.Aux8_SLIDER_DATA = SLIDER_GetValue(hItem); //保存滑块值
 				WM_InvalidateRect(pMsg->hWin, &Rect[7]); //无效化该值重新刷新显示值
 
 				//SLIDER_SetValue(WM_GetDialogItem(pMsg->hWin, ID_SLIDER_6), value[7]);
@@ -658,6 +914,8 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			{
 			//复选框已被点击
 			case WM_NOTIFICATION_CLICKED:
+				WM_SetFocus(WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_0)); //改变聚焦
+				In_Third[input_channel_third]->Item = aux1_checkbox;
 				break;
 
 			//复选框已被释放
@@ -666,22 +924,24 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 
 			//复选框的状态已改变
 			case WM_NOTIFICATION_VALUE_CHANGED:
+				
 				//因为用了CHECKBOX_SetState，所以无点击时也会进入该选项-次
 				//为了让创建复选框时不进行状态标记的转换
-				if(In_Third->checkbox_sta & (0x01<<0))
+				if(In_Third[input_channel_third]->checkbox_sta & (0x01<<0))
 				{
-					if(In_Third->data.Aux1_CHECKBOX_STA == 0)
+					In_Third[input_channel_third]->change_item = aux1_checkbox;
+					if(In_Third[input_channel_third]->data.Aux1_CHECKBOX_STA == 0)
 					{
-						In_Third->data.Aux1_CHECKBOX_STA = 1;
+						In_Third[input_channel_third]->data.Aux1_CHECKBOX_STA = 1;
 					}
 					else
 					{
-						In_Third->data.Aux1_CHECKBOX_STA = 0;
+						In_Third[input_channel_third]->data.Aux1_CHECKBOX_STA = 0;
 					}
 				}
 				else
 				{
-					In_Third->checkbox_sta |= (0x01<<0);
+					In_Third[input_channel_third]->checkbox_sta |= (0x01<<0);
 				}
 
 				break;
@@ -694,6 +954,8 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			{
 				//复选框已被点击
 				case WM_NOTIFICATION_CLICKED:
+					WM_SetFocus(WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_1)); //改变聚焦
+					In_Third[input_channel_third]->Item = aux2_checkbox;
 					break;
 
 				//复选框已被释放
@@ -702,21 +964,23 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 
 				//复选框的状态已改变
 				case WM_NOTIFICATION_VALUE_CHANGED:
+					
 					//为了让创建复选框时不进行状态标记的转换
-					if(In_Third->checkbox_sta & (0x01<<1))
+					if(In_Third[input_channel_third]->checkbox_sta & (0x01<<1))
 					{
-						if(In_Third->data.Aux2_CHECKBOX_STA == 0)
+						In_Third[input_channel_third]->change_item = aux2_checkbox;
+						if(In_Third[input_channel_third]->data.Aux2_CHECKBOX_STA == 0)
 						{
-							In_Third->data.Aux2_CHECKBOX_STA = 1;
+							In_Third[input_channel_third]->data.Aux2_CHECKBOX_STA = 1;
 						}
 						else
 						{
-							In_Third->data.Aux2_CHECKBOX_STA = 0;
+							In_Third[input_channel_third]->data.Aux2_CHECKBOX_STA = 0;
 						}
 					}
 					else
 					{
-						In_Third->checkbox_sta |= (0x01<<1);
+						In_Third[input_channel_third]->checkbox_sta |= (0x01<<1);
 					}
 
 					break;
@@ -729,6 +993,8 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			{
 				//复选框已被点击
 				case WM_NOTIFICATION_CLICKED:
+					WM_SetFocus(WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_2)); //改变聚焦
+					In_Third[input_channel_third]->Item = aux3_checkbox;
 					break;
 
 				//复选框已被释放
@@ -737,21 +1003,23 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 
 				//复选框的状态已改变
 				case WM_NOTIFICATION_VALUE_CHANGED:
+					
 					//为了让创建复选框时不进行状态标记的转换
-					if(In_Third->checkbox_sta & (0x01<<2))
+					if(In_Third[input_channel_third]->checkbox_sta & (0x01<<2))
 					{
-						if(In_Third->data.Aux3_CHECKBOX_STA == 0)
+						In_Third[input_channel_third]->change_item = aux3_checkbox;
+						if(In_Third[input_channel_third]->data.Aux3_CHECKBOX_STA == 0)
 						{
-							In_Third->data.Aux3_CHECKBOX_STA = 1;
+							In_Third[input_channel_third]->data.Aux3_CHECKBOX_STA = 1;
 						}
 						else
 						{
-							In_Third->data.Aux3_CHECKBOX_STA = 0;
+							In_Third[input_channel_third]->data.Aux3_CHECKBOX_STA = 0;
 						}
 					}
 					else
 					{
-						In_Third->checkbox_sta |= (0x01<<2);
+						In_Third[input_channel_third]->checkbox_sta |= (0x01<<2);
 					}
 
 					break;
@@ -764,6 +1032,8 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			{
 				//复选框已被点击
 				case WM_NOTIFICATION_CLICKED:
+					WM_SetFocus(WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_3)); //改变聚焦
+					In_Third[input_channel_third]->Item = aux4_checkbox;
 					break;
 
 				//复选框已被释放
@@ -772,21 +1042,23 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 
 				//复选框的状态已改变
 				case WM_NOTIFICATION_VALUE_CHANGED:
+					
 					//为了让创建复选框时不进行状态标记的转换
-					if(In_Third->checkbox_sta & (0x01<<3))
+					if(In_Third[input_channel_third]->checkbox_sta & (0x01<<3))
 					{
-						if(In_Third->data.Aux4_CHECKBOX_STA == 0)
+						In_Third[input_channel_third]->change_item = aux4_checkbox;
+						if(In_Third[input_channel_third]->data.Aux4_CHECKBOX_STA == 0)
 						{
-							In_Third->data.Aux4_CHECKBOX_STA = 1;
+							In_Third[input_channel_third]->data.Aux4_CHECKBOX_STA = 1;
 						}
 						else
 						{
-							In_Third->data.Aux4_CHECKBOX_STA = 0;
+							In_Third[input_channel_third]->data.Aux4_CHECKBOX_STA = 0;
 						}
 					}
 					else
 					{
-						In_Third->checkbox_sta |= (0x01<<3);
+						In_Third[input_channel_third]->checkbox_sta |= (0x01<<3);
 					}
 
 					break;
@@ -799,6 +1071,8 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			{
 				//复选框已被点击
 				case WM_NOTIFICATION_CLICKED:
+					WM_SetFocus(WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_4)); //改变聚焦
+					In_Third[input_channel_third]->Item = aux5_checkbox;
 					break;
 
 				//复选框已被释放
@@ -807,21 +1081,23 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 
 				//复选框的状态已改变
 				case WM_NOTIFICATION_VALUE_CHANGED:
+					
 					//为了让创建复选框时不进行状态标记的转换
-					if(In_Third->checkbox_sta & (0x01<<4))
+					if(In_Third[input_channel_third]->checkbox_sta & (0x01<<4))
 					{
-						if(In_Third->data.Aux5_CHECKBOX_STA == 0)
+						In_Third[input_channel_third]->change_item = aux5_checkbox;
+						if(In_Third[input_channel_third]->data.Aux5_CHECKBOX_STA == 0)
 						{
-							In_Third->data.Aux5_CHECKBOX_STA = 1;
+							In_Third[input_channel_third]->data.Aux5_CHECKBOX_STA = 1;
 						}
 						else
 						{
-							In_Third->data.Aux5_CHECKBOX_STA = 0;
+							In_Third[input_channel_third]->data.Aux5_CHECKBOX_STA = 0;
 						}
 					}
 					else
 					{
-						In_Third->checkbox_sta |= (0x01<<4);
+						In_Third[input_channel_third]->checkbox_sta |= (0x01<<4);
 					}
 
 					break;
@@ -834,6 +1110,8 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			{
 				//复选框已被点击
 				case WM_NOTIFICATION_CLICKED:
+					WM_SetFocus(WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_5)); //改变聚焦
+					In_Third[input_channel_third]->Item = aux6_checkbox;
 					break;
 
 				//复选框已被释放
@@ -842,21 +1120,23 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 
 				//复选框的状态已改变
 				case WM_NOTIFICATION_VALUE_CHANGED:
+					
 					//为了让创建复选框时不进行状态标记的转换
-					if(In_Third->checkbox_sta & (0x01<<5))
+					if(In_Third[input_channel_third]->checkbox_sta & (0x01<<5))
 					{
-						if(In_Third->data.Aux6_CHECKBOX_STA == 0)
+						In_Third[input_channel_third]->change_item = aux6_checkbox;
+						if(In_Third[input_channel_third]->data.Aux6_CHECKBOX_STA == 0)
 						{
-							In_Third->data.Aux6_CHECKBOX_STA = 1;
+							In_Third[input_channel_third]->data.Aux6_CHECKBOX_STA = 1;
 						}
 						else
 						{
-							In_Third->data.Aux6_CHECKBOX_STA = 0;
+							In_Third[input_channel_third]->data.Aux6_CHECKBOX_STA = 0;
 						}
 					}
 					else
 					{
-						In_Third->checkbox_sta |= (0x01<<5);
+						In_Third[input_channel_third]->checkbox_sta |= (0x01<<5);
 					}
 
 					break;
@@ -869,6 +1149,8 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			{
 				//复选框已被点击
 				case WM_NOTIFICATION_CLICKED:
+					WM_SetFocus(WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_6)); //改变聚焦
+					In_Third[input_channel_third]->Item = aux7_checkbox;
 					break;
 
 				//复选框已被释放
@@ -877,21 +1159,23 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 
 				//复选框的状态已改变
 				case WM_NOTIFICATION_VALUE_CHANGED:
+					
 					//为了让创建复选框时不进行状态标记的转换
-					if(In_Third->checkbox_sta & (0x01<<6))
+					if(In_Third[input_channel_third]->checkbox_sta & (0x01<<6))
 					{
-						if(In_Third->data.Aux7_CHECKBOX_STA == 0)
+						In_Third[input_channel_third]->change_item = aux7_checkbox;
+						if(In_Third[input_channel_third]->data.Aux7_CHECKBOX_STA == 0)
 						{
-							In_Third->data.Aux7_CHECKBOX_STA = 1;
+							In_Third[input_channel_third]->data.Aux7_CHECKBOX_STA = 1;
 						}
 						else
 						{
-							In_Third->data.Aux7_CHECKBOX_STA = 0;
+							In_Third[input_channel_third]->data.Aux7_CHECKBOX_STA = 0;
 						}
 					}
 					else
 					{
-						In_Third->checkbox_sta |= (0x01<<6);
+						In_Third[input_channel_third]->checkbox_sta |= (0x01<<6);
 					}
 
 					break;
@@ -904,6 +1188,8 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			{
 				//复选框已被点击
 				case WM_NOTIFICATION_CLICKED:
+					WM_SetFocus(WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_7)); //改变聚焦
+					In_Third[input_channel_third]->Item = aux8_checkbox;
 					break;
 
 				//复选框已被释放
@@ -912,21 +1198,23 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 
 				//复选框的状态已改变
 				case WM_NOTIFICATION_VALUE_CHANGED:
+					
 					//为了让创建复选框时不进行状态标记的转换
-					if(In_Third->checkbox_sta & (0x01<<7))
+					if(In_Third[input_channel_third]->checkbox_sta & (0x01<<7))
 					{
-						if(In_Third->data.Aux8_CHECKBOX_STA == 0)
+						In_Third[input_channel_third]->change_item = aux8_checkbox;
+						if(In_Third[input_channel_third]->data.Aux8_CHECKBOX_STA == 0)
 						{
-							In_Third->data.Aux8_CHECKBOX_STA = 1;
+							In_Third[input_channel_third]->data.Aux8_CHECKBOX_STA = 1;
 						}
 						else
 						{
-							In_Third->data.Aux8_CHECKBOX_STA = 0;
+							In_Third[input_channel_third]->data.Aux8_CHECKBOX_STA = 0;
 						}
 					}
 					else
 					{
-						In_Third->checkbox_sta |= (0x01<<7);
+						In_Third[input_channel_third]->checkbox_sta |= (0x01<<7);
 					}
 
 					break;
@@ -962,7 +1250,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			//已释放按钮
 			case WM_NOTIFICATION_RELEASED:
 				GUI_EndDialog(pMsg->hWin, 0);   //结束当前界面
-				hWin_now = Input_Second();      //切换下一个界面
+				hWin_now = Input_Five();      //切换下一个界面
 				break;
 			}
 			break;
@@ -1012,22 +1300,38 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 	/*********************************自定义信息**********************************************/
 	//旋钮左转
 	case MSG_KNOB_CONTROL_LEFT:
+		Item_change(&(In_Third[input_channel_third]->Item),aux1_slider,aux8_checkbox,Next_dir);
 		GUI_SendKeyMsg(GUI_KEY_TAB, 1);     //下一个聚焦点
 		break;
 	
 	//旋钮右转
 	case MSG_KNOB_CONTROL_RIGHT:
+		Item_change(&(In_Third[input_channel_third]->Item),aux1_slider,aux8_checkbox,Last_dir);
 		GUI_SendKeyMsg(GUI_KEY_BACKTAB, 1); //上一个聚焦
 		break;
 	
 	//INPUT左转
 	case MSG_KNOB_INPUT_LEFT:
-		GUI_SendKeyMsg(GUI_KEY_LEFT,1); //滑块数值减少
+//		GUI_SendKeyMsg(GUI_KEY_LEFT,1); //滑块数值减少
+		if(In_Third[input_channel_third]->dir == 2)
+		{
+			In_Third[input_channel_third]->Key_count = 0;
+		}
+		In_Third[input_channel_third]->dir = 1;
+		In_Third[input_channel_third]->slider_change = Value_Change_dec;
+		_slider_add_dec(pMsg,In_Third[input_channel_third]->slider_change);
 		break;
 	
 	//INPUT右转
 	case MSG_KNOB_INPUT_RIGHT:
-		GUI_SendKeyMsg(GUI_KEY_RIGHT,1); //滑块数值增加
+		if(In_Third[input_channel_third]->dir == 1)
+		{
+			In_Third[input_channel_third]->Key_count = 0;
+		}
+		In_Third[input_channel_third]->dir = 2;
+//		GUI_SendKeyMsg(GUI_KEY_RIGHT,1); //滑块数值增加
+		In_Third[input_channel_third]->slider_change = Value_Change_add;
+		_slider_add_dec(pMsg,In_Third[input_channel_third]->slider_change);
 		break;
 	
 	//CONTROL按下
@@ -1038,17 +1342,23 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 	//页面切换
 	case MSG_KNOB_OUT_LEFT:	
 		GUI_EndDialog(pMsg->hWin, 0);   //结束当前界面
-		hWin_now = Input_Second();      //切换下一个界面
+		hWin_now = Input_Five();      //切换下一个界面
 		break;
 	
 	case MSG_KNOB_OUT_RIGHT:
 		GUI_EndDialog(pMsg->hWin, 0);   //结束当前界面
-		hWin_now = Input_Four();      //切换下一个界面
+		hWin_now = Input_Four();      //切换上一个界面
 		break;
 	
 	//ESC
 	case MSG_KEY_ESC:
 		GUI_SendKeyMsg(GUI_KEY_ESCAPE, 1);  //退出
+		break;
+	
+	//没有旋钮动作
+	case MSG_KNOB_NULL:
+		In_Third[input_channel_third]->Key_count = 0;
+		In_Third[input_channel_third]->dir		 = 0;
 		break;
 	/****************************************END********************************************/
 	/*********************************按键处理******************************************/
@@ -1059,14 +1369,14 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case GUI_KEY_ESCAPE:
             GUI_EndDialog(pMsg->hWin, 0); //关闭当前窗口
             hWin_now = Input_First();  //显示Input_First页面
-			INPUT_CHANNEL = 1;
+//			input_channel_third = 1;
             break;
 		}
 		break;
 		
 	//可以在这里释放数据结构
 	case WM_DELETE:
-		myfree(0,In_Third); //释放动态内存
+//		myfree(0,In_Third[input_channel_third]); //释放动态内存
 		break;
 	
 	
@@ -1086,6 +1396,15 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 *
 *       CreateWindow
 */
+//复选框状态初始化
+void Checkbox_Init(u8 *p)
+{
+	if(*p > 1)
+	{
+		*p = 0;
+	}
+}
+
 //初始化数据
 static void Init_data(Input_Third_data *L)
 {
@@ -1106,14 +1425,27 @@ static void Init_data(Input_Third_data *L)
 //	L->data.Aux7_CHECKBOX_STA	= 0;
 //	L->data.Aux8_CHECKBOX_STA	= 0;
 	
-	L->face_switch  	= 	INPUT_CHANNEL;  //获得选中的通道
-	L->String       	= 	face_string[INPUT_CHANNEL]; //头项目字符串
+	L->face_switch  	= 	input_channel_third;  //获得选中的通道
+	L->String       	= 	face_string[input_channel_third]; //头项目字符串
 	L->Time_count       =	0;
 	L->hItime			=	0;
 	L->Key_count		=	0;
 	L->Released			=	0;
 	L->checkbox_sta     =   0;
-	AT24C16_PageRead((u8 *)L,IIC_Addr[(L->face_switch)+7],sizeof(Input_Data3));  //提取数据
+	L->Item				=	aux1_slider;  //初始化选中的子项
+	L->change_item 		=	-1;
+//	AT24C16_PageRead((u8 *)L,IIC_Addr[(L->face_switch)+7],sizeof(Input_Data3));  //提取数据
+	
+	//复选框状态初始化
+	Checkbox_Init(&(L->data.Aux1_CHECKBOX_STA));
+	Checkbox_Init(&(L->data.Aux2_CHECKBOX_STA));
+	Checkbox_Init(&(L->data.Aux3_CHECKBOX_STA));
+	Checkbox_Init(&(L->data.Aux4_CHECKBOX_STA));
+	Checkbox_Init(&(L->data.Aux5_CHECKBOX_STA));
+	Checkbox_Init(&(L->data.Aux6_CHECKBOX_STA));
+	Checkbox_Init(&(L->data.Aux7_CHECKBOX_STA));
+	Checkbox_Init(&(L->data.Aux8_CHECKBOX_STA));
+	
 }
 
 
@@ -1121,18 +1453,22 @@ WM_HWIN Input_Third(void) {
 	WM_HWIN hWin;
 	
 	//申请数据
-	In_Third = (Input_Third_data *)mymalloc(0,sizeof(Input_Third_data));
+//	In_Third = (Input_Third_data *)mymalloc(0,sizeof(Input_Third_data));
+//	
+//	if(In_Third == NULL)
+//	{
+//		return 0;
+//	}
+//	else
+//	{
+//		EEPROM_FREE = 1;
+//		Init_data(In_Third);
+//	}
+	input_channel_third = INPUT_CHANNEL;
 	
-	if(In_Third == NULL)
-	{
-		return 0;
-	}
-	else
-	{
-		Init_data(In_Third);
-	}
 	
 	
+	Init_data(In_Third[input_channel_third]);
 	hWin = GUI_CreateDialogBox(_aDialogCreate, GUI_COUNTOF(_aDialogCreate), _cbDialog, WM_HBKWIN, 0, 0);
 	return hWin;
 }

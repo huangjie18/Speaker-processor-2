@@ -45,6 +45,7 @@
 ..\obj\input_first.o: ..\STemWin\inc\TEXT.h
 ..\obj\input_first.o: ..\STemWin\inc\TREEVIEW.h
 ..\obj\input_first.o: ..\STemWin\inc\KNOB.h
+..\obj\input_first.o: ..\STemWin\inc\MESSAGEBOX.h
 ..\obj\input_first.o: ..\HARDWARE\InterFace\interface.h
 ..\obj\input_first.o: ..\HARDWARE\Test\example.h
 ..\obj\input_first.o: ..\HARDWARE\InterFace\interface.h
@@ -80,4 +81,14 @@
 ..\obj\input_first.o: ..\STM32F10x_StdPeriph_Driver\inc\misc.h
 ..\obj\input_first.o: ..\HARDWARE\IC24C16\24c16.h
 ..\obj\input_first.o: ..\HARDWARE\IIC\iic.h
+..\obj\input_first.o: ..\adau1452\inc\ak4612.h
+..\obj\input_first.o: ..\adau1452\inc\spi.h
+..\obj\input_first.o: ..\SYSTEM\delay\delay.h
+..\obj\input_first.o: ..\SYSTEM\usart\usart.h
+..\obj\input_first.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 ..\obj\input_first.o: ..\MALLOC\malloc.h
+..\obj\input_first.o: ..\HARDWARE\inface_2\DATA\data.h
+..\obj\input_first.o: ..\adau1452\inc\algorithm.h
+..\obj\input_first.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+..\obj\input_first.o: ..\adau1452\inc\sigmastudiofw.h
+..\obj\input_first.o: ..\adau1452\inc\adau1452_drive_ic_1_param.h

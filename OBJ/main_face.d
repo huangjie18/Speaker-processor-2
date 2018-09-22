@@ -45,6 +45,7 @@
 ..\obj\main_face.o: ..\STemWin\inc\TEXT.h
 ..\obj\main_face.o: ..\STemWin\inc\TREEVIEW.h
 ..\obj\main_face.o: ..\STemWin\inc\KNOB.h
+..\obj\main_face.o: ..\STemWin\inc\MESSAGEBOX.h
 ..\obj\main_face.o: ..\HARDWARE\InterFace\interface.h
 ..\obj\main_face.o: ..\HARDWARE\Test\example.h
 ..\obj\main_face.o: ..\HARDWARE\InterFace\interface.h
@@ -80,4 +81,10 @@
 ..\obj\main_face.o: ..\STM32F10x_StdPeriph_Driver\inc\misc.h
 ..\obj\main_face.o: ..\HARDWARE\IC24C16\24c16.h
 ..\obj\main_face.o: ..\HARDWARE\IIC\iic.h
+..\obj\main_face.o: ..\adau1452\inc\ak4612.h
+..\obj\main_face.o: ..\adau1452\inc\spi.h
+..\obj\main_face.o: ..\SYSTEM\delay\delay.h
+..\obj\main_face.o: ..\SYSTEM\usart\usart.h
+..\obj\main_face.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 ..\obj\main_face.o: ..\MALLOC\malloc.h
+..\obj\main_face.o: ..\HARDWARE\RTC\rtc.h

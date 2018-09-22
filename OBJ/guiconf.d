@@ -36,3 +36,6 @@
 ..\obj\guiconf.o: ..\STM32F10x_StdPeriph_Driver\inc\stm32f10x_usart.h
 ..\obj\guiconf.o: ..\STM32F10x_StdPeriph_Driver\inc\stm32f10x_wwdg.h
 ..\obj\guiconf.o: ..\STM32F10x_StdPeriph_Driver\inc\misc.h
+..\obj\guiconf.o: ..\HARDWARE\IC24C16\24c16.h
+..\obj\guiconf.o: ..\SYSTEM\sys\sys.h
+..\obj\guiconf.o: ..\HARDWARE\IIC\iic.h

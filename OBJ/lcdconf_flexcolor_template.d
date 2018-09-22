@@ -79,9 +79,15 @@
 ..\obj\lcdconf_flexcolor_template.o: ..\STemWin\inc\TEXT.h
 ..\obj\lcdconf_flexcolor_template.o: ..\STemWin\inc\TREEVIEW.h
 ..\obj\lcdconf_flexcolor_template.o: ..\STemWin\inc\KNOB.h
+..\obj\lcdconf_flexcolor_template.o: ..\STemWin\inc\MESSAGEBOX.h
 ..\obj\lcdconf_flexcolor_template.o: ..\HARDWARE\InterFace\interface.h
 ..\obj\lcdconf_flexcolor_template.o: ..\MALLOC\malloc.h
 ..\obj\lcdconf_flexcolor_template.o: ..\HARDWARE\Test\example.h
 ..\obj\lcdconf_flexcolor_template.o: ..\HARDWARE\IC24C16\24c16.h
 ..\obj\lcdconf_flexcolor_template.o: ..\HARDWARE\IIC\iic.h
+..\obj\lcdconf_flexcolor_template.o: ..\adau1452\inc\ak4612.h
+..\obj\lcdconf_flexcolor_template.o: ..\adau1452\inc\spi.h
+..\obj\lcdconf_flexcolor_template.o: ..\SYSTEM\delay\delay.h
+..\obj\lcdconf_flexcolor_template.o: ..\SYSTEM\usart\usart.h
+..\obj\lcdconf_flexcolor_template.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 ..\obj\lcdconf_flexcolor_template.o: ..\HARDWARE\TOUCH\touch.h

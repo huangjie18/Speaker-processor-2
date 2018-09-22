@@ -1,0 +1,6 @@
+-c --cpu Cortex-M4 -g -O0 --apcs=interwork --split_sections -I..\CORE -I..\STM32F10x_StdPeriph_Driver\inc -I..\USER -I..\SYSTEM\delay -I..\SYSTEM\sys -I..\SYSTEM\usart -I..\HARDWARE\LCD -I..\STemWin\Config -I..\STemWin\inc -I..\MALLOC -I..\HARDWARE\TIMER -I..\STemWin\Demo -I..\HARDWARE\Test -I..\HARDWARE\InterFace -I..\HARDWARE\LED -I..\HARDWARE\KEY -I..\STemWin\STemWin_Addons -I..\HARDWARE\TOUCH -I..\HARDWARE\IIC -I..\HARDWARE\IC24C16
+-I D:\GitHub\Speaker-processor-2\USER\RTE
+-I C:\Keil_v5\ARM\PACK\Keil\AT32F4xx_DFP\1.0.3\Device\Include
+-I C:\Keil_v5\ARM\CMSIS\Include
+-D__UVISION_VERSION="515" -DSTM32F10X_HD -DUSE_STDPERIPH_DRIVER
+-o ..\obj\stm32f10x_gpio.o --omf_browse ..\obj\stm32f10x_gpio.crf --depend ..\obj\stm32f10x_gpio.d --feedback "..\OBJ\Processor.fed" "..\STM32F10x_StdPeriph_Driver\src\stm32f10x_gpio.c"

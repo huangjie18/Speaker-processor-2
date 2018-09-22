@@ -56,9 +56,9 @@ ARM Macro Assembler    Page 1
    32 00000000         ;   <o> Stack Size (in Bytes) <0x0-0xFFFFFFFF:8>
    33 00000000         ; </h>
    34 00000000         
-   35 00000000 00000800 
+   35 00000000 00000B00 
                        Stack_Size
-                               EQU              0x00000800
+                               EQU              0x00000B00
    36 00000000         
    37 00000000                 AREA             STACK, NOINIT, READWRITE, ALIGN
 =3
@@ -70,17 +70,17 @@ ARM Macro Assembler    Page 2
 
 
                                SPACE            Stack_Size
-   39 00000800         __initial_sp
-   40 00000800         
-   41 00000800         ; <h> Heap Configuration
-   42 00000800         ;   <o>  Heap Size (in Bytes) <0x0-0xFFFFFFFF:8>
-   43 00000800         ; </h>
-   44 00000800         
-   45 00000800 00000200 
+   39 00000B00         __initial_sp
+   40 00000B00         
+   41 00000B00         ; <h> Heap Configuration
+   42 00000B00         ;   <o>  Heap Size (in Bytes) <0x0-0xFFFFFFFF:8>
+   43 00000B00         ; </h>
+   44 00000B00         
+   45 00000B00 00000200 
                        Heap_Size
                                EQU              0x00000200
-   46 00000800         
-   47 00000800                 AREA             HEAP, NOINIT, READWRITE, ALIGN=
+   46 00000B00         
+   47 00000B00                 AREA             HEAP, NOINIT, READWRITE, ALIGN=
 3
    48 00000000         __heap_base
    49 00000000         Heap_Mem
@@ -560,7 +560,7 @@ ARM Macro Assembler    Page 9
               00000000 
               00000000 
               00000000 
-              00000800 
+              00000B00 
               00000200 
               00000000 
 Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4 --apcs=interw
@@ -592,7 +592,7 @@ Symbol: Stack_Mem
       At line 347 in file ..\CORE\startup_stm32f10x_hd.s
       At line 349 in file ..\CORE\startup_stm32f10x_hd.s
 
-__initial_sp 00000800
+__initial_sp 00000B00
 
 Symbol: __initial_sp
    Definitions
@@ -1416,7 +1416,7 @@ Symbol: Heap_Size
       At line 49 in file ..\CORE\startup_stm32f10x_hd.s
       At line 348 in file ..\CORE\startup_stm32f10x_hd.s
 
-Stack_Size 00000800
+Stack_Size 00000B00
 
 Symbol: Stack_Size
    Definitions

@@ -45,6 +45,7 @@
 ..\obj\flex_set.o: ..\STemWin\inc\TEXT.h
 ..\obj\flex_set.o: ..\STemWin\inc\TREEVIEW.h
 ..\obj\flex_set.o: ..\STemWin\inc\KNOB.h
+..\obj\flex_set.o: ..\STemWin\inc\MESSAGEBOX.h
 ..\obj\flex_set.o: ..\HARDWARE\InterFace\interface.h
 ..\obj\flex_set.o: ..\HARDWARE\Test\example.h
 ..\obj\flex_set.o: ..\HARDWARE\InterFace\interface.h
@@ -80,4 +81,9 @@
 ..\obj\flex_set.o: ..\STM32F10x_StdPeriph_Driver\inc\misc.h
 ..\obj\flex_set.o: ..\HARDWARE\IC24C16\24c16.h
 ..\obj\flex_set.o: ..\HARDWARE\IIC\iic.h
+..\obj\flex_set.o: ..\adau1452\inc\ak4612.h
+..\obj\flex_set.o: ..\adau1452\inc\spi.h
+..\obj\flex_set.o: ..\SYSTEM\delay\delay.h
+..\obj\flex_set.o: ..\SYSTEM\usart\usart.h
+..\obj\flex_set.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 ..\obj\flex_set.o: ..\MALLOC\malloc.h

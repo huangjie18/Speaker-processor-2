@@ -17,15 +17,15 @@ u16 IIC_Addr[Addr_num]={0};
 static void IIC_Addr_Init(void)
 {
 	IIC_Addr[0] 	=	 0;   										//INPUT_First首数据存放地址
-	IIC_Addr[1]		=	IIC_Addr[0] + sizeof(Input_First_data);		//IN1_Second首数据存放地址
-	IIC_Addr[2]  	=	IIC_Addr[1] + sizeof(Input_Data);    		//IN2_Second首数据存放地址
-	IIC_Addr[3]  	=	IIC_Addr[2] + sizeof(Input_Data);    		//IN3_Second首数据存放地址
-	IIC_Addr[4]  	=	IIC_Addr[3] + sizeof(Input_Data);    		//IN4_Second首数据存放地址
-	IIC_Addr[5]  	=	IIC_Addr[4] + sizeof(Input_Data);    		//IN5_Second首数据存放地址
-	IIC_Addr[6]  	=	IIC_Addr[5] + sizeof(Input_Data);    		//IN6_Second首数据存放地址
-	IIC_Addr[7]  	=	IIC_Addr[6] + sizeof(Input_Data);    		//IN7_Second首数据存放地址
+	IIC_Addr[1]		=	IIC_Addr[0] + sizeof(Input_Data1);		//IN1_Second首数据存放地址
+	IIC_Addr[2]  	=	IIC_Addr[1] + sizeof(Input_Data2);    		//IN2_Second首数据存放地址
+	IIC_Addr[3]  	=	IIC_Addr[2] + sizeof(Input_Data2);    		//IN3_Second首数据存放地址
+	IIC_Addr[4]  	=	IIC_Addr[3] + sizeof(Input_Data2);    		//IN4_Second首数据存放地址
+	IIC_Addr[5]  	=	IIC_Addr[4] + sizeof(Input_Data2);    		//IN5_Second首数据存放地址
+	IIC_Addr[6]  	=	IIC_Addr[5] + sizeof(Input_Data2);    		//IN6_Second首数据存放地址
+	IIC_Addr[7]  	=	IIC_Addr[6] + sizeof(Input_Data2);    		//IN7_Second首数据存放地址
 	
-	IIC_Addr[8]		=	IIC_Addr[7] + sizeof(Input_Data);			//IN1_Third首地址存放地址
+	IIC_Addr[8]		=	IIC_Addr[7] + sizeof(Input_Data2);			//IN1_Third首地址存放地址
 	IIC_Addr[9]		=	IIC_Addr[8] + sizeof(Input_Data3);			//IN2_Third首地址存放地址
 	IIC_Addr[10]	=	IIC_Addr[9] + sizeof(Input_Data3);			//IN3_Third首地址存放地址
 	IIC_Addr[11]	=	IIC_Addr[10] + sizeof(Input_Data3);			//IN4_Third首地址存放地址
@@ -60,6 +60,19 @@ static void IIC_Addr_Init(void)
 	IIC_Addr[36]	=	IIC_Addr[35] + sizeof(Output_Data2);		//OUT6_Third数据存放地址
 	IIC_Addr[37]	=	IIC_Addr[36] + sizeof(Output_Data2);		//OUT7_Third数据存放地址
 	IIC_Addr[38]	=	IIC_Addr[37] + sizeof(Output_Data2);		//OUT8_Third数据存放地址
+	
+	IIC_Addr[39]	=	IIC_Addr[38] + sizeof(Output_Data2);		//OUT1_Four数据存放地址
+	IIC_Addr[40]	=	IIC_Addr[39] + sizeof(Output_Data4);		//OUT2_Four数据存放地址
+	IIC_Addr[41]	=	IIC_Addr[40] + sizeof(Output_Data4);		//OUT3_Four数据存放地址
+	IIC_Addr[42]	=	IIC_Addr[41] + sizeof(Output_Data4);		//OUT4_Four数据存放地址
+	IIC_Addr[43]	=	IIC_Addr[42] + sizeof(Output_Data4);		//OUT5_Four数据存放地址
+	IIC_Addr[44]	=	IIC_Addr[43] + sizeof(Output_Data4);		//OUT6_Four数据存放地址
+	IIC_Addr[45]	=	IIC_Addr[44] + sizeof(Output_Data4);		//OUT7_Four数据存放地址
+	IIC_Addr[46]	=	IIC_Addr[45] + sizeof(Output_Data4);		//OUT8_Four数据存放地址
+	
+	//SYSTEM 数据
+	IIC_Addr[47]	=	IIC_Addr[46] + sizeof(Output_Data4);        //SYS_Fisrt数据存放地址
+	IIC_Addr[48]	=	IIC_Addr[47] + sizeof(System_Data1);   		//SYS_Second数据存放地址
 	
 }
 
@@ -221,7 +234,6 @@ u8 IIC_ReadByte(void)
 */
 u8 IIC_WaitAck(void)
 {
-	u8 re;
 	u8 time;
 	EEPROM_I2C_SDA_1();  /* CPU释放SDA总线 */
 	delay_us(2);

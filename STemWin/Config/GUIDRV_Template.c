@@ -236,11 +236,11 @@ static void _XorPixel(GUI_DEVICE * pDevice, int x, int y)
 static void _FillRect(GUI_DEVICE * pDevice, int x0, int y0, int x1, int y1)
 {
 
-//原来的函数
+	//原来的函数
     LCD_PIXELINDEX PixelIndex;
     int x;
     u16 Color;
-    u32 temp1;      //Program Size: Code=45980 RO-data=18328 RW-data=816 ZI-data=14704
+    u32 temp1;      
     u32 temp = (x1 - x0 + 1) * (y1 - y0 + 1);
 
 

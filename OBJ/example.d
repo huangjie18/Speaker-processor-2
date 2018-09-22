@@ -47,6 +47,7 @@
 ..\obj\example.o: ..\STemWin\inc\TEXT.h
 ..\obj\example.o: ..\STemWin\inc\TREEVIEW.h
 ..\obj\example.o: ..\STemWin\inc\KNOB.h
+..\obj\example.o: ..\STemWin\inc\MESSAGEBOX.h
 ..\obj\example.o: ..\HARDWARE\InterFace\interface.h
 ..\obj\example.o: ..\MALLOC\malloc.h
 ..\obj\example.o: ..\CORE\stm32f10x.h
@@ -82,3 +83,10 @@
 ..\obj\example.o: ..\SYSTEM\sys\sys.h
 ..\obj\example.o: ..\HARDWARE\IC24C16\24c16.h
 ..\obj\example.o: ..\HARDWARE\IIC\iic.h
+..\obj\example.o: ..\adau1452\inc\ak4612.h
+..\obj\example.o: ..\adau1452\inc\spi.h
+..\obj\example.o: ..\SYSTEM\delay\delay.h
+..\obj\example.o: ..\SYSTEM\usart\usart.h
+..\obj\example.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+..\obj\example.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+..\obj\example.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h

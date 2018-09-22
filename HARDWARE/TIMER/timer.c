@@ -40,21 +40,23 @@ void TIM3_Int_Init(u16 arr,u16 psc)
 
 void TIM3_IRQHandler(void)
 {
-	static u8 i=0;
+//	static u8 i=0;
 	if(TIM_GetITStatus(TIM3,TIM_IT_Update)!=RESET)
 	{	
-		i++;
+		
 		OS_TimeMS++;
-		if(i>=10) //10ms调用一次触屏函数
-		{
-			#if (USE_TOUCH_MODE == 1)
-			GUI_TOUCH_Exec();  //调用STemwin自带触摸函数
-			#else
-			ReadTouch();   //自定义触摸函数
-			#endif
-			 
-			i=0;
-		}
+		
+//		i++;
+//		if(i>=10) //10ms调用一次触屏函数
+//		{
+//			#if (USE_TOUCH_MODE == 1)
+//			GUI_TOUCH_Exec();  //调用STemwin自带触摸函数
+//			#else
+//			ReadTouch();   //自定义触摸函数
+//			#endif
+//			 
+//			i=0;
+//		}
 	}
 	TIM_ClearITPendingBit(TIM3,TIM_IT_Update);
 }

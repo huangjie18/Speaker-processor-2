@@ -45,6 +45,7 @@
 ..\obj\input_third.o: ..\STemWin\inc\TEXT.h
 ..\obj\input_third.o: ..\STemWin\inc\TREEVIEW.h
 ..\obj\input_third.o: ..\STemWin\inc\KNOB.h
+..\obj\input_third.o: ..\STemWin\inc\MESSAGEBOX.h
 ..\obj\input_third.o: ..\HARDWARE\InterFace\interface.h
 ..\obj\input_third.o: ..\HARDWARE\Test\example.h
 ..\obj\input_third.o: ..\HARDWARE\InterFace\interface.h
@@ -80,5 +81,11 @@
 ..\obj\input_third.o: ..\STM32F10x_StdPeriph_Driver\inc\misc.h
 ..\obj\input_third.o: ..\HARDWARE\IC24C16\24c16.h
 ..\obj\input_third.o: ..\HARDWARE\IIC\iic.h
+..\obj\input_third.o: ..\adau1452\inc\ak4612.h
+..\obj\input_third.o: ..\adau1452\inc\spi.h
+..\obj\input_third.o: ..\SYSTEM\delay\delay.h
+..\obj\input_third.o: ..\SYSTEM\usart\usart.h
+..\obj\input_third.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 ..\obj\input_third.o: ..\MALLOC\malloc.h
 ..\obj\input_third.o: ..\STemWin\inc\BUTTON_Private.h
+..\obj\input_third.o: ..\HARDWARE\inface_2\DATA\data.h

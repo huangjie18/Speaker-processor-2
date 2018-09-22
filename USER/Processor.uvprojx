@@ -12,15 +12,15 @@
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>
         <TargetCommonOption>
-          <Device>AT32F403VC</Device>
+          <Device>AT32F403VG</Device>
           <Vendor>ArteryTek</Vendor>
           <PackID>Keil.AT32F4xx_DFP.1.0.3</PackID>
-          <Cpu>IROM(0x08000000,0x40000) IRAM(0x20000000,0x38000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
+          <Cpu>IROM(0x08000000,0x100000) IRAM(0x20000000,0x38000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
-          <FlashDriverDll>UL2CM3(-S0 -C0 -P0 -FD20000000 -FC1000 -FN1 -FF0AT32F403_256 -FS08000000 -FL040000 -FP0($$Device:AT32F403VC$Flash\AT32F403_256.FLM))</FlashDriverDll>
+          <FlashDriverDll>UL2CM3(-S0 -C0 -P0 -FD20000000 -FC1000 -FN1 -FF0AT32F403_1024 -FS08000000 -FL0100000 -FP0($$Device:AT32F403VG$Flash\AT32F403_1024.FLM))</FlashDriverDll>
           <DeviceId>0</DeviceId>
-          <RegisterFile>$$Device:AT32F403VC$Device\Include\AT32F403xx.h</RegisterFile>
+          <RegisterFile>$$Device:AT32F403VG$Device\Include\AT32F403xx.h</RegisterFile>
           <MemoryEnv></MemoryEnv>
           <Cmp></Cmp>
           <Asm></Asm>
@@ -30,7 +30,7 @@
           <SLE66CMisc></SLE66CMisc>
           <SLE66AMisc></SLE66AMisc>
           <SLE66LinkerMisc></SLE66LinkerMisc>
-          <SFDFile>$$Device:AT32F403VC$SVD\AT32F403xx.svd</SFDFile>
+          <SFDFile>$$Device:AT32F403VG$SVD\AT32F403xx.svd</SFDFile>
           <bCustSvd>0</bCustSvd>
           <UseEnv>0</UseEnv>
           <BinPath></BinPath>
@@ -148,7 +148,7 @@
             <RestoreSysVw>1</RestoreSysVw>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
-          <TargetSelection>11</TargetSelection>
+          <TargetSelection>6</TargetSelection>
           <SimDlls>
             <CpuDll></CpuDll>
             <CpuDllArguments></CpuDllArguments>
@@ -162,7 +162,7 @@
             <PeripheralDll></PeripheralDll>
             <PeripheralDllArguments></PeripheralDllArguments>
             <InitializationFile></InitializationFile>
-            <Driver>STLink\ST-LINKIII-KEIL_SWO.dll</Driver>
+            <Driver>Segger\JL2CM3.dll</Driver>
           </TargetDlls>
         </DebugOption>
         <Utilities>
@@ -286,7 +286,7 @@
               <IROM>
                 <Type>1</Type>
                 <StartAddress>0x8000000</StartAddress>
-                <Size>0x40000</Size>
+                <Size>0x100000</Size>
               </IROM>
               <XRAM>
                 <Type>0</Type>
@@ -311,7 +311,7 @@
               <OCR_RVCT4>
                 <Type>1</Type>
                 <StartAddress>0x8000000</StartAddress>
-                <Size>0x40000</Size>
+                <Size>0x100000</Size>
               </OCR_RVCT4>
               <OCR_RVCT5>
                 <Type>1</Type>
@@ -368,7 +368,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F10X_HD,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\CORE;..\STM32F10x_StdPeriph_Driver\inc;..\USER;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\HARDWARE\LCD;..\STemWin\Config;..\STemWin\inc;..\MALLOC;..\HARDWARE\TIMER;..\STemWin\Demo;..\HARDWARE\Test;..\HARDWARE\InterFace;..\HARDWARE\LED;..\HARDWARE\KEY;..\STemWin\STemWin_Addons;..\HARDWARE\TOUCH;..\HARDWARE\IIC;..\HARDWARE\IC24C16</IncludePath>
+              <IncludePath>..\CORE;..\STM32F10x_StdPeriph_Driver\inc;..\USER;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\HARDWARE\LCD;..\STemWin\Config;..\STemWin\inc;..\MALLOC;..\HARDWARE\TIMER;..\STemWin\Demo;..\HARDWARE\Test;..\HARDWARE\InterFace;..\HARDWARE\LED;..\HARDWARE\KEY;..\STemWin\STemWin_Addons;..\HARDWARE\TOUCH;..\HARDWARE\IIC;..\HARDWARE\IC24C16;..\adau1452\inc;..\HARDWARE\inface_2\DATA;..\HARDWARE\inface_2\BMP;..\HARDWARE\RTC</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -481,6 +481,31 @@
               <FileType>1</FileType>
               <FilePath>..\STM32F10x_StdPeriph_Driver\src\stm32f10x_flash.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f10x_i2c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\STM32F10x_StdPeriph_Driver\src\stm32f10x_i2c.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\STM32F10x_StdPeriph_Driver\src\stm32f10x_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_rtc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\STM32F10x_StdPeriph_Driver\src\stm32f10x_rtc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_bkp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\STM32F10x_StdPeriph_Driver\src\stm32f10x_bkp.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_pwr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\STM32F10x_StdPeriph_Driver\src\stm32f10x_pwr.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -542,11 +567,6 @@
               <FilePath>..\HARDWARE\Lannge\lannge_yellow.c</FilePath>
             </File>
             <File>
-              <FileName>lannge_white.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\Lannge\lannge_white.c</FilePath>
-            </File>
-            <File>
               <FileName>touch.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\TOUCH\touch.c</FilePath>
@@ -560,6 +580,11 @@
               <FileName>24c16.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\IC24C16\24c16.c</FilePath>
+            </File>
+            <File>
+              <FileName>rtc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\RTC\rtc.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -637,11 +662,6 @@
               <FilePath>..\HARDWARE\inface_2\INPUT\Input_First.c</FilePath>
             </File>
             <File>
-              <FileName>Input_Four.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\inface_2\INPUT\Input_Four.c</FilePath>
-            </File>
-            <File>
               <FileName>Input_Second.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\inface_2\INPUT\Input_Second.c</FilePath>
@@ -652,14 +672,19 @@
               <FilePath>..\HARDWARE\inface_2\INPUT\Input_Third.c</FilePath>
             </File>
             <File>
+              <FileName>Input_Four.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\inface_2\INPUT\Input_Four.c</FilePath>
+            </File>
+            <File>
+              <FileName>Input_Five.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\inface_2\INPUT\Input_Five.c</FilePath>
+            </File>
+            <File>
               <FileName>Output_First.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\inface_2\OUTPUT\Output_First.c</FilePath>
-            </File>
-            <File>
-              <FileName>Output_Four.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\inface_2\OUTPUT\Output_Four.c</FilePath>
             </File>
             <File>
               <FileName>Output_Second.c</FileName>
@@ -670,6 +695,126 @@
               <FileName>Output_Third.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\inface_2\OUTPUT\Output_Third.c</FilePath>
+            </File>
+            <File>
+              <FileName>Output_Four.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\inface_2\OUTPUT\Output_Four.c</FilePath>
+            </File>
+            <File>
+              <FileName>Mode_First.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\inface_2\MODE\Mode_First.c</FilePath>
+            </File>
+            <File>
+              <FileName>System_First.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\inface_2\SYSTEM\System_First.c</FilePath>
+            </File>
+            <File>
+              <FileName>System_Second.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\inface_2\SYSTEM\System_Second.c</FilePath>
+            </File>
+            <File>
+              <FileName>System_Third.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\inface_2\SYSTEM\System_Third.c</FilePath>
+            </File>
+            <File>
+              <FileName>System_password.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\inface_2\SYSTEM\System_password.c</FilePath>
+            </File>
+            <File>
+              <FileName>Gen_First.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\inface_2\GEN\Gen_First.c</FilePath>
+            </File>
+            <File>
+              <FileName>Gen_Second.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\inface_2\GEN\Gen_Second.c</FilePath>
+            </File>
+            <File>
+              <FileName>Gen_Third.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\inface_2\GEN\Gen_Third.c</FilePath>
+            </File>
+            <File>
+              <FileName>Gen_Four.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\inface_2\GEN\Gen_Four.c</FilePath>
+            </File>
+            <File>
+              <FileName>Gen_Five.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\inface_2\GEN\Gen_Five.c</FilePath>
+            </File>
+            <File>
+              <FileName>Time_First.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\inface_2\TIME\Time_First.c</FilePath>
+            </File>
+            <File>
+              <FileName>Meter.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\inface_2\RTA\Meter.c</FilePath>
+            </File>
+            <File>
+              <FileName>Rta.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\inface_2\RTA\Rta.c</FilePath>
+            </File>
+            <File>
+              <FileName>bmp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\inface_2\BMP\bmp.c</FilePath>
+            </File>
+            <File>
+              <FileName>data.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\inface_2\DATA\data.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>adau1452</GroupName>
+          <Files>
+            <File>
+              <FileName>ADAU1452_DRIVE_IC_1.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\adau1452\src\ADAU1452_DRIVE_IC_1.c</FilePath>
+            </File>
+            <File>
+              <FileName>adau1452_seq.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\adau1452\src\adau1452_seq.c</FilePath>
+            </File>
+            <File>
+              <FileName>ak4612.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\adau1452\src\ak4612.c</FilePath>
+            </File>
+            <File>
+              <FileName>algorithm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\adau1452\src\algorithm.c</FilePath>
+            </File>
+            <File>
+              <FileName>initfiles.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\adau1452\src\initfiles.c</FilePath>
+            </File>
+            <File>
+              <FileName>sigmastudiofw.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\adau1452\src\sigmastudiofw.c</FilePath>
+            </File>
+            <File>
+              <FileName>spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\adau1452\src\spi.c</FilePath>
             </File>
           </Files>
         </Group>

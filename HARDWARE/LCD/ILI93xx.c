@@ -645,7 +645,7 @@ u16 GetPoint(u16 x, u16 y)
 {
 	u16 r;
 	u16 b;
-	u16 g;
+//	u16 g;
 	WriteComm(0x2a);   
 	WriteData(x>>8);
 	WriteData(x&0xff);

@@ -1,5 +1,5 @@
 #include "24c16.h"
-#include "iic.h"
+
 #include "delay.h"
 
 
@@ -107,6 +107,7 @@ u8 AT24C16_PageWrite(u8 *_pWriteBuf,u16 _usAddress,u16 _usSize)
 	}
 	/* 命令执行成功，发送I2C总线停止信号 */
 	IIC_Stop();
+//	delay_ms(10);  //防止连续页写
 	return 1;
 	
 	#else
@@ -205,6 +206,54 @@ u8 AT24C16_PageRead(u8 *_pReadBuf,u16 _usAddress, u16 _usSize)
 
 
 #if yehuo_use
+u8 AT24CXX_ReadOneByte(u16 ReadAddr)
+{				  
+	u8 temp=0;		  	    																 
+    IIC_Start();  
+	if(EE_TYPE>AT24C16)
+	{
+		IIC_SendByte(0XA0);	   //发送写命令
+		IIC_WaitAck();
+		IIC_SendByte(ReadAddr>>8);//发送高地址
+		IIC_WaitAck();		 
+	}else 
+	{
+		IIC_SendByte(0XA0|((ReadAddr/256)<<1));   //发送器件地址0XA0,写数据 	
+	}		
+
+	IIC_WaitAck(); 
+    IIC_SendByte(ReadAddr&255);   //发送低地址
+	IIC_WaitAck();	    
+	IIC_Start();  	 	   
+	IIC_SendByte(0XA1|((ReadAddr/256)<<1));           //进入接收模式			   
+	IIC_WaitAck();	 
+    temp=IIC_ReadByte();	
+	IIC_NAck();	//停止接受数据
+    IIC_Stop();//产生一个停止条件	    
+	return temp;
+}
+
+
+void AT24CXX_WriteOneByte(u16 WriteAddr,u8 DataToWrite)
+{				   	  	    																 
+   IIC_Start();  
+	if(EE_TYPE>AT24C16)
+	{
+		IIC_SendByte(0XA0);	    //发送写命令
+		IIC_WaitAck();
+		IIC_SendByte(WriteAddr>>8);//发送高地址
+ 	}else
+	{
+		IIC_SendByte(0XA0|((WriteAddr/256)<<1));   //发送器件地址0XA0,写数据 
+	}	 
+	IIC_WaitAck();	   
+    IIC_SendByte(WriteAddr&255);   //发送低地址
+	IIC_WaitAck(); 	 										  		   
+	IIC_SendByte(DataToWrite);     //发送字节							   
+	IIC_WaitAck();  		    	   
+    IIC_Stop();//产生一个停止条件 
+	delay_ms(10);	 
+}
 #else
 //在AT24CXX指定地址读出一个数据
 //ReadAddr:开始读数的地址  
